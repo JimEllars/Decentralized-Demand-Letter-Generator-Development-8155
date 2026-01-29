@@ -2,7 +2,7 @@ import React from 'react';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 
 const DocumentPreview = ({ formData, isPaid }) => {
-  const { principal, interest, total, rateUsed } = calculateTotal(
+  const { principal, interest, total, rateUsed, daysOverdue } = calculateTotal(
     formData.items,
     formData.statutoryInterest,
     formData.dueDate,
@@ -38,9 +38,14 @@ const DocumentPreview = ({ formData, isPaid }) => {
       </div>
 
       <div className="text-xs space-y-4">
-        <p className="font-bold border-b border-slate-200 pb-1 text-blue-900 uppercase tracking-tighter">
-          RE: FORMAL DEMAND FOR PAYMENT - JURISDICTION: {formData.jurisdiction}
-        </p>
+        <div className="font-bold border-b border-slate-200 pb-1 text-blue-900 uppercase tracking-tighter flex justify-between items-center">
+          <span>RE: FORMAL DEMAND FOR PAYMENT - JURISDICTION: {formData.jurisdiction}</span>
+          {daysOverdue > 0 && (
+            <span className="text-red-600 bg-red-50 px-2 py-0.5 rounded text-[9px] border border-red-100">
+              {daysOverdue} DAYS OVERDUE
+            </span>
+          )}
+        </div>
         
         <p className="leading-relaxed text-justify">{tone.intro}</p>
 

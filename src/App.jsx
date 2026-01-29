@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiFileText, FiCreditCard, FiDownload, FiTrash2, FiArrowRight } from 'react-icons/fi';
+import { FiFileText, FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import LetterForm from './components/LetterForm';
@@ -9,6 +9,7 @@ import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
 import { processPayment } from './services/paymentService';
 import { calculateTotal, getToneTemplate } from './utils/calculations';
+import { generatePdfDefinition } from './services/pdfGenerator';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
@@ -34,7 +35,20 @@ const App = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
+  // Robust Validation Check
+  const isValid = formData.creditorName?.trim() &&
+                  formData.debtorName?.trim() &&
+                  formData.debtorAddress?.trim() &&
+                  formData.dueDate &&
+                  formData.items && formData.items.length > 0 &&
+                  formData.items.every(i => i.amount && parseFloat(i.amount) > 0);
+
   const handlePayment = async () => {
+    if (!isValid) {
+      alert("Please complete all required fields (marked in red) before unlocking the document.");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       const result = await processPayment(9.00);
@@ -50,7 +64,12 @@ const App = () => {
   };
 
   const handleDownload = () => {
-    const { total, interest, principal, rateUsed } = calculateTotal(
+    if (!isValid) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    const calculatedValues = calculateTotal(
       formData.items,
       formData.statutoryInterest,
       formData.dueDate,
@@ -58,36 +77,7 @@ const App = () => {
     );
     const tone = getToneTemplate(formData.tone);
 
-    const docDefinition = {
-      content: [
-        { text: tone.title, style: 'header', alignment: 'center' },
-        { text: '\n\n' },
-        { columns: [
-          { stack: [{ text: 'FROM:', style: 'label' }, { text: formData.creditorName, bold: true }] },
-          { stack: [{ text: 'DATE:', style: 'label', alignment: 'right' }, { text: new Date().toLocaleDateString(), alignment: 'right' }] }
-        ]},
-        { text: '\n' },
-        { stack: [{ text: 'TO:', style: 'label' }, { text: formData.debtorName, bold: true }, { text: formData.debtorAddress }] },
-        { text: `\nRE: NOTICE OF OVERDUE ACCOUNT (${formData.jurisdiction})`, style: 'subheader' },
-        { text: `\n${tone.intro}` },
-        { text: '\n' },
-        { table: { widths: ['*', 'auto'], body: [
-          [{ text: 'Description', bold: true }, { text: 'Amount', bold: true }],
-          ...formData.items.map(i => [i.description, `$${parseFloat(i.amount || 0).toFixed(2)}`]),
-          [{ text: `Statutory Interest (${rateUsed}%)`, italic: true }, `$${interest}`],
-          [{ text: 'TOTAL DUE', bold: true, fillColor: '#f1f5f9' }, { text: `$${total}`, bold: true, fillColor: '#f1f5f9' }]
-        ]}},
-        { text: `\nPayment must be received by ${formData.dueDate || 'immediately'}. ${tone.closing}` },
-        { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName },
-        { text: '\n\nGenerated via AXiM Documents Automation', style: 'footer', alignment: 'center' }
-      ],
-      styles: { 
-        header: { fontSize: 16, bold: true, color: '#1e3a8a' }, 
-        subheader: { fontSize: 12, bold: true }, 
-        label: { fontSize: 8, color: 'grey' },
-        footer: { fontSize: 8, color: '#cccccc', margin: [0, 50, 0, 0] }
-      }
-    };
+    const docDefinition = generatePdfDefinition(formData, calculatedValues, tone);
     pdfMake.createPdf(docDefinition).download(`AXiM_Demand_${formData.jurisdiction}.pdf`);
   };
 
@@ -115,13 +105,29 @@ const App = () => {
               </div>
             )}
             <DocumentPreview formData={formData} isPaid={isPaid} />
+
             <div className="mt-6 space-y-3">
+              {!isValid && (
+                <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-2 rounded-lg text-xs flex items-center gap-2">
+                  <SafeIcon icon={FiAlertCircle} />
+                  Please complete all required fields to unlock/download.
+                </div>
+              )}
+
               {isPaid ? (
-                <button onClick={handleDownload} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+                <button
+                  onClick={handleDownload}
+                  disabled={!isValid}
+                  className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-600 text-slate-400 cursor-not-allowed'}`}
+                >
                   <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
                 </button>
               ) : (
-                <button onClick={() => setShowPaymentModal(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all transform hover:scale-[1.01] active:scale-[0.99]">
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  disabled={!isValid}
+                  className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-700 text-slate-500 cursor-not-allowed'}`}
+                >
                   <SafeIcon icon={FiCreditCard} /> UNLOCK FOR $9.00
                 </button>
               )}
