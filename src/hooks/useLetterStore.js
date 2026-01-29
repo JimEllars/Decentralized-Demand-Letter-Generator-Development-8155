@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const STORAGE_KEY = 'axim_demand_letter_draft';
+const STORAGE_KEY = 'axim_demand_letter_draft_v2';
 
 export const useLetterStore = (initialData) => {
   const [formData, setFormData] = useState(() => {
