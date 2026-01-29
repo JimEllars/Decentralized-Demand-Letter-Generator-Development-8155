@@ -3,12 +3,13 @@ import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus, FiTrash2 } from 'reac
 import FormSection from './FormSection';
 import SafeIcon from '../common/SafeIcon';
 import { STATE_NAMES, STATE_INTEREST_RATES } from '../utils/constants';
+import { generateId } from '../utils/helpers';
 
 const LetterForm = ({ formData, onUpdate }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
   const handleAddItem = () => {
-    const newItems = [...(formData.items || []), { description: '', amount: '' }];
+    const newItems = [...(formData.items || []), { id: generateId(), description: '', amount: '' }];
     onUpdate('items', newItems);
   };
 
@@ -92,7 +93,7 @@ const LetterForm = ({ formData, onUpdate }) => {
       <FormSection title="Itemized Debt Specifics" icon={FiDollarSign}>
         <div className="space-y-3">
           {(formData.items || []).map((item, index) => (
-            <div key={index} className="flex gap-2 items-start">
+            <div key={item.id || index} className="flex gap-2 items-start">
               <input 
                 placeholder="Description (e.g. Invoice #101)" 
                 value={item.description} 
