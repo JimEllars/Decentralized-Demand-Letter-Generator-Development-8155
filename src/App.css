@@ -23,8 +23,13 @@
   background: #94a3b8;
 }
 
-/* Smooth transitions */
-* {
+/* Smooth transitions - Applied only to interactive elements for performance */
+button,
+a,
+input,
+select,
+textarea,
+.transition-all {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
