@@ -59,7 +59,7 @@ const DocumentPreview = ({ formData, isPaid }) => {
             </thead>
             <tbody className="divide-y divide-slate-200">
               {(formData.items || []).map((item, i) => (
-                <tr key={item.id || i}>
+                <tr key={item.id}>
                   <td className="px-3 py-2">{item.description || 'General Debt'}</td>
                   <td className="px-3 py-2 text-right font-mono">${parseFloat(item.amount || 0).toFixed(2)}</td>
                 </tr>
