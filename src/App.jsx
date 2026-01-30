@@ -12,6 +12,7 @@ import { calculateTotal, getToneTemplate } from './utils/calculations';
 import { generatePdfDefinition } from './services/pdfGenerator';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { generateId } from './utils/helpers';
 
 if (pdfMake.vfs === undefined && pdfFonts && pdfFonts.pdfMake) {
   pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -24,7 +25,7 @@ const initialFormState = {
   creditorAddress: '',
   debtorName: '',
   debtorAddress: '',
-  items: [{ description: 'Main Service Debt', amount: '' }],
+  items: [{ id: generateId(), description: 'Main Service Debt', amount: '' }],
   dueDate: '',
   statutoryInterest: '0',
 };
