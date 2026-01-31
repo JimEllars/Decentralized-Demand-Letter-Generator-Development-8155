@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFileText, FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
@@ -35,6 +35,16 @@ const App = () => {
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  useEffect(() => {
+    // Check for payment success parameter from Stripe redirect
+    const query = new URLSearchParams(window.location.search);
+    if (query.get('paid') === 'true') {
+      setIsPaid(true);
+      // Clean up the URL without refreshing
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   // Robust Validation Check
   const isValid = formData.creditorName?.trim() &&

@@ -2,15 +2,55 @@
  * AXiM Payment Bridge
  * 
  * To integrate a real provider:
- * 1. Install their SDK (npm install @stripe/stripe-js)
- * 2. Replace the simulation logic below with their checkout flow.
+ * 1. Set VITE_PAYMENT_API_URL in your .env file.
+ * 2. The backend should return { url: 'https://checkout.stripe.com/...' } or { success: true }.
  */
 
 export const processPayment = async (amount) => {
+  const paymentApiUrl = import.meta.env.VITE_PAYMENT_API_URL;
+
+  if (paymentApiUrl) {
+    try {
+      console.log(`AXiM Bridge: Initiating secure transaction for $${amount} via ${paymentApiUrl}...`);
+
+      const response = await fetch(`${paymentApiUrl}/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create payment session');
+      }
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        console.log("Redirecting to payment provider...");
+        window.location.href = data.url;
+
+        // Return a promise that never resolves to prevent UI state changes during redirect
+        return new Promise(() => {});
+      } else if (data.success) {
+        return data;
+      } else {
+        throw new Error('Invalid response from payment provider');
+      }
+
+    } catch (error) {
+      console.error("Payment Service Error:", error);
+      // If a real backend is configured but fails, we throw to alert the user
+      // instead of silently falling back to mock (which would give free access).
+      throw error;
+    }
+  }
+
+  // Fallback: Simulation Mode (No Backend Configured)
   return new Promise((resolve, reject) => {
-    // This is where you would call your backend to create a Stripe Checkout Session
-    // or initialize a PayPal button.
-    console.log(`AXiM Bridge: Initiating secure transaction for $${amount}...`);
+    console.log(`AXiM Bridge: Initiating simulated transaction for $${amount}...`);
     
     setTimeout(() => {
       // Simulate a successful response from a payment provider
