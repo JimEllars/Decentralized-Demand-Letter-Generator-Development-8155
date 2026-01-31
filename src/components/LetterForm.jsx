@@ -5,6 +5,12 @@ import SafeIcon from '../common/SafeIcon';
 import { STATE_NAMES, STATE_INTEREST_RATES } from '../utils/constants';
 import { generateId } from '../utils/helpers';
 
+// Sort states alphabetically by name
+const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].localeCompare(STATE_NAMES[b])).map(code => ({
+  code,
+  name: `${STATE_NAMES[code]} (${STATE_INTEREST_RATES[code]}%)`
+}));
+
 const LetterForm = ({ formData, onUpdate }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
@@ -23,12 +29,6 @@ const LetterForm = ({ formData, onUpdate }) => {
     newItems[index][field] = value;
     onUpdate('items', newItems);
   };
-
-  // Sort states alphabetically by name
-  const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].localeCompare(STATE_NAMES[b])).map(code => ({
-    code,
-    name: `${STATE_NAMES[code]} (${STATE_INTEREST_RATES[code]}%)`
-  }));
 
   const getInputClass = (value, required = false) => {
     const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
