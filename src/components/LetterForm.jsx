@@ -15,6 +15,7 @@ const LetterForm = ({ formData, onUpdate }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
   const handleAddItem = () => {
+    // Generate unique ID for new item to ensure stable rendering
     const newItems = [...(formData.items || []), { id: generateId(), description: '', amount: '' }];
     onUpdate('items', newItems);
   };
@@ -25,8 +26,9 @@ const LetterForm = ({ formData, onUpdate }) => {
   };
 
   const handleItemChange = (index, field, value) => {
-    const newItems = [...formData.items];
-    newItems[index][field] = value;
+    const newItems = formData.items.map((item, i) =>
+      i === index ? { ...item, [field]: value } : item
+    );
     onUpdate('items', newItems);
   };
 
@@ -93,7 +95,7 @@ const LetterForm = ({ formData, onUpdate }) => {
       <FormSection title="Itemized Debt Specifics" icon={FiDollarSign}>
         <div className="space-y-3">
           {(formData.items || []).map((item, index) => (
-            <div key={item.id || index} className="flex gap-2 items-start">
+            <div key={item.id} className="flex gap-2 items-start">
               <input 
                 placeholder="Description (e.g. Invoice #101)" 
                 value={item.description} 
