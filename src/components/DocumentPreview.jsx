@@ -9,9 +9,8 @@ const DocumentPreview = ({ formData }) => {
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm whitespace-nowrap">
           <tbody className="divide-y divide-slate-200">
-            {(formData.items || []).map((item, i) => (
-              // Optimization: Use item.id as key instead of index to improve rendering performance and avoid reconciliation issues
-              <tr key={item.id || i}>
+            {(formData.items || []).map((item) => (
+              <tr key={item.id}>
                 <td className="px-3 py-2 text-slate-700">{item.description || 'General Debt'}</td>
                 <td className="px-3 py-2 text-right text-slate-600 font-medium">
                   {item.amount ? `$${item.amount}` : '-'}
