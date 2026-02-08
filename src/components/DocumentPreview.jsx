@@ -2,7 +2,7 @@ import React from 'react';
 
 const DocumentPreview = ({ formData }) => {
   return (
-    <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-lg shadow-sm mt-6">
+    <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-lg shadow-sm">
       <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Document Preview</h3>
       </div>
