@@ -4,6 +4,7 @@ import { FiFileText, FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCi
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import LetterForm from './components/LetterForm';
+import DocumentPreview from './components/DocumentPreview';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
 import { processPayment } from './services/paymentService';
@@ -136,6 +137,11 @@ const App = () => {
             </button>
           </div>
           <LetterForm formData={formData} onUpdate={updateField} />
+        </motion.section>
+
+        {/* Live Document Preview */}
+        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+          <DocumentPreview formData={formData} />
         </motion.section>
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
