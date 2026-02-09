@@ -24,7 +24,8 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create payment session');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to create payment session');
     }
 
     const data = await response.json();
@@ -49,6 +50,15 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
   }
 };
 
+/**
+ * Processes a payment for the specified amount.
+ *
+ * If VITE_PAYMENT_API_URL is configured, it initiates a real transaction.
+ * Otherwise, it falls back to a simulation mode for development/demo.
+ *
+ * @param {number} amount - The amount to charge (e.g., 9.00).
+ * @returns {Promise<{success: boolean, transactionId?: string} | never>}
+ */
 export const processPayment = async (amount) => {
   const paymentApiUrl = import.meta.env.VITE_PAYMENT_API_URL;
 
