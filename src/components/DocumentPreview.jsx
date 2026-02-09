@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DocumentPreview = ({ formData }) => {
+const DocumentPreview = React.memo(({ items = [] }) => {
   return (
     <div className="w-full overflow-hidden bg-white border border-slate-200 rounded-lg shadow-sm">
       <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
@@ -9,7 +9,7 @@ const DocumentPreview = ({ formData }) => {
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm whitespace-nowrap">
           <tbody className="divide-y divide-slate-200">
-            {(formData.items || []).map((item) => (
+            {items.map((item) => (
               <tr key={item.id}>
                 <td className="px-3 py-2 text-slate-700">{item.description || 'General Debt'}</td>
                 <td className="px-3 py-2 text-right text-slate-600 font-medium">
@@ -22,6 +22,6 @@ const DocumentPreview = ({ formData }) => {
       </div>
     </div>
   );
-};
+});
 
 export default DocumentPreview;
