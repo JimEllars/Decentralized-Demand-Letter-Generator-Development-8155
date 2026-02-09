@@ -26,7 +26,13 @@ export const useLetterStore = (initialData) => {
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    const handler = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
   }, [formData]);
 
   const updateField = (name, value) => {
