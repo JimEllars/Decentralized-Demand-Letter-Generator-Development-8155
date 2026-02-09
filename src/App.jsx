@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiFileText, FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiCheckCircle, FiEdit3, FiLock } from 'react-icons/fi';
+import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit3, FiLock } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import LetterForm from './components/LetterForm';
@@ -141,7 +141,7 @@ const App = () => {
 
         {/* Live Document Preview */}
         <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <DocumentPreview formData={formData} />
+          <DocumentPreview items={formData.items} />
         </motion.section>
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
