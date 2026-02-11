@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.7.0",
     "date-fns": "4.1.0",
     "framer-motion": "^11.0.8",
     "pdfmake": "^0.2.10",
