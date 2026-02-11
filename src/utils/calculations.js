@@ -1,13 +1,19 @@
 import { differenceInCalendarDays, parseISO, startOfToday } from 'date-fns';
-import { STATE_INTEREST_RATES, TONE_TEMPLATES } from './constants';
+import { STATE_INTEREST_RATES, TONE_TEMPLATES } from './constants.js';
 
 /**
  * AXiM Statutory Interest & Calculation Engine
  */
 
-export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT') => {
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2
+});
+
+export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null) => {
   // Calculate Principal from itemized list
-  const principal = items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+  const principal = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   
   // Determine Rate
   const r = (parseFloat(interestRate) > 0) 
@@ -19,10 +25,12 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
 
   if (dueDate && principal > 0) {
     const due = parseISO(dueDate);
-    const now = startOfToday();
+    // Use letterDate if provided, otherwise default to today
+    const end = letterDate ? parseISO(letterDate) : startOfToday();
 
     // Calculate difference in calendar days
-    const diff = differenceInCalendarDays(now, due);
+    // If letterDate is before dueDate, diff will be negative or zero, handled by diff > 0 check
+    const diff = differenceInCalendarDays(end, due);
 
     if (diff > 0) {
       diffDays = diff;
@@ -32,10 +40,15 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
     }
   }
 
+  const total = principal + interest;
+
   return {
     principal: principal,
-    interest: interest.toFixed(2),
-    total: (principal + parseFloat(interest)).toFixed(2),
+    interest: interest,
+    total: total,
+    formattedPrincipal: currencyFormatter.format(principal),
+    formattedInterest: currencyFormatter.format(interest),
+    formattedTotal: currencyFormatter.format(total),
     rateUsed: (r * 100).toFixed(2),
     daysOverdue: diffDays
   };

@@ -7,6 +7,7 @@ import LetterForm from './components/LetterForm';
 import DocumentPreview from './components/DocumentPreview';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
+import { useToast } from './contexts/ToastContext';
 import { processPayment } from './services/paymentService';
 import { calculateTotal, getToneTemplate } from './utils/calculations';
 import { generatePdfDefinition } from './services/pdfGenerator';
@@ -21,11 +22,13 @@ const initialFormState = {
   debtorAddress: '',
   items: [{ id: generateId(), description: 'Main Service Debt', amount: '' }],
   dueDate: '',
+  letterDate: new Date().toISOString().split('T')[0],
   statutoryInterest: '0',
 };
 
 const App = () => {
   const { formData, updateField, resetForm } = useLetterStore(initialFormState);
+  const toast = useToast();
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -35,6 +38,7 @@ const App = () => {
     const query = new URLSearchParams(window.location.search);
     if (query.get('paid') === 'true') {
       setIsPaid(true);
+      toast.success("Payment successful! You can now download your document.");
       // Clean up the URL without refreshing
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -45,12 +49,13 @@ const App = () => {
                   formData.debtorName?.trim() &&
                   formData.debtorAddress?.trim() &&
                   formData.dueDate &&
+                  formData.letterDate &&
                   formData.items && formData.items.length > 0 &&
                   formData.items.every(i => i.amount && parseFloat(i.amount) > 0);
 
   const handlePayment = async () => {
     if (!isValid) {
-      alert("Please complete all required fields (marked in red) before unlocking the document.");
+      toast.error("Please complete all required fields (marked in red) before unlocking the document.");
       return;
     }
 
@@ -60,9 +65,10 @@ const App = () => {
       if (result.success) {
         setIsPaid(true);
         setShowPaymentModal(false);
+        toast.success("Payment successful!");
       }
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setIsProcessing(false);
     }
@@ -70,7 +76,7 @@ const App = () => {
 
   const handleDownload = async () => {
     if (!isValid) {
-      alert("Please complete all required fields.");
+      toast.error("Please complete all required fields.");
       return;
     }
 
@@ -78,7 +84,8 @@ const App = () => {
       formData.items,
       formData.statutoryInterest,
       formData.dueDate,
-      formData.jurisdiction
+      formData.jurisdiction,
+      formData.letterDate
     );
     const tone = getToneTemplate(formData.tone);
     const docDefinition = generatePdfDefinition(formData, calculatedValues, tone);
@@ -95,9 +102,10 @@ const App = () => {
       }
 
       pdfMake.createPdf(docDefinition).download(`AXiM_Demand_${formData.jurisdiction}.pdf`);
+      toast.success("Download started!");
     } catch (error) {
       console.error('Failed to load PDF generator:', error);
-      alert('Failed to generate PDF. Please try again.');
+      toast.error('Failed to generate PDF. Please try again.');
     }
   };
 
