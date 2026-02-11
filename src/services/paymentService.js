@@ -1,10 +1,18 @@
+import { loadStripe } from '@stripe/stripe-js';
+
 /**
  * AXiM Payment Bridge
  * 
  * To integrate a real provider:
  * 1. Set VITE_PAYMENT_API_URL in your .env file.
- * 2. The backend should return { url: 'https://checkout.stripe.com/...' } or { success: true }.
+ * 2. Set VITE_STRIPE_PUBLISHABLE_KEY in your .env file (optional, but recommended for client-side redirection).
+ * 3. The backend should return { sessionId: 'cs_test_...' } or { url: 'https://checkout.stripe.com/...' } or { success: true }.
  */
+
+// Initialize Stripe if a key is provided
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 /**
  * Initiates a transaction via the configured backend.
@@ -30,9 +38,23 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
 
     const data = await response.json();
 
-    if (data.url) {
-      // Redirect to Stripe Checkout
-      console.log("Redirecting to payment provider...");
+    if (data.sessionId && stripePromise) {
+       // Redirect using Stripe SDK
+       console.log("Redirecting to Stripe Checkout via SDK...");
+       const stripe = await stripePromise;
+       if (!stripe) {
+         throw new Error("Stripe SDK failed to load.");
+       }
+       const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+       if (error) {
+         throw error;
+       }
+       // Return a promise that never resolves to prevent UI state changes during redirect
+       return new Promise(() => {});
+
+    } else if (data.url) {
+      // Redirect to Stripe Checkout via URL
+      console.log("Redirecting to payment provider via URL...");
       window.location.href = data.url;
 
       // Return a promise that never resolves to prevent UI state changes during redirect
@@ -40,7 +62,7 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
     } else if (data.success) {
       return data;
     } else {
-      throw new Error('Invalid response from payment provider');
+      throw new Error('Invalid response from payment provider: Missing sessionId or url');
     }
   } catch (error) {
     console.error("Payment Service Error:", error);
