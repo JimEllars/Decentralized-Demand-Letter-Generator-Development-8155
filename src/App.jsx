@@ -10,13 +10,7 @@ import { useLetterStore } from './hooks/useLetterStore';
 import { processPayment } from './services/paymentService';
 import { calculateTotal, getToneTemplate } from './utils/calculations';
 import { generatePdfDefinition } from './services/pdfGenerator';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { generateId } from './utils/helpers';
-
-if (pdfMake.vfs === undefined && pdfFonts && pdfFonts.pdfMake) {
-  pdfMake.vfs = pdfFonts.pdfMake.vfs;
-}
 
 const initialFormState = {
   jurisdiction: 'CA',
@@ -74,7 +68,7 @@ const App = () => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!isValid) {
       alert("Please complete all required fields.");
       return;
@@ -87,9 +81,24 @@ const App = () => {
       formData.jurisdiction
     );
     const tone = getToneTemplate(formData.tone);
-
     const docDefinition = generatePdfDefinition(formData, calculatedValues, tone);
-    pdfMake.createPdf(docDefinition).download(`AXiM_Demand_${formData.jurisdiction}.pdf`);
+
+    try {
+      const pdfMakeModule = await import('pdfmake/build/pdfmake');
+      const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
+      // Handle both ESM and CJS exports
+      const pdfMake = pdfMakeModule.default || pdfMakeModule;
+      const pdfFonts = pdfFontsModule.default || pdfFontsModule;
+
+      if (pdfMake.vfs === undefined && pdfFonts && pdfFonts.pdfMake) {
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
+      }
+
+      pdfMake.createPdf(docDefinition).download(`AXiM_Demand_${formData.jurisdiction}.pdf`);
+    } catch (error) {
+      console.error('Failed to load PDF generator:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   return (
