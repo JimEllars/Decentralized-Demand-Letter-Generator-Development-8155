@@ -1,23 +1,43 @@
 
 /**
+ * Shared formatters and cache to improve performance
+ */
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2
+});
+
+const dateFormatter = new Intl.DateTimeFormat(undefined);
+const dateCache = new Map();
+
+/**
  * Helper to format currency
  */
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2
-  }).format(amount);
+  return currencyFormatter.format(amount);
 };
 
 /**
  * Helper to format date YYYY-MM-DD to Locale Date String
  */
 const formatDate = (dateString) => {
-  if (!dateString) return new Date().toLocaleDateString();
-  // Append time to ensure local timezone parsing, or just parse components
+  if (!dateString) return dateFormatter.format(new Date());
+
+  const cached = dateCache.get(dateString);
+  if (cached) return cached;
+
   const [year, month, day] = dateString.split('-');
-  return new Date(year, month - 1, day).toLocaleDateString();
+  const date = new Date(year, month - 1, day);
+
+  // Guard against invalid dates to match original toLocaleDateString() behavior
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+
+  const formatted = dateFormatter.format(date);
+  dateCache.set(dateString, formatted);
+  return formatted;
 };
 
 /**
