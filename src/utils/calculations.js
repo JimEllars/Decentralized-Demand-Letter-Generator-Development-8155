@@ -1,15 +1,10 @@
 import { differenceInCalendarDays, parseISO, startOfToday } from 'date-fns';
 import { STATE_INTEREST_RATES, TONE_TEMPLATES } from './constants.js';
+import { formatCurrency } from './formatters.js';
 
 /**
  * AXiM Statutory Interest & Calculation Engine
  */
-
-const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2
-});
 
 export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null) => {
   // Calculate Principal from itemized list
@@ -46,9 +41,9 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
     principal: principal,
     interest: interest,
     total: total,
-    formattedPrincipal: currencyFormatter.format(principal),
-    formattedInterest: currencyFormatter.format(interest),
-    formattedTotal: currencyFormatter.format(total),
+    formattedPrincipal: formatCurrency(principal),
+    formattedInterest: formatCurrency(interest),
+    formattedTotal: formatCurrency(total),
     rateUsed: (r * 100).toFixed(2),
     daysOverdue: diffDays
   };

@@ -1,22 +1,11 @@
 
+import { formatCurrency } from '../utils/formatters.js';
+
 /**
  * Shared formatters and cache to improve performance
  */
-const currencyFormatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2
-});
-
 const dateFormatter = new Intl.DateTimeFormat(undefined);
 const dateCache = new Map();
-
-/**
- * Helper to format currency
- */
-const formatCurrency = (amount) => {
-  return currencyFormatter.format(amount);
-};
 
 /**
  * Helper to format date YYYY-MM-DD to Locale Date String
