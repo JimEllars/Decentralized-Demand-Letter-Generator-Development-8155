@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit3, FiLock } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
@@ -45,13 +45,15 @@ const App = () => {
   }, []);
 
   // Robust Validation Check
-  const isValid = formData.creditorName?.trim() &&
-                  formData.debtorName?.trim() &&
-                  formData.debtorAddress?.trim() &&
-                  formData.dueDate &&
-                  formData.letterDate &&
-                  formData.items && formData.items.length > 0 &&
-                  formData.items.every(i => i.amount && parseFloat(i.amount) > 0);
+  const isValid = useMemo(() => {
+    return formData.creditorName?.trim() &&
+           formData.debtorName?.trim() &&
+           formData.debtorAddress?.trim() &&
+           formData.dueDate &&
+           formData.letterDate &&
+           formData.items && formData.items.length > 0 &&
+           formData.items.every(i => i.amount && parseFloat(i.amount) > 0);
+  }, [formData]);
 
   const handlePayment = async () => {
     if (!isValid) {
