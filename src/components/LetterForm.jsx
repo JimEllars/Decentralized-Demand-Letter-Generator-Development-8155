@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, memo } from 'react';
 import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
@@ -12,7 +12,7 @@ const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].loca
   name: `${STATE_NAMES[code]} (${STATE_INTEREST_RATES[code]}%)`
 }));
 
-const LetterForm = ({ formData, onUpdate }) => {
+const LetterForm = memo(({ formData, onUpdate }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
   // Keep latest items in ref to stabilize handlers
@@ -184,6 +184,8 @@ const LetterForm = ({ formData, onUpdate }) => {
       </FormSection>
     </div>
   );
-};
+});
+
+LetterForm.displayName = 'LetterForm';
 
 export default LetterForm;
