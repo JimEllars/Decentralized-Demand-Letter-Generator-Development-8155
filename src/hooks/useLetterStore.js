@@ -4,7 +4,10 @@ import { generateId } from '../utils/helpers';
 const STORAGE_KEY = 'axim_demand_letter_draft_v2';
 
 export const useLetterStore = (initialData) => {
-  const [formData, setFormData] = useState(() => {
+  const [formData, setFormData] = useState(initialData);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -16,16 +19,18 @@ export const useLetterStore = (initialData) => {
             id: item.id || generateId()
           }));
         }
-        return parsed;
+        setFormData(parsed);
       } catch (error) {
         console.error('Failed to parse saved state:', error);
-        return initialData;
       }
     }
-    return initialData;
-  });
+    setIsInitialized(true);
+  }, []);
 
   useEffect(() => {
+    // Only save if data has been initialized from storage
+    if (!isInitialized) return;
+
     const handler = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     }, 500);
@@ -33,7 +38,7 @@ export const useLetterStore = (initialData) => {
     return () => {
       clearTimeout(handler);
     };
-  }, [formData]);
+  }, [formData, isInitialized]);
 
   const updateField = useCallback((name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -44,5 +49,5 @@ export const useLetterStore = (initialData) => {
     localStorage.removeItem(STORAGE_KEY);
   }, [initialData]);
 
-  return { formData, updateField, resetForm };
+  return { formData, updateField, resetForm, isInitialized };
 };
