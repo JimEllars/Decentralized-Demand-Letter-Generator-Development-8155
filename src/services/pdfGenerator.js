@@ -25,6 +25,12 @@ const formatDate = (dateString) => {
   }
 
   const formatted = dateFormatter.format(date);
+
+  if (dateCache.size >= 1000) {
+    const firstKey = dateCache.keys().next().value;
+    dateCache.delete(firstKey);
+  }
+
   dateCache.set(dateString, formatted);
   return formatted;
 };
