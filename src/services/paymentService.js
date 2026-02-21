@@ -38,32 +38,37 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
 
     const data = await response.json();
 
+    // Prioritize Stripe.js redirection if configured and sessionId is present
     if (data.sessionId && stripePromise) {
-       // Redirect using Stripe SDK
        console.log("Redirecting to Stripe Checkout via SDK...");
        const stripe = await stripePromise;
-       if (!stripe) {
-         throw new Error("Stripe SDK failed to load.");
+       if (stripe) {
+         const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+         if (error) {
+           throw error;
+         }
+         // Return a promise that never resolves to prevent UI state changes during redirect
+         return new Promise(() => {});
        }
-       const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-       if (error) {
-         throw error;
-       }
-       // Return a promise that never resolves to prevent UI state changes during redirect
-       return new Promise(() => {});
+    }
 
-    } else if (data.url) {
-      // Redirect to Stripe Checkout via URL
+    // Fallback to URL redirection (also handles case where sessionId is present but key is missing)
+    if (data.url) {
       console.log("Redirecting to payment provider via URL...");
       window.location.href = data.url;
-
-      // Return a promise that never resolves to prevent UI state changes during redirect
       return new Promise(() => {});
-    } else if (data.success) {
-      return data;
-    } else {
-      throw new Error('Invalid response from payment provider: Missing sessionId or url');
     }
+
+    // If sessionId was provided but we couldn't use it, and no URL fallback
+    if (data.sessionId && !stripePromise) {
+       throw new Error("Backend returned a session ID, but VITE_STRIPE_PUBLISHABLE_KEY is not configured in the frontend.");
+    }
+
+    if (data.success) {
+      return data;
+    }
+
+    throw new Error('Invalid response from payment provider: Missing sessionId or url');
   } catch (error) {
     console.error("Payment Service Error:", error);
     // If a real backend is configured but fails, we throw to alert the user
