@@ -1,6 +1,7 @@
-import React from 'react';
-import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus, FiTrash2 } from 'react-icons/fi';
+import React, { useCallback, useRef } from 'react';
+import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
+import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
 import { STATE_NAMES, STATE_INTEREST_RATES } from '../utils/constants';
 import { generateId } from '../utils/helpers';
@@ -14,23 +15,27 @@ const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].loca
 const LetterForm = ({ formData, onUpdate }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
-  const handleAddItem = () => {
+  // Keep latest items in ref to stabilize handlers
+  const itemsRef = useRef(formData.items);
+  itemsRef.current = formData.items;
+
+  const handleAddItem = useCallback(() => {
     // Generate unique ID for new item to ensure stable rendering
-    const newItems = [...(formData.items || []), { id: generateId(), description: '', amount: '' }];
+    const newItems = [...(itemsRef.current || []), { id: generateId(), description: '', amount: '' }];
     onUpdate('items', newItems);
-  };
+  }, [onUpdate]);
 
-  const handleRemoveItem = (index) => {
-    const newItems = formData.items.filter((_, i) => i !== index);
+  const handleRemoveItem = useCallback((index) => {
+    const newItems = itemsRef.current.filter((_, i) => i !== index);
     onUpdate('items', newItems);
-  };
+  }, [onUpdate]);
 
-  const handleItemChange = (index, field, value) => {
-    const newItems = formData.items.map((item, i) =>
+  const handleItemChange = useCallback((index, field, value) => {
+    const newItems = itemsRef.current.map((item, i) =>
       i === index ? { ...item, [field]: value } : item
     );
     onUpdate('items', newItems);
-  };
+  }, [onUpdate]);
 
   const getInputClass = (value, required = false) => {
     const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
@@ -148,32 +153,14 @@ const LetterForm = ({ formData, onUpdate }) => {
       <FormSection title="Itemized Debt Specifics" icon={FiDollarSign}>
         <div className="space-y-3">
           {(formData.items || []).map((item, index) => (
-            <div key={item.id} className="flex gap-2 items-start">
-              <div className="flex-grow">
-                 <input
-                  aria-label={`Description for item ${index + 1}`}
-                  placeholder="Description (e.g. Invoice #101)"
-                  value={item.description}
-                  onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
-              <div className="flex flex-col w-24">
-                <input
-                  aria-label={`Amount for item ${index + 1}`}
-                  type="number"
-                  placeholder="0.00"
-                  value={item.amount}
-                  onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${!item.amount ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
-                />
-              </div>
-              {formData.items.length > 1 && (
-                <button onClick={() => handleRemoveItem(index)} className="p-2 text-slate-400 hover:text-red-500" aria-label="Remove item">
-                  <SafeIcon icon={FiTrash2} />
-                </button>
-              )}
-            </div>
+            <LetterItem
+              key={item.id}
+              item={item}
+              index={index}
+              onChange={handleItemChange}
+              onRemove={handleRemoveItem}
+              showRemove={formData.items.length > 1}
+            />
           ))}
           <button 
             onClick={handleAddItem}

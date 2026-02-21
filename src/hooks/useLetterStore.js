@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { generateId } from '../utils/helpers';
 
 const STORAGE_KEY = 'axim_demand_letter_draft_v2';
@@ -35,14 +35,14 @@ export const useLetterStore = (initialData) => {
     };
   }, [formData]);
 
-  const updateField = (name, value) => {
+  const updateField = useCallback((name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData(initialData);
     localStorage.removeItem(STORAGE_KEY);
-  };
+  }, [initialData]);
 
   return { formData, updateField, resetForm };
 };
