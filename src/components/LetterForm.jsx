@@ -37,6 +37,23 @@ const LetterForm = memo(({ formData, onUpdate }) => {
     onUpdate('items', newItems);
   }, [onUpdate]);
 
+  const handleSetToday = useCallback((field) => {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    onUpdate(field, `${year}-${month}-${day}`);
+  }, [onUpdate]);
+
+  const handleSetPastDate = useCallback((field, days) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    onUpdate(field, `${year}-${month}-${day}`);
+  }, [onUpdate]);
+
   const getInputClass = (value, required = false) => {
     const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
     if (required && !value) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
@@ -98,9 +115,18 @@ const LetterForm = memo(({ formData, onUpdate }) => {
         </div>
 
          <div className="space-y-1 mt-4">
-            <label htmlFor="letterDate" className="text-[10px] font-bold text-slate-400 uppercase">
-              Letter Date
-            </label>
+            <div className="flex justify-between items-center">
+                <label htmlFor="letterDate" className="text-[10px] font-bold text-slate-400 uppercase">
+                Letter Date
+                </label>
+                <button
+                  onClick={() => handleSetToday('letterDate')}
+                  className="text-[10px] text-blue-500 hover:text-blue-700 font-bold uppercase transition-colors"
+                  type="button"
+                >
+                  Set to Today
+                </button>
+            </div>
             <input
               id="letterDate"
               type="date"
@@ -175,7 +201,16 @@ const LetterForm = memo(({ formData, onUpdate }) => {
           </button>
         </div>
         <div className="pt-4 space-y-2">
-          <label htmlFor="dueDate" className="text-[10px] font-bold text-slate-400 uppercase">Original Due Date</label>
+          <div className="flex justify-between items-center">
+            <label htmlFor="dueDate" className="text-[10px] font-bold text-slate-400 uppercase">Original Due Date</label>
+            <button
+                onClick={() => handleSetPastDate('dueDate', 30)}
+                className="text-[10px] text-blue-500 hover:text-blue-700 font-bold uppercase transition-colors"
+                type="button"
+            >
+                Set to 30 Days Ago
+            </button>
+          </div>
           <input
             id="dueDate"
             name="dueDate"
