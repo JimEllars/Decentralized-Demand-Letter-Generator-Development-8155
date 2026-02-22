@@ -81,8 +81,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
         { text: STATE_SPECIFIC_CLAUSES[formData.jurisdiction].text, style: 'small', italics: true }
       ] : []),
 
-      { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName },
-      { text: '\n\nGenerated via AXiM Documents Automation', style: 'footer', alignment: 'center' }
+      { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName }
     ],
     styles: {
       header: { fontSize: 16, bold: true, color: '#1e3a8a' },
