@@ -1,18 +1,4 @@
 
-export const STATE_INTEREST_RATES = {
-  'AL': 7.5, 'AK': 10.5, 'AZ': 10.0, 'AR': 6.0, 'CA': 10.0,
-  'CO': 8.0, 'CT': 8.0, 'DE': 5.0, 'DC': 6.0, 'FL': 4.75,
-  'GA': 7.0, 'HI': 10.0, 'ID': 12.0, 'IL': 5.0, 'IN': 8.0,
-  'IA': 5.0, 'KS': 10.0, 'KY': 6.0, 'LA': 5.0, 'ME': 6.0,
-  'MD': 6.0, 'MA': 12.0, 'MI': 5.0, 'MN': 4.0, 'MS': 8.0,
-  'MO': 9.0, 'MT': 10.0, 'NE': 12.0, 'NV': 5.25, 'NH': 5.0,
-  'NJ': 2.5, 'NM': 8.75, 'NY': 9.0, 'NC': 8.0, 'ND': 6.5,
-  'OH': 5.0, 'OK': 6.0, 'OR': 9.0, 'PA': 6.0, 'RI': 12.0,
-  'SC': 7.25, 'SD': 10.0, 'TN': 10.0, 'TX': 6.0, 'UT': 10.0,
-  'VT': 12.0, 'VA': 6.0, 'WA': 12.0, 'WV': 7.0, 'WI': 5.0,
-  'WY': 7.0, 'DEFAULT': 6.0
-};
-
 export const STATE_NAMES = {
   'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
   'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'DC': 'District of Columbia', 'FL': 'Florida',
@@ -26,6 +12,65 @@ export const STATE_NAMES = {
   'VT': 'Vermont', 'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin',
   'WY': 'Wyoming'
 };
+
+export const STATE_LEGAL_DETAILS = {
+  'AL': { rate: 7.5, statute: 'Ala. Code § 8-8-10' },
+  'AK': { rate: 10.5, statute: 'Alaska Stat. § 45.45.010' },
+  'AZ': { rate: 10.0, statute: 'Ariz. Rev. Stat. § 44-1201' },
+  'AR': { rate: 6.0, statute: 'Ark. Const. art. XIX, § 13' },
+  'CA': { rate: 10.0, statute: 'Cal. Civ. Code § 3289' },
+  'CO': { rate: 8.0, statute: 'Colo. Rev. Stat. § 5-12-102' },
+  'CT': { rate: 8.0, statute: 'Conn. Gen. Stat. § 37-3a' },
+  'DE': { rate: 5.0, statute: 'Del. Code tit. 6, § 2301' },
+  'DC': { rate: 6.0, statute: 'D.C. Code § 28-3302' },
+  'FL': { rate: 4.75, statute: 'Fla. Stat. § 55.03' },
+  'GA': { rate: 7.0, statute: 'Ga. Code § 7-4-2' },
+  'HI': { rate: 10.0, statute: 'Haw. Rev. Stat. § 478-2' },
+  'ID': { rate: 12.0, statute: 'Idaho Code § 28-22-104' },
+  'IL': { rate: 5.0, statute: '815 ILCS 205/2' },
+  'IN': { rate: 8.0, statute: 'Ind. Code § 24-4.6-1-102' },
+  'IA': { rate: 5.0, statute: 'Iowa Code § 535.2' },
+  'KS': { rate: 10.0, statute: 'Kan. Stat. § 16-201' },
+  'KY': { rate: 6.0, statute: 'Ky. Rev. Stat. § 360.010' },
+  'LA': { rate: 5.0, statute: 'La. Civ. Code art. 2924' },
+  'ME': { rate: 6.0, statute: 'Me. Rev. Stat. tit. 14, § 1602' },
+  'MD': { rate: 6.0, statute: 'Md. Const. art. III, § 57' },
+  'MA': { rate: 12.0, statute: 'Mass. Gen. Laws ch. 231, § 6C' },
+  'MI': { rate: 5.0, statute: 'Mich. Comp. Laws § 438.31' },
+  'MN': { rate: 4.0, statute: 'Minn. Stat. § 334.01' },
+  'MS': { rate: 8.0, statute: 'Miss. Code § 75-17-1' },
+  'MO': { rate: 9.0, statute: 'Mo. Rev. Stat. § 408.020' },
+  'MT': { rate: 10.0, statute: 'Mont. Code § 31-1-106' },
+  'NE': { rate: 12.0, statute: 'Neb. Rev. Stat. § 45-104' },
+  'NV': { rate: 5.25, statute: 'Nev. Rev. Stat. § 99.040' },
+  'NH': { rate: 5.0, statute: 'N.H. Rev. Stat. § 336:1' },
+  'NJ': { rate: 2.5, statute: 'N.J. Court Rules 4:42-11' },
+  'NM': { rate: 8.75, statute: 'N.M. Stat. § 56-8-3' },
+  'NY': { rate: 9.0, statute: 'N.Y. C.P.L.R. § 5004' },
+  'NC': { rate: 8.0, statute: 'N.C. Gen. Stat. § 24-1' },
+  'ND': { rate: 6.5, statute: 'N.D. Cent. Code § 47-14-05' },
+  'OH': { rate: 5.0, statute: 'Ohio Rev. Code § 1343.03' },
+  'OK': { rate: 6.0, statute: 'Okla. Stat. tit. 15, § 266' },
+  'OR': { rate: 9.0, statute: 'Or. Rev. Stat. § 82.010' },
+  'PA': { rate: 6.0, statute: '41 Pa. Stat. § 202' },
+  'RI': { rate: 12.0, statute: 'R.I. Gen. Laws § 6-26-1' },
+  'SC': { rate: 7.25, statute: 'S.C. Code § 34-31-20' },
+  'SD': { rate: 10.0, statute: 'S.D. Codified Laws § 54-3-16' },
+  'TN': { rate: 10.0, statute: 'Tenn. Code § 47-14-123' },
+  'TX': { rate: 6.0, statute: 'Tex. Fin. Code § 302.002' },
+  'UT': { rate: 10.0, statute: 'Utah Code § 15-1-1' },
+  'VT': { rate: 12.0, statute: 'Vt. Stat. tit. 9, § 41a' },
+  'VA': { rate: 6.0, statute: 'Va. Code § 6.2-301' },
+  'WA': { rate: 12.0, statute: 'Wash. Rev. Code § 19.52.010' },
+  'WV': { rate: 7.0, statute: 'W. Va. Code § 47-6-5' },
+  'WI': { rate: 5.0, statute: 'Wis. Stat. § 138.04' },
+  'WY': { rate: 7.0, statute: 'Wyo. Stat. § 40-14-106' },
+  'DEFAULT': { rate: 6.0, statute: 'Applicable Statutory Rate' }
+};
+
+export const STATE_INTEREST_RATES = Object.fromEntries(
+  Object.keys(STATE_LEGAL_DETAILS).map(key => [key, STATE_LEGAL_DETAILS[key].rate])
+);
 
 export const TONE_TEMPLATES = {
   soft: {

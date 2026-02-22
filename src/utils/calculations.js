@@ -1,5 +1,5 @@
 import { differenceInCalendarDays, parseISO, startOfToday } from 'date-fns';
-import { STATE_INTEREST_RATES, TONE_TEMPLATES } from './constants.js';
+import { STATE_LEGAL_DETAILS, TONE_TEMPLATES } from './constants.js';
 import { formatCurrency } from './formatters.js';
 
 /**
@@ -10,10 +10,25 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
   // Calculate Principal from itemized list
   const principal = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   
+  // Resolve jurisdiction safely
+  const safeJurisdiction = (STATE_LEGAL_DETAILS && STATE_LEGAL_DETAILS[jurisdiction])
+    ? jurisdiction
+    : 'DEFAULT';
+
+  const legalDetails = STATE_LEGAL_DETAILS[safeJurisdiction];
+
+  // Check for custom rate override
+  const customRate = parseFloat(interestRate);
+  const isCustomRate = !isNaN(customRate) && customRate > 0;
+
   // Determine Rate
-  const r = (parseFloat(interestRate) > 0) 
-    ? parseFloat(interestRate) / 100 
-    : (STATE_INTEREST_RATES[jurisdiction] || STATE_INTEREST_RATES['DEFAULT']) / 100;
+  const rPercentage = isCustomRate ? customRate : legalDetails.rate;
+  const r = rPercentage / 100;
+
+  // Determine Statute Used
+  const statuteUsed = isCustomRate
+    ? `Custom Agreed Rate (${customRate}%)`
+    : legalDetails.statute;
 
   let interest = 0;
   let diffDays = 0;
@@ -44,8 +59,9 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
     formattedPrincipal: formatCurrency(principal),
     formattedInterest: formatCurrency(interest),
     formattedTotal: formatCurrency(total),
-    rateUsed: (r * 100).toFixed(2),
-    daysOverdue: diffDays
+    rateUsed: rPercentage.toFixed(2),
+    daysOverdue: diffDays,
+    statuteUsed: statuteUsed
   };
 };
 
