@@ -3,7 +3,7 @@ import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
-import { STATE_NAMES, STATE_INTEREST_RATES } from '../utils/constants';
+import { STATE_NAMES, STATE_INTEREST_RATES, STATE_LEGAL_DETAILS } from '../utils/constants';
 import { generateId } from '../utils/helpers';
 
 // Sort states alphabetically by name
@@ -59,6 +59,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               {stateOptions.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
               <option value="DEFAULT">Other / International (6%)</option>
             </select>
+            {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
+               <p className="text-[10px] text-slate-500 italic mt-1">
+                  Legal Basis: {STATE_LEGAL_DETAILS[formData.jurisdiction].statute}
+               </p>
+            )}
           </div>
           <div className="space-y-1">
             <label htmlFor="tone" className="text-[10px] font-bold text-slate-400 uppercase">Document Tone</label>

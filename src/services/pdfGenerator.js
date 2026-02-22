@@ -43,14 +43,14 @@ const formatDate = (dateString) => {
  * @returns {Object} PDF definition object
  */
 export const generatePdfDefinition = (formData, calculatedValues, tone) => {
-  const { formattedTotal, formattedInterest, rateUsed } = calculatedValues;
+  const { formattedTotal, formattedInterest, rateUsed, statuteUsed } = calculatedValues;
 
   return {
     content: [
       { text: tone.title, style: 'header', alignment: 'center' },
       { text: '\n\n' },
       { columns: [
-        { stack: [{ text: 'FROM:', style: 'label' }, { text: formData.creditorName, bold: true }] },
+        { stack: [{ text: 'FROM:', style: 'label' }, { text: formData.creditorName, bold: true }, { text: formData.creditorAddress || '' }] },
         { stack: [{ text: 'DATE:', style: 'label', alignment: 'right' }, { text: formatDate(formData.letterDate), alignment: 'right' }] }
       ]},
       { text: '\n' },
@@ -68,13 +68,18 @@ export const generatePdfDefinition = (formData, calculatedValues, tone) => {
         [{ text: 'TOTAL DUE', bold: true, fillColor: '#f1f5f9' }, { text: formattedTotal, bold: true, fillColor: '#f1f5f9' }]
       ]}},
       { text: `\nPayment must be received by ${formatDate(formData.dueDate)}. ${tone.closing}` },
+      { text: '\n' },
+      // Legal Authority Section
+      { text: 'LEGAL AUTHORITY & INTEREST CALCULATION', style: 'subheader' },
+      { text: `This demand includes interest calculated at an annual rate of ${rateUsed}% pursuant to ${statuteUsed || 'applicable law'}.`, style: 'small' },
       { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName },
       { text: '\n\nGenerated via AXiM Documents Automation', style: 'footer', alignment: 'center' }
     ],
     styles: {
       header: { fontSize: 16, bold: true, color: '#1e3a8a' },
-      subheader: { fontSize: 12, bold: true },
+      subheader: { fontSize: 12, bold: true, margin: [0, 10, 0, 5] },
       label: { fontSize: 8, color: 'grey' },
+      small: { fontSize: 9, color: '#475569' },
       footer: { fontSize: 8, color: '#cccccc', margin: [0, 50, 0, 0] }
     }
   };
