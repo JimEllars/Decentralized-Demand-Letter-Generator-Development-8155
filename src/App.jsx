@@ -4,7 +4,6 @@ import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import LetterForm from './components/LetterForm';
-import DocumentPreview from './components/DocumentPreview';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
 import { useToast } from './contexts/ToastContext';
@@ -16,7 +15,7 @@ import { generateId } from './utils/helpers';
 const initialFormState = {
   jurisdiction: 'CA',
   tone: 'firm',
-  creditorName: 'AXiM Systems Client',
+  creditorName: '',
   creditorAddress: '',
   debtorName: '',
   debtorAddress: '',
@@ -108,7 +107,7 @@ const App = () => {
         pdfMake.vfs = pdfFonts.pdfMake.vfs;
       }
 
-      pdfMake.createPdf(docDefinition).download(`AXiM_Demand_${formData.jurisdiction}.pdf`);
+      pdfMake.createPdf(docDefinition).download(`Demand_Letter_${formData.jurisdiction}.pdf`);
       toast.success("Download started!");
     } catch (error) {
       console.error('Failed to load PDF generator:', error);
@@ -169,16 +168,6 @@ const App = () => {
             </button>
           </div>
           <LetterForm formData={formData} onUpdate={updateField} />
-        </motion.section>
-
-        {/* Live Document Preview */}
-        <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <DocumentPreview
-             formData={formData}
-             calculatedValues={calculatedValues}
-             toneTemplate={toneTemplate}
-             isPaid={isPaid}
-          />
         </motion.section>
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
