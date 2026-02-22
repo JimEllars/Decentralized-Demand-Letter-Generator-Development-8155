@@ -1,7 +1,8 @@
 import React from 'react';
 import { formatCurrency } from '../utils/formatters';
+import { STATE_SPECIFIC_CLAUSES } from '../utils/constants';
 
-const DocumentPreview = React.memo(({ formData, calculatedValues, toneTemplate }) => {
+const DocumentPreview = React.memo(({ formData, calculatedValues, toneTemplate, isPaid }) => {
   if (!formData || !calculatedValues || !toneTemplate) return null;
 
   const { letterDate, creditorName, creditorAddress, debtorName, debtorAddress, jurisdiction, dueDate, items } = formData;
@@ -31,11 +32,13 @@ const DocumentPreview = React.memo(({ formData, calculatedValues, toneTemplate }
       <div className="p-8 md:p-12 relative min-h-[600px] text-sm text-slate-800 leading-relaxed font-serif">
 
         {/* Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
-          <div className="transform -rotate-45 text-slate-100 text-6xl md:text-9xl font-black opacity-50 select-none whitespace-nowrap">
-            PREVIEW
+        {!isPaid && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
+            <div className="transform -rotate-45 text-slate-100 text-6xl md:text-9xl font-black opacity-50 select-none whitespace-nowrap">
+              PREVIEW
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content Wrapper */}
         <div className="relative z-10 space-y-6">
@@ -123,6 +126,14 @@ const DocumentPreview = React.memo(({ formData, calculatedValues, toneTemplate }
                 <p className="text-xs text-slate-500 leading-relaxed">
                     This demand includes interest calculated at an annual rate of {rateUsed}% pursuant to <span className="font-semibold text-slate-700">{statuteUsed}</span>.
                 </p>
+                {STATE_SPECIFIC_CLAUSES[jurisdiction] && (
+                  <div className="mt-4">
+                     <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider font-sans mb-1">{STATE_SPECIFIC_CLAUSES[jurisdiction].label}</h4>
+                     <p className="text-xs text-slate-500 leading-relaxed italic">
+                        {STATE_SPECIFIC_CLAUSES[jurisdiction].text}
+                     </p>
+                  </div>
+                )}
             </div>
 
             {/* Signature Area */}

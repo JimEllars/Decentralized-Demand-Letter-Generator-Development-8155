@@ -94,3 +94,19 @@ export const TONE_TEMPLATES = {
     closing: "Please remit payment at your earliest convenience to avoid any service interruption."
   }
 };
+
+export const STATE_SPECIFIC_CLAUSES = {
+  'CA': {
+    label: "California Disclosure",
+    text: "NOTICE: The state Rosenthal Fair Debt Collection Practices Act and the federal Fair Debt Collection Practices Act require that, except under unusual circumstances, collectors may not contact you before 8 a.m. or after 9 p.m. They may not harass you by using threats of violence or arrest or by using obscene language. Collectors may not use false or misleading statements or call you at work if they know or have reason to know that you may not receive personal calls at work. For the most part, collectors may not tell another person, other than your attorney or spouse, about your debt. Collectors may contact another person to confirm your location or enforce a judgment. For more information about debt collection activities, you may contact the Federal Trade Commission at 1-877-FTC-HELP or www.ftc.gov."
+  },
+  'NY': {
+    label: "New York Disclosure",
+    text: "Debt collectors, in accordance with the Fair Debt Collection Practices Act, 15 U.S.C. § 1692 et seq., are prohibited from engaging in abusive, deceptive, and unfair debt collection efforts, including but not limited to: (i) the use or threat of violence; (ii) the use of obscene or profane language; and (iii) repeated phone calls made with the intent to annoy, abuse, or harass."
+  },
+  'TX': {
+    label: "Texas Disclosure",
+    text: "Asserting a claim for collection of a debt in Texas requires strict adherence to the Texas Debt Collection Act. This communication is an attempt to collect a debt and any information obtained will be used for that purpose."
+  },
+  // Add other states as needed. Default is empty.
+};
