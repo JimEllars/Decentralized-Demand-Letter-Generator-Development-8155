@@ -95,7 +95,7 @@ const App = () => {
       return;
     }
 
-    const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate);
+    const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate, { watermark: !isPaid });
 
     try {
       const pdfMakeModule = await import('pdfmake/build/pdfmake');
@@ -177,6 +177,7 @@ const App = () => {
              formData={formData}
              calculatedValues={calculatedValues}
              toneTemplate={toneTemplate}
+             isPaid={isPaid}
           />
         </motion.section>
 

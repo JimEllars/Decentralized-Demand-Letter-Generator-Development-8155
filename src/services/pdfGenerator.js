@@ -1,5 +1,6 @@
 
 import { formatCurrency } from '../utils/formatters.js';
+import { STATE_SPECIFIC_CLAUSES } from '../utils/constants.js';
 
 /**
  * Shared formatters and cache to improve performance
@@ -72,6 +73,14 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       // Legal Authority Section
       { text: 'LEGAL AUTHORITY & INTEREST CALCULATION', style: 'subheader' },
       { text: `This demand includes interest calculated at an annual rate of ${rateUsed}% pursuant to ${statuteUsed || 'applicable law'}.`, style: 'small' },
+
+      // State-Specific Legal Disclosures
+      ...(STATE_SPECIFIC_CLAUSES[formData.jurisdiction] ? [
+        { text: '\n' },
+        { text: STATE_SPECIFIC_CLAUSES[formData.jurisdiction].label.toUpperCase(), style: 'subheader' },
+        { text: STATE_SPECIFIC_CLAUSES[formData.jurisdiction].text, style: 'small', italics: true }
+      ] : []),
+
       { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName },
       { text: '\n\nGenerated via AXiM Documents Automation', style: 'footer', alignment: 'center' }
     ],

@@ -25,6 +25,15 @@ const LetterForm = memo(({ formData, onUpdate }) => {
     onUpdate('items', newItems);
   }, [onUpdate]);
 
+  const handleAddLateFee = useCallback(() => {
+    // Calculate 5% of current principal
+    const principal = (itemsRef.current || []).reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const fee = (principal * 0.05).toFixed(2);
+
+    const newItems = [...(itemsRef.current || []), { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
+    onUpdate('items', newItems);
+  }, [onUpdate]);
+
   const handleRemoveItem = useCallback((index) => {
     const newItems = itemsRef.current.filter((_, i) => i !== index);
     onUpdate('items', newItems);
@@ -193,12 +202,21 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               showRemove={formData.items.length > 1}
             />
           ))}
-          <button 
-            onClick={handleAddItem}
-            className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-blue-400 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
-          >
-            <SafeIcon icon={FiPlus} /> ADD LINE ITEM
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddItem}
+              className="flex-1 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-blue-400 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
+            >
+              <SafeIcon icon={FiPlus} /> ADD LINE ITEM
+            </button>
+            <button
+              onClick={handleAddLateFee}
+              className="flex-shrink-0 px-4 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-amber-400 hover:text-amber-600 transition-all flex items-center justify-center gap-2"
+              title="Add 5% Late Fee"
+            >
+              <SafeIcon icon={FiPlus} /> +5% FEE
+            </button>
+          </div>
         </div>
         <div className="pt-4 space-y-2">
           <div className="flex justify-between items-center">
