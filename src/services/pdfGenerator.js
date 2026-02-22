@@ -42,10 +42,10 @@ const formatDate = (dateString) => {
  * @param {Object} tone - Tone template object
  * @returns {Object} PDF definition object
  */
-export const generatePdfDefinition = (formData, calculatedValues, tone) => {
+export const generatePdfDefinition = (formData, calculatedValues, tone, options = {}) => {
   const { formattedTotal, formattedInterest, rateUsed, statuteUsed } = calculatedValues;
 
-  return {
+  const docDefinition = {
     content: [
       { text: tone.title, style: 'header', alignment: 'center' },
       { text: '\n\n' },
@@ -83,4 +83,10 @@ export const generatePdfDefinition = (formData, calculatedValues, tone) => {
       footer: { fontSize: 8, color: '#cccccc', margin: [0, 50, 0, 0] }
     }
   };
+
+  if (options.watermark) {
+    docDefinition.watermark = { text: 'PREVIEW - NOT FOR USE', color: 'gray', opacity: 0.1, bold: true, italics: false };
+  }
+
+  return docDefinition;
 };

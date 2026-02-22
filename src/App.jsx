@@ -27,7 +27,7 @@ const initialFormState = {
 };
 
 const App = () => {
-  const { formData, updateField, resetForm } = useLetterStore(initialFormState);
+  const { formData, updateField, resetForm, isInitialized } = useLetterStore(initialFormState);
   const toast = useToast();
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -43,6 +43,19 @@ const App = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  // Calculate Totals Live
+  const calculatedValues = useMemo(() => {
+    return calculateTotal(
+      formData.items,
+      formData.statutoryInterest,
+      formData.dueDate,
+      formData.jurisdiction,
+      formData.letterDate
+    );
+  }, [formData]);
+
+  const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
   // Robust Validation Check
   const isValid = useMemo(() => {
@@ -82,15 +95,7 @@ const App = () => {
       return;
     }
 
-    const calculatedValues = calculateTotal(
-      formData.items,
-      formData.statutoryInterest,
-      formData.dueDate,
-      formData.jurisdiction,
-      formData.letterDate
-    );
-    const tone = getToneTemplate(formData.tone);
-    const docDefinition = generatePdfDefinition(formData, calculatedValues, tone);
+    const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate);
 
     try {
       const pdfMakeModule = await import('pdfmake/build/pdfmake');
@@ -110,6 +115,14 @@ const App = () => {
       toast.error('Failed to generate PDF. Please try again.');
     }
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-400">
+         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-400"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
@@ -160,7 +173,11 @@ const App = () => {
 
         {/* Live Document Preview */}
         <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <DocumentPreview items={formData.items} />
+          <DocumentPreview
+             formData={formData}
+             calculatedValues={calculatedValues}
+             toneTemplate={toneTemplate}
+          />
         </motion.section>
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
