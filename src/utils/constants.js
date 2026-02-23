@@ -108,5 +108,17 @@ export const STATE_SPECIFIC_CLAUSES = {
     label: "Texas Disclosure",
     text: "Asserting a claim for collection of a debt in Texas requires strict adherence to the Texas Debt Collection Act. This communication is an attempt to collect a debt and any information obtained will be used for that purpose."
   },
+  'CO': {
+    label: "Colorado Disclosure",
+    text: "FOR INFORMATION ABOUT THE COLORADO FAIR DEBT COLLECTION PRACTICES ACT, SEE WWW.COAG.GOV/CAR. A consumer has the right to request in writing that a debt collector or collection agency cease further communication with the consumer. A written request to cease communication will not prohibit the debt collector or collection agency from taking any other action authorized by law to collect the debt."
+  },
+  'MA': {
+    label: "Massachusetts Disclosure",
+    text: "NOTICE OF IMPORTANT RIGHTS: You have the right to make a written or oral request that telephone calls regarding your debt not be made to you at your place of employment. Any such oral request will be valid for only ten days unless you provide written confirmation of the request postmarked or delivered within seven days of such request. You may terminate this request by writing to the debt collector."
+  },
+  'MN': {
+    label: "Minnesota Disclosure",
+    text: "This collection agency is licensed by the Minnesota Department of Commerce."
+  },
   // Add other states as needed. Default is empty.
 };
