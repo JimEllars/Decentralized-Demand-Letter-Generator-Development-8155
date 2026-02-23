@@ -7,8 +7,11 @@ import { formatCurrency } from './formatters.js';
  */
 
 export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null) => {
+  // Ensure items is an array
+  const safeItems = Array.isArray(items) ? items : [];
+
   // Calculate Principal from itemized list
-  const principal = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  const principal = safeItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   
   // Resolve jurisdiction safely
   const safeJurisdiction = (STATE_LEGAL_DETAILS && STATE_LEGAL_DETAILS[jurisdiction])

@@ -11,6 +11,7 @@ import { processPayment } from './services/paymentService';
 import { calculateTotal, getToneTemplate } from './utils/calculations';
 import { generatePdfDefinition } from './services/pdfGenerator';
 import { generateId } from './utils/helpers';
+import { validateForm, getFirstErrorFieldId } from './utils/validation';
 
 const initialFormState = {
   jurisdiction: 'CA',
@@ -76,19 +77,31 @@ const App = () => {
   const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
   // Robust Validation Check
-  const isValid = useMemo(() => {
-    return formData.creditorName?.trim() &&
-           formData.debtorName?.trim() &&
-           formData.debtorAddress?.trim() &&
-           formData.dueDate &&
-           formData.letterDate &&
-           formData.items && formData.items.length > 0 &&
-           formData.items.every(i => i.amount && parseFloat(i.amount) > 0);
-  }, [formData]);
+  const { isValid, errors } = useMemo(() => validateForm(formData), [formData]);
+
+  const handleValidationFail = (errors) => {
+    const firstErrorId = getFirstErrorFieldId(errors);
+    if (firstErrorId) {
+      const element = document.getElementById(firstErrorId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+      }
+    }
+    toast.error("Please complete all required fields (marked in red).");
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!isValid) {
+      handleValidationFail(errors);
+      return;
+    }
+    setShowPaymentModal(true);
+  };
 
   const handlePayment = async () => {
     if (!isValid) {
-      toast.error("Please complete all required fields (marked in red) before unlocking the document.");
+      handleValidationFail(errors);
       return;
     }
 
@@ -109,7 +122,7 @@ const App = () => {
 
   const handleDownload = async () => {
     if (!isValid) {
-      toast.error("Please complete all required fields.");
+      handleValidationFail(errors);
       return;
     }
 
@@ -201,16 +214,14 @@ const App = () => {
               {isPaid ? (
                 <button
                   onClick={handleDownload}
-                  disabled={!isValid}
-                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
                 >
                   <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
                 </button>
               ) : (
                 <button
-                  onClick={() => setShowPaymentModal(true)}
-                  disabled={!isValid}
-                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+                  onClick={handleProceedToCheckout}
+                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
                 >
                   <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
                 </button>

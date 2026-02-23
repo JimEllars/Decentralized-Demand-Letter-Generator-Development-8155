@@ -199,7 +199,7 @@ const LetterForm = memo(({ formData, onUpdate }) => {
       </FormSection>
 
       <FormSection title="Itemized Debt Specifics" icon={FiDollarSign}>
-        <div className="space-y-3">
+        <div id="items-section" className="space-y-3">
           {(formData.items || []).map((item, index) => (
             <LetterItem
               key={item.id}
