@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiTrendingUp, FiCheckCircle, FiAlertCircle, FiCopy, FiCheck } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const SummaryCard = ({ calculatedValues, jurisdiction }) => {
   const { principal, interest, total, formattedPrincipal, formattedInterest, formattedTotal, rateUsed, daysOverdue, statuteUsed } = calculatedValues;
+  const [copied, setCopied] = useState(false);
 
   if (principal <= 0) {
     return null;
   }
+
+  const handleCopy = () => {
+    const text = `Demand Summary (${jurisdiction}):\nPrincipal: ${formattedPrincipal}\nInterest: ${formattedInterest} (${rateUsed}% via ${statuteUsed})\nTotal Recoverable: ${formattedTotal}`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  };
 
   return (
     <motion.div
@@ -20,9 +31,18 @@ const SummaryCard = ({ calculatedValues, jurisdiction }) => {
         <h3 className="font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wider text-xs">
           <SafeIcon icon={FiTrendingUp} /> Financial Summary
         </h3>
-        <span className="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded">
-          {jurisdiction} Law Applied
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded">
+            {jurisdiction} Law Applied
+          </span>
+          <button
+            onClick={handleCopy}
+            className="text-slate-400 hover:text-blue-500 transition-colors"
+            title="Copy Summary to Clipboard"
+          >
+            {copied ? <FiCheck className="text-emerald-500" /> : <FiCopy />}
+          </button>
+        </div>
       </div>
 
       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">

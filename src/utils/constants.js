@@ -134,5 +134,14 @@ export const STATE_SPECIFIC_CLAUSES = {
   }
 };
 
+// Safe environment access for testing
+const getEnv = () => {
+  try {
+    return import.meta.env || {};
+  } catch {
+    return {};
+  }
+};
+
 // Stripe Configuration
-export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || null;
+export const STRIPE_PUBLISHABLE_KEY = getEnv().VITE_STRIPE_PUBLISHABLE_KEY || null;

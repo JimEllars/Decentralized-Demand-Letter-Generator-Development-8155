@@ -26,8 +26,10 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
   const legalDetails = STATE_LEGAL_DETAILS[safeJurisdiction];
 
   // Check for custom rate override
+  // Allow 0 as a valid custom rate if explicitly set (string '0' or number 0)
+  // We treat empty string, null, or undefined as "use default"
   const customRate = parseFloat(interestRate);
-  const isCustomRate = !isNaN(customRate) && customRate > 0;
+  const isCustomRate = !isNaN(customRate) && interestRate !== '' && interestRate !== null && interestRate !== undefined;
 
   // Determine Rate
   const rPercentage = isCustomRate ? customRate : legalDetails.rate;

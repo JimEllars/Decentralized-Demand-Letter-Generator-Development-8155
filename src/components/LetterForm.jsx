@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, memo } from 'react';
+import React, { useCallback, useRef, memo, useEffect } from 'react';
 import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
@@ -17,7 +17,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
 
   // Keep latest items in ref to stabilize handlers
   const itemsRef = useRef(formData.items);
-  itemsRef.current = formData.items;
+
+  // Sync ref with formData.items using useEffect to avoid side-effects during render
+  useEffect(() => {
+    itemsRef.current = formData.items;
+  }, [formData.items]);
 
   const handleAddItem = useCallback(() => {
     // Generate unique ID for new item to ensure stable rendering

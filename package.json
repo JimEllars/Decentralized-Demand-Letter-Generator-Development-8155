@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "bash tests/run_tests.sh"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.7.0",
