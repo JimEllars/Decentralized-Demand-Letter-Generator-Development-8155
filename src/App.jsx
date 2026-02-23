@@ -140,7 +140,8 @@ const App = () => {
         pdfMake.vfs = pdfFonts.pdfMake.vfs;
       }
 
-      pdfMake.createPdf(docDefinition).download(`Demand_Letter_${formData.jurisdiction}.pdf`);
+      const safeJurisdiction = (formData.jurisdiction || 'DEFAULT').replace(/[^a-zA-Z0-9]/g, '_');
+      pdfMake.createPdf(docDefinition).download(`Demand_Letter_${safeJurisdiction}.pdf`);
       toast.success("Download started!");
     } catch (error) {
       console.error('Failed to load PDF generator:', error);

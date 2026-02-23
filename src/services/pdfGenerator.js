@@ -64,7 +64,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       { text: '\n' },
       { table: { widths: ['*', 'auto'], body: [
         [{ text: 'Description', bold: true }, { text: 'Amount', bold: true }],
-        ...(formData.items || []).map(i => [
+        ...(Array.isArray(formData.items) ? formData.items : []).map(i => [
           i.description || 'Item',
           formatCurrency(parseFloat(i.amount || 0))
         ]),

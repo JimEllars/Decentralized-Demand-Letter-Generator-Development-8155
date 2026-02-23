@@ -9,6 +9,9 @@ export const validateForm = (formData) => {
   if (!formData.creditorName?.trim()) {
     errors.creditorName = "Creditor Name is required.";
   }
+  if (!formData.creditorAddress?.trim()) {
+    errors.creditorAddress = "Creditor Address is required.";
+  }
   if (!formData.debtorName?.trim()) {
     errors.debtorName = "Debtor Name is required.";
   }
@@ -45,6 +48,7 @@ export const validateForm = (formData) => {
 
 export const getFirstErrorFieldId = (errors) => {
   if (errors.creditorName) return 'creditorName';
+  if (errors.creditorAddress) return 'creditorAddress';
   if (errors.debtorName) return 'debtorName';
   if (errors.debtorAddress) return 'debtorAddress';
   if (errors.dueDate) return 'dueDate';
