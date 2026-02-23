@@ -120,7 +120,18 @@ export const STATE_SPECIFIC_CLAUSES = {
     label: "Minnesota Disclosure",
     text: "This collection agency is licensed by the Minnesota Department of Commerce."
   },
-  // Add other states as needed. Default is empty.
+  'FL': {
+    label: "Florida Disclosure",
+    text: "This communication is for the purpose of collecting a debt, and any information obtained will be used for that purpose. In accordance with the Florida Consumer Collection Practices Act, debt collectors are prohibited from engaging in certain conduct, including the use of threats or coercion."
+  },
+  'NC': {
+    label: "North Carolina Disclosure",
+    text: "This collection agency is licensed by the North Carolina Department of Insurance. North Carolina General Statute § 58-70-1 et seq. prohibits debt collectors from using unfair, deceptive, or unconscionable means to collect debts."
+  },
+  'DEFAULT': {
+    label: "Debt Collection Notice",
+    text: "This communication is an attempt to collect a debt and any information obtained will be used for that purpose. Unless you dispute the validity of this debt or any portion thereof within 30 days after receipt of this notice, the debt will be assumed to be valid."
+  }
 };
 
 // Stripe Configuration

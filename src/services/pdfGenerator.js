@@ -46,6 +46,8 @@ const formatDate = (dateString) => {
 export const generatePdfDefinition = (formData, calculatedValues, tone, options = {}) => {
   const { formattedTotal, formattedInterest, rateUsed, statuteUsed } = calculatedValues;
 
+  const legalDisclosure = STATE_SPECIFIC_CLAUSES[formData.jurisdiction] || STATE_SPECIFIC_CLAUSES['DEFAULT'];
+
   const docDefinition = {
     content: [
       { text: tone.title, style: 'header', alignment: 'center' },
@@ -75,10 +77,10 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       { text: `This demand includes interest calculated at an annual rate of ${rateUsed}% pursuant to ${statuteUsed || 'applicable law'}.`, style: 'small' },
 
       // State-Specific Legal Disclosures
-      ...(STATE_SPECIFIC_CLAUSES[formData.jurisdiction] ? [
+      ...(legalDisclosure ? [
         { text: '\n' },
-        { text: STATE_SPECIFIC_CLAUSES[formData.jurisdiction].label.toUpperCase(), style: 'subheader' },
-        { text: STATE_SPECIFIC_CLAUSES[formData.jurisdiction].text, style: 'small', italics: true }
+        { text: legalDisclosure.label.toUpperCase(), style: 'subheader' },
+        { text: legalDisclosure.text, style: 'small', italics: true }
       ] : []),
 
       { text: '\n\nSincerely,\n\n__________________________\n' + formData.creditorName }
