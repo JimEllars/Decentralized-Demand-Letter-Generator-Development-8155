@@ -4,6 +4,7 @@ import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import LetterForm from './components/LetterForm';
+import SummaryCard from './components/SummaryCard';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
 import { useToast } from './contexts/ToastContext';
@@ -201,6 +202,9 @@ const App = () => {
           </div>
           <LetterForm formData={formData} onUpdate={updateField} />
         </motion.section>
+
+        {/* Live Financial Summary */}
+        <SummaryCard calculatedValues={calculatedValues} jurisdiction={formData.jurisdiction} />
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
             <div className="space-y-3">

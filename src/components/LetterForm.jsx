@@ -228,7 +228,9 @@ const LetterForm = memo(({ formData, onUpdate }) => {
         </div>
         <div className="pt-4 space-y-2">
           <div className="flex justify-between items-center">
-            <label htmlFor="dueDate" className="text-[10px] font-bold text-slate-400 uppercase">Original Due Date</label>
+            <label htmlFor="dueDate" className="text-[10px] font-bold text-slate-400 uppercase">
+              Original Due Date <span className="text-slate-300 font-normal normal-case">(Used for interest calc)</span>
+            </label>
             <button
                 onClick={() => handleSetPastDate('dueDate', 30)}
                 className="text-[10px] text-blue-500 hover:text-blue-700 font-bold uppercase transition-colors"
