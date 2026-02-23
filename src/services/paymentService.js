@@ -19,7 +19,7 @@ const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
  * @param {string} apiUrl
  * @param {number} amount
  */
-const initiateBackendTransaction = async (apiUrl, amount) => {
+export const initiateBackendTransaction = async (apiUrl, amount) => {
   try {
     console.log(`AXiM Bridge: Initiating secure transaction for $${amount} via configured backend (${apiUrl})...`);
 
@@ -42,14 +42,17 @@ const initiateBackendTransaction = async (apiUrl, amount) => {
     if (data.sessionId && stripePromise) {
        console.log("Redirecting to Stripe Checkout via SDK...");
        const stripe = await stripePromise;
-       if (stripe) {
-         const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-         if (error) {
-           throw error;
-         }
-         // Return a promise that never resolves to prevent UI state changes during redirect
-         return new Promise(() => {});
+
+       if (!stripe) {
+          throw new Error("Stripe SDK failed to load.");
        }
+
+       const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+       if (error) {
+         throw error;
+       }
+       // Return a promise that never resolves to prevent UI state changes during redirect
+       return new Promise(() => {});
     }
 
     // Fallback to URL redirection (also handles case where sessionId is present but key is missing)
@@ -97,6 +100,7 @@ export const processPayment = async (amount) => {
   return new Promise((resolve, reject) => {
     console.log(`AXiM Bridge: Initiating simulated transaction for $${amount}...`);
     
+    // Simulate API latency
     setTimeout(() => {
       // Simulate a successful response from a payment provider
       const mockResponse = {
@@ -110,6 +114,6 @@ export const processPayment = async (amount) => {
       } else {
         reject(new Error("The transaction was declined by the provider."));
       }
-    }, 2000);
+    }, 1500);
   });
 };

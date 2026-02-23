@@ -74,7 +74,10 @@ const LetterForm = memo(({ formData, onUpdate }) => {
       <FormSection title="Legal Strategy" icon={FiZap}>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="jurisdiction" className="text-[10px] font-bold text-slate-400 uppercase">Jurisdiction</label>
+            <label htmlFor="jurisdiction" className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+              Jurisdiction
+              <span className="text-[9px] text-slate-300 font-normal normal-case">(Governing Law)</span>
+            </label>
             <select
               id="jurisdiction"
               name="jurisdiction"
@@ -110,17 +113,22 @@ const LetterForm = memo(({ formData, onUpdate }) => {
 
         <div className="space-y-1 mt-4">
             <label htmlFor="statutoryInterest" className="text-[10px] font-bold text-slate-400 uppercase">
-              Custom Interest Rate Override (%) <span className="text-slate-300 font-normal normal-case">(Optional - leave 0 to use state default)</span>
+              Custom Interest Rate Override <span className="text-slate-300 font-normal normal-case">(Optional - leave 0 to use state default)</span>
             </label>
-            <input
-              id="statutoryInterest"
-              type="number"
-              name="statutoryInterest"
-              placeholder={`Current Default: ${STATE_INTEREST_RATES[formData.jurisdiction] || 6}%`}
-              value={formData.statutoryInterest}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            />
+            <div className="relative">
+                <input
+                  id="statutoryInterest"
+                  type="number"
+                  name="statutoryInterest"
+                  placeholder={`Current Default: ${STATE_INTEREST_RATES[formData.jurisdiction] || 6}%`}
+                  value={formData.statutoryInterest}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none pr-8"
+                />
+                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-slate-400 pointer-events-none font-light">
+                    %
+                 </div>
+            </div>
         </div>
 
          <div className="space-y-1 mt-4">
