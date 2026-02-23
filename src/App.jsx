@@ -223,12 +223,22 @@ const App = () => {
                   <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
                 </button>
               ) : (
-                <button
-                  onClick={handleProceedToCheckout}
-                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
-                >
-                  <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
-                </button>
+                <>
+                  <button
+                    onClick={handleProceedToCheckout}
+                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
+                  >
+                    <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
+                  </button>
+                  {isValid && (
+                    <button
+                      onClick={handleDownload}
+                      className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                      <SafeIcon icon={FiDownload} /> DOWNLOAD WATERMARKED PREVIEW
+                    </button>
+                  )}
+                </>
               )}
 
               <div className="text-center text-xs text-slate-400 mt-2">

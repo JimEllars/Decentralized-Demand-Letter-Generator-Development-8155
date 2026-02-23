@@ -4,6 +4,11 @@ import { formatCurrency } from './formatters.js';
 
 /**
  * AXiM Statutory Interest & Calculation Engine
+ *
+ * Implements logic for debt totals including:
+ * - Principal summation
+ * - State-specific statutory interest (or custom override)
+ * - Simple interest calculation based on days overdue
  */
 
 export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null) => {
@@ -48,6 +53,8 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
     if (diff > 0) {
       diffDays = diff;
       if (r > 0) {
+        // Simple Interest Formula: (Principal * Rate * Days) / 365
+        // We use 365 days for the year basis (standard for most statutory interest)
         interest = (principal * r / 365) * diffDays;
       }
     }

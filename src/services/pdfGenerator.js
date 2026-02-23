@@ -51,6 +51,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
   const docDefinition = {
     content: [
       { text: tone.title, style: 'header', alignment: 'center' },
+      { canvas: [{ type: 'line', x1: 0, y1: 5, x2: 515, y2: 5, lineWidth: 2, lineColor: '#1e3a8a' }] },
       { text: '\n\n' },
       { columns: [
         { stack: [{ text: 'FROM:', style: 'label' }, { text: formData.creditorName, bold: true }, { text: formData.creditorAddress || '' }] },
@@ -95,7 +96,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
   };
 
   if (options.watermark) {
-    docDefinition.watermark = { text: 'PREVIEW - NOT FOR USE', color: 'gray', opacity: 0.1, bold: true, italics: false };
+    docDefinition.watermark = { text: 'PREVIEW - NOT FOR USE', color: 'gray', opacity: 0.2, bold: true, italics: false };
   }
 
   return docDefinition;
