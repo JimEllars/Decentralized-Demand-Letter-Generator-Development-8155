@@ -135,4 +135,4 @@ export const STATE_SPECIFIC_CLAUSES = {
 };
 
 // Stripe Configuration
-export const STRIPE_PUBLISHABLE_KEY = 'pk_live_51M9M9WJahsdipCJXf8NR7es7EnYBzk5vxNCKWW51H7TZdYdC4N0qMYATnHniWkN85iZc2lIMWh360fKuYGMFFUDt00A1wBVyPk';
+export const STRIPE_PUBLISHABLE_KEY = null;
