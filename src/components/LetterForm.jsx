@@ -171,6 +171,19 @@ const LetterForm = memo(({ formData, onUpdate }) => {
             {!formData.creditorName && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
           </div>
           <div>
+            <label htmlFor="creditorAddress" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Creditor Address</label>
+            <textarea
+              id="creditorAddress"
+              name="creditorAddress"
+              placeholder="Your Mailing Address"
+              rows="2"
+              value={formData.creditorAddress}
+              onChange={handleChange}
+              className={`${getInputClass(formData.creditorAddress, true)} resize-none`}
+            />
+            {!formData.creditorAddress && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+          </div>
+          <div>
             <label htmlFor="debtorName" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Debtor Name</label>
             <input
               id="debtorName"
