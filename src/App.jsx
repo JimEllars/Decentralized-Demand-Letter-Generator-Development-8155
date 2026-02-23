@@ -25,23 +25,42 @@ const initialFormState = {
   statutoryInterest: '0',
 };
 
+const PAYMENT_STORAGE_KEY = 'axim_demand_letter_paid_status';
+
 const App = () => {
-  const { formData, updateField, resetForm, isInitialized } = useLetterStore(initialFormState);
+  const { formData, updateField, resetForm: resetStore, isInitialized } = useLetterStore(initialFormState);
   const toast = useToast();
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
-    // Check for payment success parameter from Stripe redirect
+    // Load payment status from storage
+    const savedPaidStatus = localStorage.getItem(PAYMENT_STORAGE_KEY);
+    if (savedPaidStatus === 'true') {
+      setIsPaid(true);
+    }
+
+    // Check for payment parameters from Stripe redirect
     const query = new URLSearchParams(window.location.search);
     if (query.get('paid') === 'true') {
       setIsPaid(true);
+      localStorage.setItem(PAYMENT_STORAGE_KEY, 'true');
       toast.success("Payment successful! You can now download your document.");
       // Clean up the URL without refreshing
       window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (query.get('canceled') === 'true') {
+      toast.error("Payment was canceled.");
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  const resetForm = () => {
+    resetStore();
+    localStorage.removeItem(PAYMENT_STORAGE_KEY);
+    setIsPaid(false);
+    toast.success("Form reset successfully.");
+  };
 
   // Calculate Totals Live
   const calculatedValues = useMemo(() => {
