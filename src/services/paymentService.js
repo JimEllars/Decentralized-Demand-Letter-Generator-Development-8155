@@ -1,4 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js';
+import { STRIPE_PUBLISHABLE_KEY } from '../utils/constants';
 
 /**
  * AXiM Payment Bridge
@@ -10,9 +11,8 @@ import { loadStripe } from '@stripe/stripe-js';
  */
 
 // Initialize Stripe if a key is provided
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
-  : null;
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 /**
  * Initiates a transaction via the configured backend.
