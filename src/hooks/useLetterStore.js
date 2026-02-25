@@ -3,8 +3,8 @@ import { generateId } from '../utils/helpers';
 
 const STORAGE_KEY = 'axim_demand_letter_draft_v2';
 
-export const useLetterStore = (initialData) => {
-  const [formData, setFormData] = useState(initialData);
+export const useLetterStore = (initialDataOrFn) => {
+  const [formData, setFormData] = useState(initialDataOrFn);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -45,9 +45,10 @@ export const useLetterStore = (initialData) => {
   }, []);
 
   const resetForm = useCallback(() => {
-    setFormData(initialData);
+    const newState = typeof initialDataOrFn === 'function' ? initialDataOrFn() : initialDataOrFn;
+    setFormData(newState);
     localStorage.removeItem(STORAGE_KEY);
-  }, [initialData]);
+  }, [initialDataOrFn]);
 
   return { formData, updateField, resetForm, isInitialized };
 };

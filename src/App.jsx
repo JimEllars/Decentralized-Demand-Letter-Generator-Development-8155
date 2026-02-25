@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit3, FiLock } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
@@ -7,14 +7,14 @@ import LetterForm from './components/LetterForm';
 import SummaryCard from './components/SummaryCard';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
+import { usePayment } from './hooks/usePayment';
+import { usePdfGenerator } from './hooks/usePdfGenerator';
 import { useToast } from './contexts/ToastContext';
-import { processPayment } from './services/paymentService';
 import { calculateTotal, getToneTemplate } from './utils/calculations';
-import { generatePdfDefinition } from './services/pdfGenerator';
-import { generateId } from './utils/helpers';
+import { generateId, getLocalDateString } from './utils/helpers';
 import { validateForm, getFirstErrorFieldId } from './utils/validation';
 
-const initialFormState = {
+const getInitialState = () => ({
   jurisdiction: 'CA',
   tone: 'firm',
   creditorName: '',
@@ -23,44 +23,30 @@ const initialFormState = {
   debtorAddress: '',
   items: [{ id: generateId(), description: 'Main Service Debt', amount: '' }],
   dueDate: '',
-  letterDate: new Date().toISOString().split('T')[0],
+  letterDate: getLocalDateString(),
   statutoryInterest: '0',
-};
-
-const PAYMENT_STORAGE_KEY = 'axim_demand_letter_paid_status';
+});
 
 const App = () => {
-  const { formData, updateField, resetForm: resetStore, isInitialized } = useLetterStore(initialFormState);
+  const { formData, updateField, resetForm: resetStore, isInitialized } = useLetterStore(getInitialState);
   const toast = useToast();
-  const [isPaid, setIsPaid] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  useEffect(() => {
-    // Load payment status from storage
-    const savedPaidStatus = localStorage.getItem(PAYMENT_STORAGE_KEY);
-    if (savedPaidStatus === 'true') {
-      setIsPaid(true);
-    }
+  // Custom hooks
+  const {
+    isPaid,
+    isProcessing,
+    showPaymentModal,
+    setShowPaymentModal,
+    handleProceedToCheckout,
+    handlePayment,
+    resetPayment
+  } = usePayment();
 
-    // Check for payment parameters from Stripe redirect
-    const query = new URLSearchParams(window.location.search);
-    if (query.get('paid') === 'true') {
-      setIsPaid(true);
-      localStorage.setItem(PAYMENT_STORAGE_KEY, 'true');
-      toast.success("Payment successful! You can now download your document.");
-      // Clean up the URL without refreshing
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (query.get('canceled') === 'true') {
-      toast.error("Payment was canceled.");
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
+  const { handleDownload: triggerDownload, isGenerating } = usePdfGenerator();
 
   const resetForm = () => {
     resetStore();
-    localStorage.removeItem(PAYMENT_STORAGE_KEY);
-    setIsPaid(false);
+    resetPayment();
     toast.success("Form reset successfully.");
   };
 
@@ -80,7 +66,7 @@ const App = () => {
   // Robust Validation Check
   const { isValid, errors } = useMemo(() => validateForm(formData), [formData]);
 
-  const handleValidationFail = (errors) => {
+  const onValidationFail = () => {
     const firstErrorId = getFirstErrorFieldId(errors);
     if (firstErrorId) {
       const element = document.getElementById(firstErrorId);
@@ -92,62 +78,9 @@ const App = () => {
     toast.error("Please complete all required fields (marked in red).");
   };
 
-  const handleProceedToCheckout = () => {
-    if (!isValid) {
-      handleValidationFail(errors);
-      return;
-    }
-    setShowPaymentModal(true);
-  };
-
-  const handlePayment = async () => {
-    if (!isValid) {
-      handleValidationFail(errors);
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const result = await processPayment(9.00);
-      if (result.success) {
-        setIsPaid(true);
-        setShowPaymentModal(false);
-        toast.success("Payment successful!");
-      }
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!isValid) {
-      handleValidationFail(errors);
-      return;
-    }
-
-    const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate, { watermark: !isPaid });
-
-    try {
-      const pdfMakeModule = await import('pdfmake/build/pdfmake');
-      const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
-      // Handle both ESM and CJS exports
-      const pdfMake = pdfMakeModule.default || pdfMakeModule;
-      const pdfFonts = pdfFontsModule.default || pdfFontsModule;
-
-      if (pdfMake.vfs === undefined && pdfFonts && pdfFonts.pdfMake) {
-        pdfMake.vfs = pdfFonts.pdfMake.vfs;
-      }
-
-      const safeJurisdiction = (formData.jurisdiction || 'DEFAULT').replace(/[^a-zA-Z0-9]/g, '_');
-      pdfMake.createPdf(docDefinition).download(`Demand_Letter_${safeJurisdiction}.pdf`);
-      toast.success("Download started!");
-    } catch (error) {
-      console.error('Failed to load PDF generator:', error);
-      toast.error('Failed to generate PDF. Please try again.');
-    }
-  };
+  const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
+  const onPaymentConfirm = () => handlePayment(isValid, onValidationFail);
+  const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid);
 
   if (!isInitialized) {
     return (
@@ -201,7 +134,7 @@ const App = () => {
               <SafeIcon icon={FiTrash2} /> RESET FORM
             </button>
           </div>
-          <LetterForm formData={formData} onUpdate={updateField} />
+          <LetterForm formData={formData} onUpdate={updateField} errors={errors} />
         </motion.section>
 
         {/* Live Financial Summary */}
@@ -218,25 +151,46 @@ const App = () => {
 
               {isPaid ? (
                 <button
-                  onClick={handleDownload}
-                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
+                  onClick={onDownloadClick}
+                  disabled={isGenerating}
+                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
                 >
-                  <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
+                  {isGenerating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      GENERATING PDF...
+                    </>
+                  ) : (
+                    <>
+                      <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
+                    </>
+                  )}
                 </button>
               ) : (
                 <>
                   <button
-                    onClick={handleProceedToCheckout}
-                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500'}`}
+                    onClick={onCheckoutClick}
+                    disabled={isProcessing}
+                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isProcessing ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
                   >
-                    <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        PROCESSING...
+                      </>
+                    ) : (
+                      <>
+                        <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
+                      </>
+                    )}
                   </button>
                   {isValid && (
                     <button
-                      onClick={handleDownload}
-                      className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      onClick={onDownloadClick}
+                      disabled={isGenerating}
+                      className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <SafeIcon icon={FiDownload} /> DOWNLOAD WATERMARKED PREVIEW
+                      {isGenerating ? "GENERATING PREVIEW..." : <> <SafeIcon icon={FiDownload} /> DOWNLOAD WATERMARKED PREVIEW </>}
                     </button>
                   )}
                 </>
@@ -260,7 +214,7 @@ const App = () => {
       </main>
 
       <AnimatePresence>
-        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={handlePayment} onCancel={() => setShowPaymentModal(false)} />}
+        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} />}
       </AnimatePresence>
     </div>
   );
