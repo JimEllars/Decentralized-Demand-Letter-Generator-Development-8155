@@ -135,4 +135,4 @@ export const STATE_SPECIFIC_CLAUSES = {
 };
 
 // Stripe Configuration
-export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || null;
+export const STRIPE_PUBLISHABLE_KEY = (import.meta.env && import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) || null;

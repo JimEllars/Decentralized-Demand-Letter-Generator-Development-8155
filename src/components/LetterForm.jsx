@@ -4,7 +4,7 @@ import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
 import { STATE_NAMES, STATE_INTEREST_RATES, STATE_LEGAL_DETAILS } from '../utils/constants';
-import { generateId } from '../utils/helpers';
+import { generateId, getLocalDateString } from '../utils/helpers';
 
 // Sort states alphabetically by name
 const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].localeCompare(STATE_NAMES[b])).map(code => ({
@@ -12,7 +12,7 @@ const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].loca
   name: `${STATE_NAMES[code]} (${STATE_INTEREST_RATES[code]}%)`
 }));
 
-const LetterForm = memo(({ formData, onUpdate }) => {
+const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
   // Keep latest items in ref to stabilize handlers
@@ -47,26 +47,25 @@ const LetterForm = memo(({ formData, onUpdate }) => {
   }, [onUpdate]);
 
   const handleSetToday = useCallback((field) => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    onUpdate(field, `${year}-${month}-${day}`);
+    onUpdate(field, getLocalDateString());
   }, [onUpdate]);
 
   const handleSetPastDate = useCallback((field, days) => {
     const date = new Date();
     date.setDate(date.getDate() - days);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    onUpdate(field, `${year}-${month}-${day}`);
+    onUpdate(field, getLocalDateString(date));
   }, [onUpdate]);
 
-  const getInputClass = (value, required = false) => {
+  const getInputClass = (field, value, required = false) => {
+    const hasError = errors[field] || (required && !value);
     const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
-    if (required && !value) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
+    if (hasError) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
     return `${base} border-slate-300 focus:border-blue-500`;
+  };
+
+  const ErrorMessage = ({ error, id }) => {
+    if (!error) return null;
+    return <p id={id} className="text-[10px] text-red-500 mt-1 font-bold">{error}</p>;
   };
 
   return (
@@ -150,9 +149,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               name="letterDate"
               value={formData.letterDate || ''}
               onChange={handleChange}
-              className={getInputClass(formData.letterDate, true)}
+              className={getInputClass('letterDate', formData.letterDate, true)}
+              aria-invalid={!!errors.letterDate}
+              aria-describedby={errors.letterDate ? "letterDate-error" : undefined}
             />
-            {!formData.letterDate && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+            <ErrorMessage id="letterDate-error" error={errors.letterDate} />
         </div>
       </FormSection>
 
@@ -166,9 +167,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               placeholder="Your Name / Company"
               value={formData.creditorName}
               onChange={handleChange}
-              className={getInputClass(formData.creditorName, true)}
+              className={getInputClass('creditorName', formData.creditorName, true)}
+              aria-invalid={!!errors.creditorName}
+              aria-describedby={errors.creditorName ? "creditorName-error" : undefined}
             />
-            {!formData.creditorName && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+            <ErrorMessage id="creditorName-error" error={errors.creditorName} />
           </div>
           <div>
             <label htmlFor="creditorAddress" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Creditor Address</label>
@@ -179,9 +182,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               rows="2"
               value={formData.creditorAddress}
               onChange={handleChange}
-              className={`${getInputClass(formData.creditorAddress, true)} resize-none`}
+              className={`${getInputClass('creditorAddress', formData.creditorAddress, true)} resize-none`}
+              aria-invalid={!!errors.creditorAddress}
+              aria-describedby={errors.creditorAddress ? "creditorAddress-error" : undefined}
             />
-            {!formData.creditorAddress && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+            <ErrorMessage id="creditorAddress-error" error={errors.creditorAddress} />
           </div>
           <div>
             <label htmlFor="debtorName" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Debtor Name</label>
@@ -191,9 +196,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               placeholder="Debtor Full Name"
               value={formData.debtorName}
               onChange={handleChange}
-              className={getInputClass(formData.debtorName, true)}
+              className={getInputClass('debtorName', formData.debtorName, true)}
+              aria-invalid={!!errors.debtorName}
+              aria-describedby={errors.debtorName ? "debtorName-error" : undefined}
             />
-            {!formData.debtorName && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+            <ErrorMessage id="debtorName-error" error={errors.debtorName} />
           </div>
           <div>
             <label htmlFor="debtorAddress" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Debtor Address</label>
@@ -204,9 +211,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               rows="2"
               value={formData.debtorAddress}
               onChange={handleChange}
-              className={`${getInputClass(formData.debtorAddress, true)} resize-none`}
+              className={`${getInputClass('debtorAddress', formData.debtorAddress, true)} resize-none`}
+              aria-invalid={!!errors.debtorAddress}
+              aria-describedby={errors.debtorAddress ? "debtorAddress-error" : undefined}
             />
-            {!formData.debtorAddress && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+            <ErrorMessage id="debtorAddress-error" error={errors.debtorAddress} />
           </div>
         </div>
       </FormSection>
@@ -221,8 +230,10 @@ const LetterForm = memo(({ formData, onUpdate }) => {
               onChange={handleItemChange}
               onRemove={handleRemoveItem}
               showRemove={formData.items.length > 1}
+              error={errors.itemErrors?.find(e => e.index === index)?.message}
             />
           ))}
+          {errors.items && <p className="text-xs text-red-500 font-bold text-center">{errors.items}</p>}
           <div className="flex gap-2">
             <button
               onClick={handleAddItem}
@@ -258,9 +269,11 @@ const LetterForm = memo(({ formData, onUpdate }) => {
             type="date"
             value={formData.dueDate}
             onChange={handleChange}
-            className={getInputClass(formData.dueDate, true)}
+            className={getInputClass('dueDate', formData.dueDate, true)}
+            aria-invalid={!!errors.dueDate}
+            aria-describedby={errors.dueDate ? "dueDate-error" : undefined}
           />
-          {!formData.dueDate && <p className="text-[10px] text-red-400 mt-1 font-bold">REQUIRED</p>}
+          <ErrorMessage id="dueDate-error" error={errors.dueDate} />
         </div>
       </FormSection>
     </div>
