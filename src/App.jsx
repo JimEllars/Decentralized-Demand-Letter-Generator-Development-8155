@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCreditCard, FiDownload, FiTrash2, FiArrowRight, FiAlertCircle, FiEdit3, FiLock } from 'react-icons/fi';
+import { FiCreditCard, FiDownload, FiTrash2, FiAlertCircle, FiEdit3 } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
+import Instructions from './components/Instructions';
 import LetterForm from './components/LetterForm';
 import SummaryCard from './components/SummaryCard';
+import UpsellCard from './components/UpsellCard';
 import PaymentModal from './components/PaymentModal';
 import { useLetterStore } from './hooks/useLetterStore';
 import { usePayment } from './hooks/usePayment';
@@ -96,34 +98,7 @@ const App = () => {
       <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8">
 
         {/* Instructions Section */}
-        <motion.section
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left"
-        >
-           <div className="flex-1">
-             <h2 className="font-bold text-lg text-slate-800 mb-2">How It Works</h2>
-             <div className="flex flex-col md:flex-row gap-4 text-sm text-slate-600">
-                <div className="flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">1</span>
-                  <span>Enter Debt Details</span>
-                </div>
-                <div className="hidden md:block text-slate-300">|</div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">2</span>
-                  <span>Secure Payment</span>
-                </div>
-                <div className="hidden md:block text-slate-300">|</div>
-                <div className="flex items-center gap-2">
-                  <span className="bg-blue-100 text-blue-700 font-bold w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0">3</span>
-                  <span>Instant Download</span>
-                </div>
-             </div>
-           </div>
-           <div className="flex items-center gap-2 text-xs bg-blue-50 text-blue-800 px-4 py-2 rounded-lg border border-blue-100 font-medium">
-             <SafeIcon icon={FiLock} /> Zero-Knowledge Privacy
-           </div>
-        </motion.section>
+        <Instructions />
 
         <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           <div className="p-4 bg-slate-50 border-b flex justify-between items-center">
@@ -201,15 +176,7 @@ const App = () => {
               </div>
             </div>
 
-          <motion.div whileHover={{ y: -5 }} className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl border border-white/10">
-            <div className="text-center sm:text-left">
-              <h4 className="font-bold text-xl leading-tight">Need Other Documents?</h4>
-              <p className="text-slate-300 text-sm opacity-90 mt-1">Check our template library for professional and affordable business documents.</p>
-            </div>
-            <button className="bg-white text-slate-900 px-6 py-3 rounded-lg text-sm font-black whitespace-nowrap hover:bg-slate-100 transition-all shadow-lg flex items-center gap-2">
-              TEMPLATE LIBRARY <SafeIcon icon={FiArrowRight} />
-            </button>
-          </motion.div>
+          <UpsellCard total={calculatedValues.total} />
         </motion.section>
       </main>
 

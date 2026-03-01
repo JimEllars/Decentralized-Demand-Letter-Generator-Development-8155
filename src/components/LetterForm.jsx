@@ -15,36 +15,32 @@ const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].loca
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
-  // Keep latest items in ref to stabilize handlers
-  const itemsRef = useRef(formData.items);
-  itemsRef.current = formData.items;
-
   const handleAddItem = useCallback(() => {
     // Generate unique ID for new item to ensure stable rendering
-    const newItems = [...(itemsRef.current || []), { id: generateId(), description: '', amount: '' }];
+    const newItems = [...(formData.items || []), { id: generateId(), description: '', amount: '' }];
     onUpdate('items', newItems);
-  }, [onUpdate]);
+  }, [formData.items, onUpdate]);
 
   const handleAddLateFee = useCallback(() => {
     // Calculate 5% of current principal
-    const principal = (itemsRef.current || []).reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const principal = (formData.items || []).reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
     const fee = (principal * 0.05).toFixed(2);
 
-    const newItems = [...(itemsRef.current || []), { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
+    const newItems = [...(formData.items || []), { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
     onUpdate('items', newItems);
-  }, [onUpdate]);
+  }, [formData.items, onUpdate]);
 
   const handleRemoveItem = useCallback((index) => {
-    const newItems = itemsRef.current.filter((_, i) => i !== index);
+    const newItems = formData.items.filter((_, i) => i !== index);
     onUpdate('items', newItems);
-  }, [onUpdate]);
+  }, [formData.items, onUpdate]);
 
   const handleItemChange = useCallback((index, field, value) => {
-    const newItems = itemsRef.current.map((item, i) =>
+    const newItems = formData.items.map((item, i) =>
       i === index ? { ...item, [field]: value } : item
     );
     onUpdate('items', newItems);
-  }, [onUpdate]);
+  }, [formData.items, onUpdate]);
 
   const handleSetToday = useCallback((field) => {
     onUpdate(field, getLocalDateString());
