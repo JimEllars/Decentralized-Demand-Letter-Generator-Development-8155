@@ -232,12 +232,14 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
           {errors.items && <p className="text-xs text-red-500 font-bold text-center">{errors.items}</p>}
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={handleAddItem}
               className="flex-1 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-blue-400 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
             >
               <SafeIcon icon={FiPlus} /> ADD LINE ITEM
             </button>
             <button
+              type="button"
               onClick={handleAddLateFee}
               className="flex-shrink-0 px-4 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-amber-400 hover:text-amber-600 transition-all flex items-center justify-center gap-2"
               title="Add 5% Late Fee"
