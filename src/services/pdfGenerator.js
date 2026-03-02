@@ -78,7 +78,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       { text: `This demand includes interest calculated at an annual rate of ${rateUsed}% pursuant to ${statuteUsed || 'applicable law'}.`, style: 'small' },
 
       // State-Specific Legal Disclosures
-      ...(legalDisclosure ? [
+      ...(legalDisclosure && legalDisclosure.label && legalDisclosure.text ? [
         { text: '\n' },
         { text: legalDisclosure.label.toUpperCase(), style: 'subheader' },
         { text: legalDisclosure.text, style: 'small', italics: true }

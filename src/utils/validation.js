@@ -31,8 +31,14 @@ export const validateForm = (formData) => {
     errors.items = "At least one item is required.";
   } else {
     formData.items.forEach((item, index) => {
-      if (!item.amount || parseFloat(item.amount) <= 0) {
-        itemErrors.push({ index, message: "Amount must be greater than 0." });
+      let message = null;
+      if (!item.description || !item.description.trim()) {
+        message = "Description is required.";
+      } else if (!item.amount || parseFloat(item.amount) <= 0) {
+        message = "Amount must be greater than 0.";
+      }
+      if (message) {
+        itemErrors.push({ index, message });
       }
     });
     if (itemErrors.length > 0) {

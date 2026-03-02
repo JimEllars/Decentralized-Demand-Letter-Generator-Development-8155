@@ -12,7 +12,8 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, er
             placeholder="Description (e.g. Invoice #101)"
             value={item.description}
             onChange={(e) => onChange(index, 'description', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${(error && error.includes('Description')) || !item.description ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300'}`}
+            aria-invalid={!!(error && error.includes('Description'))}
           />
         </div>
         <div className="flex flex-col w-24">
@@ -22,8 +23,8 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, er
             placeholder="0.00"
             value={item.amount}
             onChange={(e) => onChange(index, 'amount', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${error || !item.amount ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300'}`}
-            aria-invalid={!!error}
+            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${(error && error.includes('Amount')) || !item.amount ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300'}`}
+            aria-invalid={!!(error && error.includes('Amount'))}
           />
         </div>
         {showRemove && (
