@@ -54,7 +54,7 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
       diffDays = diff;
       if (r > 0) {
         // Simple Interest Formula: (Principal * Rate * Days) / 365
-        // We use 365 days for the year basis (standard for most statutory interest)
+        // We use 365 days for the year basis (standard for most statutory interest, ignoring leap years)
         interest = (principal * r / 365) * diffDays;
       }
     }
