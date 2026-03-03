@@ -53,7 +53,9 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
   }, [onUpdate]);
 
   const getInputClass = (field, value, required = false) => {
-    const hasError = errors[field] || (required && !value);
+    // Only show error class if errors object explicitly contains an error for this field
+    // The errors object passed down will only be populated if hasAttemptedSubmit is true
+    const hasError = errors && errors[field];
     const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
     if (hasError) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
     return `${base} border-slate-300 focus:border-blue-500`;
