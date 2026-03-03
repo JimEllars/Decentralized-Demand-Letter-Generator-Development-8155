@@ -8,6 +8,7 @@ import LetterForm from './components/LetterForm';
 import SummaryCard from './components/SummaryCard';
 import UpsellCard from './components/UpsellCard';
 import PaymentModal from './components/PaymentModal';
+import { useState } from 'react';
 import { useLetterStore } from './hooks/useLetterStore';
 import { usePayment } from './hooks/usePayment';
 import { usePdfGenerator } from './hooks/usePdfGenerator';
@@ -33,6 +34,8 @@ const App = () => {
   const { formData, updateField, resetForm: resetStore, isInitialized } = useLetterStore(getInitialState);
   const toast = useToast();
 
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
   // Custom hooks
   const {
     isPaid,
@@ -49,6 +52,7 @@ const App = () => {
   const resetForm = () => {
     resetStore();
     resetPayment();
+    setHasAttemptedSubmit(false);
     toast.success("Form reset successfully.");
   };
 
@@ -68,7 +72,10 @@ const App = () => {
   // Robust Validation Check
   const { isValid, errors } = useMemo(() => validateForm(formData), [formData]);
 
+  const displayedErrors = hasAttemptedSubmit ? errors : {};
+
   const onValidationFail = () => {
+    setHasAttemptedSubmit(true);
     const firstErrorId = getFirstErrorFieldId(errors);
     if (firstErrorId) {
       const element = document.getElementById(firstErrorId);
@@ -109,7 +116,7 @@ const App = () => {
               <SafeIcon icon={FiTrash2} /> RESET FORM
             </button>
           </div>
-          <LetterForm formData={formData} onUpdate={updateField} errors={errors} />
+          <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} />
         </motion.section>
 
         {/* Live Financial Summary */}
@@ -117,7 +124,7 @@ const App = () => {
 
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col gap-6">
             <div className="space-y-3">
-              {!isValid && (
+              {!isValid && hasAttemptedSubmit && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2 font-medium">
                   <SafeIcon icon={FiAlertCircle} />
                   Please complete all required fields (highlighted in red) to proceed.
