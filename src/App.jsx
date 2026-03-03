@@ -132,22 +132,31 @@ const App = () => {
               )}
 
               {isPaid ? (
-                <button
-                  onClick={onDownloadClick}
-                  disabled={isGenerating}
-                  className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
-                >
-                  {isGenerating ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      GENERATING PDF...
-                    </>
-                  ) : (
-                    <>
-                      <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
-                    </>
-                  )}
-                </button>
+                <>
+                  <button
+                    onClick={onDownloadClick}
+                    disabled={isGenerating}
+                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+                  >
+                    {isGenerating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        GENERATING PDF...
+                      </>
+                    ) : (
+                      <>
+                        <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={resetForm}
+                    disabled={isGenerating}
+                    className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <SafeIcon icon={FiTrash2} /> CLEAR DATA & RESET
+                  </button>
+                </>
               ) : (
                 <>
                   <button
