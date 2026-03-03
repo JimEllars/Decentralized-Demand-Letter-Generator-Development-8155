@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { generatePdfDefinition } from '../services/pdfGenerator';
+import * as pdfFontsModule from 'pdfmake/build/vfs_fonts';
 
 export const usePdfGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -17,7 +18,6 @@ export const usePdfGenerator = () => {
 
     try {
       const pdfMakeModule = await import('pdfmake/build/pdfmake');
-      const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
       // Handle both ESM and CJS exports
       const pdfMake = pdfMakeModule.default || pdfMakeModule;
       const pdfFonts = pdfFontsModule.default || pdfFontsModule;
