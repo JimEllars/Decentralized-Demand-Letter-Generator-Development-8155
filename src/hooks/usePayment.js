@@ -19,12 +19,27 @@ export const usePayment = () => {
 
     // Check for payment parameters from Stripe redirect
     const query = new URLSearchParams(window.location.search);
-    if (query.get('paid') === 'true') {
-      setIsPaid(true);
-      localStorage.setItem(PAYMENT_STORAGE_KEY, 'true');
-      toast.success("Payment successful! You can now download your document.");
-      // Clean up the URL without refreshing
-      window.history.replaceState({}, document.title, window.location.pathname);
+    const sessionId = query.get('session_id');
+
+    if (sessionId) {
+      setIsProcessing(true);
+      // Verify with your backend
+      fetch(`${import.meta.env.VITE_PAYMENT_API_URL}/verify-session?session_id=${sessionId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.isPaid) {
+            setIsPaid(true);
+            localStorage.setItem(PAYMENT_STORAGE_KEY, 'true');
+            toast.success("Payment verified! You can now download your document.");
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch(err => {
+          console.error("Payment verification failed:", err);
+          toast.error("Payment verification failed.");
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .finally(() => setIsProcessing(false));
     } else if (query.get('canceled') === 'true') {
       toast.error("Payment was canceled.");
       window.history.replaceState({}, document.title, window.location.pathname);
