@@ -19,6 +19,9 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => (
           <span className="font-bold text-3xl text-blue-900">$9.00</span>
         </div>
         <div className="space-y-3">
+          <div className="text-center text-xs text-slate-500 font-bold mb-2">
+            All sales are final. No refunds.
+          </div>
           <button onClick={onConfirm} disabled={isProcessing} className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
             {isProcessing ? (
               <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Verifying...</>
