@@ -190,6 +190,9 @@ const App = () => {
               <div className="text-center text-xs text-slate-400 mt-2">
                 Secure 256-bit SSL Encrypted Payment via Stripe
               </div>
+              <div className="text-center text-xs text-slate-500 font-bold mt-1">
+                All sales are final. No refunds.
+              </div>
             </div>
 
           <UpsellCard total={calculatedValues.total} />
