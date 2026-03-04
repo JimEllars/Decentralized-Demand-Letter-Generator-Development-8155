@@ -22,10 +22,11 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'framer-motion', 'react-icons'],
-          pdf: ['pdfmake'],
+          // Combine pdfmake and its fonts into one chunk to ensure they stay linked
+          pdf: ['pdfmake/build/pdfmake', 'pdfmake/build/vfs_fonts'],
         },
       },
     },
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 2000, // Increased limit since fonts are large
   },
 });
