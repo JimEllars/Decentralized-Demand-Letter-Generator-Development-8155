@@ -1,18 +1,8 @@
-import { loadStripe } from '@stripe/stripe-js';
-import { STRIPE_PUBLISHABLE_KEY } from '../utils/constants';
-
 /**
  * AXiM Payment Bridge
- * 
- * To integrate a real provider:
+ * * To integrate a real provider:
  * 1. Set VITE_PAYMENT_API_URL in your .env file.
- * 2. Set VITE_STRIPE_PUBLISHABLE_KEY in your .env file (optional, but recommended for client-side redirection).
- * 3. The backend should return { sessionId: 'cs_test_...' } or { url: 'https://checkout.stripe.com/...' } or { success: true }.
  */
-
-// Initialize Stripe if a key is provided
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY;
-const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
 /**
  * Initiates a transaction via the configured backend.
@@ -38,44 +28,21 @@ export const initiateBackendTransaction = async (apiUrl, amount) => {
 
     const data = await response.json();
 
-    // Prioritize Stripe.js redirection if configured and sessionId is present
-    if (data.sessionId && stripePromise) {
-       console.log("Redirecting to Stripe Checkout via SDK...");
-       const stripe = await stripePromise;
-
-       if (!stripe) {
-          throw new Error("Stripe SDK failed to load.");
-       }
-
-       const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-       if (error) {
-         throw error;
-       }
-       // Return a promise that never resolves to prevent UI state changes during redirect
-       return new Promise(() => {});
-    }
-
-    // Fallback to URL redirection (also handles case where sessionId is present but key is missing)
+    // Modern Stripe redirect: Just go directly to the Checkout URL provided by the backend
     if (data.url) {
-      console.log("Redirecting to payment provider via URL...");
+      console.log("Redirecting directly to Stripe Checkout URL...");
       window.location.href = data.url;
+      // Return a promise that never resolves to prevent UI state changes during redirect
       return new Promise(() => {});
-    }
-
-    // If sessionId was provided but we couldn't use it, and no URL fallback
-    if (data.sessionId && !stripePromise) {
-       throw new Error("Backend returned a session ID, but VITE_STRIPE_PUBLISHABLE_KEY is not configured in the frontend.");
     }
 
     if (data.success) {
       return data;
     }
 
-    throw new Error('Invalid response from payment provider: Missing sessionId or url');
+    throw new Error('Invalid response from payment provider: Missing checkout url');
   } catch (error) {
     console.error("Payment Service Error:", error);
-    // If a real backend is configured but fails, we throw to alert the user
-    // instead of silently falling back to mock (which would give free access).
     throw error;
   }
 };
@@ -100,20 +67,14 @@ export const processPayment = async (amount) => {
   return new Promise((resolve, reject) => {
     console.log(`AXiM Bridge: Initiating simulated transaction for $${amount}...`);
     
-    // Simulate API latency
     setTimeout(() => {
-      // Simulate a successful response from a payment provider
       const mockResponse = {
         success: true,
         transactionId: `AXM-${Math.random().toString(36).toUpperCase().substr(2, 9)}`,
         timestamp: new Date().toISOString()
       };
       
-      if (mockResponse.success) {
-        resolve(mockResponse);
-      } else {
-        reject(new Error("The transaction was declined by the provider."));
-      }
+      resolve(mockResponse);
     }, 1500);
   });
 };
