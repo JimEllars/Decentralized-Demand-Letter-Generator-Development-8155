@@ -21,7 +21,7 @@ export const useLetterStore = (initialDataOrFn) => {
         }
         setFormData(parsed);
       } catch (error) {
-        console.error('Failed to parse saved state:', error);
+        // Silently ignore parsing errors
       }
     }
     setIsInitialized(true);
