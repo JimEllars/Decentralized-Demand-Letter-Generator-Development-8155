@@ -35,7 +35,6 @@ export const usePayment = () => {
           window.history.replaceState({}, document.title, window.location.pathname);
         })
         .catch(err => {
-          console.error("Payment verification failed:", err);
           toast.error("Payment verification failed.");
           window.history.replaceState({}, document.title, window.location.pathname);
         })
