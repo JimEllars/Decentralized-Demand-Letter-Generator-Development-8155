@@ -11,8 +11,6 @@
  */
 export const initiateBackendTransaction = async (apiUrl, amount) => {
   try {
-    console.log(`AXiM Bridge: Initiating secure transaction for $${amount} via configured backend (${apiUrl})...`);
-
     const response = await fetch(`${apiUrl}/create-checkout-session`, {
       method: 'POST',
       headers: {
@@ -30,7 +28,6 @@ export const initiateBackendTransaction = async (apiUrl, amount) => {
 
     // Modern Stripe redirect: Just go directly to the Checkout URL provided by the backend
     if (data.url) {
-      console.log("Redirecting directly to Stripe Checkout URL...");
       window.location.href = data.url;
       // Return a promise that never resolves to prevent UI state changes during redirect
       return new Promise(() => {});
@@ -65,8 +62,6 @@ export const processPayment = async (amount) => {
 
   // Fallback: Simulation Mode (No Backend Configured)
   return new Promise((resolve, reject) => {
-    console.log(`AXiM Bridge: Initiating simulated transaction for $${amount}...`);
-    
     setTimeout(() => {
       const mockResponse = {
         success: true,
