@@ -65,7 +65,7 @@ export const processPayment = async (amount) => {
     setTimeout(() => {
       const mockResponse = {
         success: true,
-        transactionId: `AXM-${Math.random().toString(36).toUpperCase().substr(2, 9)}`,
+        transactionId: `AXM-${crypto.randomUUID().toUpperCase().split('-')[0]}`,
         timestamp: new Date().toISOString()
       };
       
