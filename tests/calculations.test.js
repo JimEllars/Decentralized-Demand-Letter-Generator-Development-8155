@@ -74,6 +74,18 @@ describe('calculateTotal', () => {
     assert.strictEqual(result.rateUsed, '10.00');
   });
 
+  it('should fallback to DEFAULT jurisdiction when an invalid jurisdiction is provided', () => {
+    // DEFAULT rate is 6%
+    const items = [{ amount: '1000' }];
+    const dueDate = '2022-01-01';
+    const letterDate = '2023-01-01';
+    const result = calculateTotal(items, 0, dueDate, 'INVALID_STATE', letterDate);
+
+    // 1000 * 0.06 * 1 = 60
+    assert.strictEqual(Math.round(result.interest), 60);
+    assert.strictEqual(result.rateUsed, '6.00');
+  });
+
   it('should handle empty items array', () => {
     const result = calculateTotal([], 0, '2023-01-01');
     assert.strictEqual(result.principal, 0);
