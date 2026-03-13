@@ -41,8 +41,7 @@ export const usePdfGenerator = () => {
 
       toast.success("Download started!");
     } catch (error) {
-      console.error('PDF Generation Error:', error);
-      toast.error(`Failed to generate PDF: ${error.message || 'Check browser console.'}`);
+      toast.error(`Failed to generate PDF: ${error.message || 'An unknown error occurred.'}`);
     } finally {
       setIsGenerating(false);
     }
