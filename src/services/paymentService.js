@@ -54,7 +54,9 @@ export const initiateBackendTransaction = async (apiUrl, amount) => {
  * @returns {Promise<{success: boolean, transactionId?: string} | never>}
  */
 export const processPayment = async (amount) => {
-  const paymentApiUrl = import.meta.env.VITE_PAYMENT_API_URL;
+  const paymentApiUrl = typeof import.meta.env !== 'undefined'
+    ? import.meta.env.VITE_PAYMENT_API_URL
+    : process.env.VITE_PAYMENT_API_URL;
 
   if (paymentApiUrl) {
     return initiateBackendTransaction(paymentApiUrl, amount);
