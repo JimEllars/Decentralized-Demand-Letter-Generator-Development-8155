@@ -3,13 +3,13 @@ import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
-import { STATE_NAMES, STATE_INTEREST_RATES, STATE_LEGAL_DETAILS } from '../utils/constants';
+import { STATE_NAMES, STATE_LEGAL_DETAILS } from '../utils/constants';
 import { generateId, getLocalDateString } from '../utils/helpers';
 
 // Sort states alphabetically by name
 const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].localeCompare(STATE_NAMES[b])).map(code => ({
   code,
-  name: `${STATE_NAMES[code]} (${STATE_INTEREST_RATES[code]}%)`
+  name: `${STATE_NAMES[code]} (${STATE_LEGAL_DETAILS[code]?.rate}%)`
 }));
 
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
@@ -117,7 +117,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
                   id="statutoryInterest"
                   type="number"
                   name="statutoryInterest"
-                  placeholder={`Current Default: ${STATE_INTEREST_RATES[formData.jurisdiction] || 6}%`}
+                  placeholder={`Current Default: ${STATE_LEGAL_DETAILS[formData.jurisdiction]?.rate || 6}%`}
                   value={formData.statutoryInterest}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none pr-8"

@@ -68,10 +68,6 @@ export const STATE_LEGAL_DETAILS = {
   'DEFAULT': { rate: 6.0, statute: 'Applicable Statutory Rate' }
 };
 
-export const STATE_INTEREST_RATES = Object.fromEntries(
-  Object.keys(STATE_LEGAL_DETAILS).map(key => [key, STATE_LEGAL_DETAILS[key].rate])
-);
-
 export const TONE_TEMPLATES = {
   soft: {
     title: "Courtesy Reminder: Payment Request",
