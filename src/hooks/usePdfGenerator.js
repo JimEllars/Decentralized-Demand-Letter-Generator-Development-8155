@@ -16,9 +16,11 @@ export const usePdfGenerator = () => {
     const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate, { watermark: !isPaid });
 
     try {
-      // 1. Import both modules dynamically
-      const pdfMakeModule = await import('pdfmake/build/pdfmake');
-      const pdfFontsModule = await import('pdfmake/build/vfs_fonts');
+      // 1. Import both modules concurrently
+      const [pdfMakeModule, pdfFontsModule] = await Promise.all([
+        import('pdfmake/build/pdfmake'),
+        import('pdfmake/build/vfs_fonts')
+      ]);
 
       // 2. Resolve the exports (handling both ESM and CJS patterns)
       const pdfMake = pdfMakeModule.default || pdfMakeModule;
