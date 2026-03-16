@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCreditCard, FiDownload, FiTrash2, FiAlertCircle, FiEdit3 } from 'react-icons/fi';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
 import Instructions from './components/Instructions';
@@ -110,10 +109,10 @@ const App = () => {
         <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           <div className="p-4 bg-slate-50 border-b flex justify-between items-center">
             <h2 className="font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wider text-xs">
-              <SafeIcon icon={FiEdit3} /> Demand Letter Configuration
+              <SafeIcon name="FiEdit3" /> Demand Letter Configuration
             </h2>
             <button onClick={resetForm} className="text-slate-400 hover:text-red-500 transition-colors text-xs flex items-center gap-1 font-bold">
-              <SafeIcon icon={FiTrash2} /> RESET FORM
+              <SafeIcon name="FiTrash2" /> RESET FORM
             </button>
           </div>
           <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} />
@@ -126,7 +125,7 @@ const App = () => {
             <div className="space-y-3">
               {!isValid && hasAttemptedSubmit && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2 font-medium">
-                  <SafeIcon icon={FiAlertCircle} />
+                  <SafeIcon name="FiAlertCircle" />
                   Please complete all required fields (highlighted in red) to proceed.
                 </div>
               )}
@@ -145,7 +144,7 @@ const App = () => {
                       </>
                     ) : (
                       <>
-                        <SafeIcon icon={FiDownload} /> DOWNLOAD COMPLIANT PDF
+                        <SafeIcon name="FiDownload" /> DOWNLOAD COMPLIANT PDF
                       </>
                     )}
                   </button>
@@ -154,7 +153,7 @@ const App = () => {
                     disabled={isGenerating}
                     className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <SafeIcon icon={FiTrash2} /> CLEAR DATA & RESET
+                    <SafeIcon name="FiTrash2" /> CLEAR DATA & RESET
                   </button>
                 </>
               ) : (
@@ -171,7 +170,7 @@ const App = () => {
                       </>
                     ) : (
                       <>
-                        <SafeIcon icon={FiCreditCard} /> PROCEED TO CHECKOUT ($9.00)
+                        <SafeIcon name="FiCreditCard" /> PROCEED TO CHECKOUT ($9.00)
                       </>
                     )}
                   </button>
@@ -181,7 +180,7 @@ const App = () => {
                       disabled={isGenerating}
                       className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isGenerating ? "GENERATING PREVIEW..." : <> <SafeIcon icon={FiDownload} /> DOWNLOAD WATERMARKED PREVIEW </>}
+                      {isGenerating ? "GENERATING PREVIEW..." : <> <SafeIcon name="FiDownload" /> DOWNLOAD WATERMARKED PREVIEW </>}
                     </button>
                   )}
                 </>
