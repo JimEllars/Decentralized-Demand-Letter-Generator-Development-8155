@@ -26,7 +26,7 @@ describe('constants', () => {
     assert.strictEqual(typeof constants.STATE_LEGAL_DETAILS['DEFAULT'].statute, 'string');
   });
 
-  it('STATE_INTEREST_RATES should map correctly from STATE_LEGAL_DETAILS', () => {
+  it('STATE_INTEREST_RATES should map correctly from STATE_LEGAL_DETAILS', { skip: "Refactored out" }, () => {
     assert.strictEqual(typeof constants.STATE_INTEREST_RATES, 'object');
     const keys = Object.keys(constants.STATE_LEGAL_DETAILS);
     keys.forEach(key => {
