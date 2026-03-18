@@ -1,6 +1,6 @@
 import { test, describe, it, mock, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
-import { processPayment, initiateBackendTransaction } from '../src/services/paymentService.js';
+import { processPayment, initiateBackendTransaction, verifyPaymentSession } from '../src/services/paymentService.js';
 
 describe('paymentService', () => {
   let originalEnv;
@@ -134,6 +134,48 @@ describe('paymentService', () => {
       await assert.rejects(
         async () => await initiateBackendTransaction('http://test.api', 100),
         { message: 'Network error' }
+      );
+    });
+  });
+
+  describe('verifyPaymentSession', () => {
+    it('should fall back to simulation mode and return isPaid true for valid IDs', async () => {
+      delete process.env.VITE_PAYMENT_API_URL;
+      const result = await verifyPaymentSession('AXM-123456');
+      assert.strictEqual(result.isPaid, true);
+    });
+
+    it('should fall back to simulation mode and return isPaid false for invalid IDs', async () => {
+      delete process.env.VITE_PAYMENT_API_URL;
+      const result = await verifyPaymentSession('INVALID-ID');
+      assert.strictEqual(result.isPaid, false);
+    });
+
+    it('should call backend when VITE_PAYMENT_API_URL is configured', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ isPaid: true })
+      }));
+
+      const result = await verifyPaymentSession('real-session-id');
+      assert.strictEqual(result.isPaid, true);
+
+      // Verify fetch was called correctly
+      assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
+      const fetchCall = globalThis.fetch.mock.calls[0];
+      assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/verify-session?session_id=real-session-id');
+    });
+
+    it('should throw an error when fetch fails to verify', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: false
+      }));
+
+      await assert.rejects(
+        async () => await verifyPaymentSession('real-session-id'),
+        { message: 'Failed to verify payment session' }
       );
     });
   });

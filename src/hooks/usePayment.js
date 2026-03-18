@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
-import { processPayment } from '../services/paymentService';
+import { processPayment, verifyPaymentSession } from '../services/paymentService';
 
 const PAYMENT_STORAGE_KEY = 'axim_demand_letter_paid_status';
 
@@ -11,34 +11,45 @@ export const usePayment = () => {
   const toast = useToast();
 
   useEffect(() => {
-    // Load payment status from storage
-    const savedPaidStatus = localStorage.getItem(PAYMENT_STORAGE_KEY);
-    if (savedPaidStatus === 'true') {
-      setIsPaid(true);
-    }
+    const verifySession = async (sessionId, isFromRedirect = false) => {
+      setIsProcessing(true);
+      try {
+        const data = await verifyPaymentSession(sessionId);
+        if (data.isPaid) {
+          setIsPaid(true);
+          localStorage.setItem(PAYMENT_STORAGE_KEY, sessionId);
+          if (isFromRedirect) {
+            toast.success("Payment verified! You can now download your document.");
+          }
+        } else {
+          // Clean up invalid session
+          if (!isFromRedirect) {
+            localStorage.removeItem(PAYMENT_STORAGE_KEY);
+          }
+        }
+      } catch (err) {
+        if (isFromRedirect) {
+          toast.error("Payment verification failed.");
+        }
+      } finally {
+        setIsProcessing(false);
+        if (isFromRedirect) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    };
 
     // Check for payment parameters from Stripe redirect
     const query = new URLSearchParams(window.location.search);
-    const sessionId = query.get('session_id');
+    const urlSessionId = query.get('session_id');
+    const savedSessionId = localStorage.getItem(PAYMENT_STORAGE_KEY);
 
-    if (sessionId) {
-      setIsProcessing(true);
-      // Verify with your backend
-      fetch(`${import.meta.env.VITE_PAYMENT_API_URL}/verify-session?session_id=${sessionId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.isPaid) {
-            setIsPaid(true);
-            localStorage.setItem(PAYMENT_STORAGE_KEY, 'true');
-            toast.success("Payment verified! You can now download your document.");
-          }
-          window.history.replaceState({}, document.title, window.location.pathname);
-        })
-        .catch(err => {
-          toast.error("Payment verification failed.");
-          window.history.replaceState({}, document.title, window.location.pathname);
-        })
-        .finally(() => setIsProcessing(false));
+    if (urlSessionId) {
+      verifySession(urlSessionId, true);
+    } else if (savedSessionId && savedSessionId !== 'true') {
+      // If we have a stored session ID, verify it's still valid
+      // Note: we ignore the old insecure 'true' value if it exists
+      verifySession(savedSessionId, false);
     } else if (query.get('canceled') === 'true') {
       toast.error("Payment was canceled.");
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -69,6 +80,9 @@ export const usePayment = () => {
       const result = await processPayment(9.00);
       if (result.success) {
         setIsPaid(true);
+        if (result.transactionId) {
+          localStorage.setItem(PAYMENT_STORAGE_KEY, result.transactionId);
+        }
         setShowPaymentModal(false);
         toast.success("Payment successful!");
       }
