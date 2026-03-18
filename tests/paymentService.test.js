@@ -74,6 +74,42 @@ describe('paymentService', () => {
       assert.strictEqual(fetchCall.arguments[1].method, 'POST');
       assert.strictEqual(fetchCall.arguments[1].body, JSON.stringify({ amount: 50.00 }));
     });
+    it('should throw an error when fetch fails (response not ok) via processPayment', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve({ message: 'Failed to create payment session' })
+      }));
+
+      await assert.rejects(
+        async () => await processPayment(50.00),
+        { message: 'Failed to create payment session' }
+      );
+    });
+
+    it('should throw an error when fetch completely fails (network error) via processPayment', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.reject(new Error('Network error')));
+
+      await assert.rejects(
+        async () => await processPayment(50.00),
+        { message: 'Network error' }
+      );
+    });
+
+    it('should throw an error when response is invalid (missing url and success) via processPayment', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ foo: 'bar' })
+      }));
+
+      await assert.rejects(
+        async () => await processPayment(50.00),
+        { message: 'Invalid response from payment provider: Missing checkout url' }
+      );
+    });
+
   });
 
   describe('initiateBackendTransaction', () => {
