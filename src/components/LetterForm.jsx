@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, memo } from 'react';
+import React, { useCallback, useRef, memo, useMemo } from 'react';
 import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
@@ -13,6 +13,16 @@ const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].loca
 }));
 
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
+  const itemErrorsMap = useMemo(() => {
+    const map = new Map();
+    if (errors?.itemErrors) {
+      for (const e of errors.itemErrors) {
+        map.set(e.index, e.message);
+      }
+    }
+    return map;
+  }, [errors?.itemErrors]);
+
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
   const handleAddItem = useCallback(() => {
@@ -228,7 +238,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               onChange={handleItemChange}
               onRemove={handleRemoveItem}
               showRemove={formData.items.length > 1}
-              error={errors.itemErrors?.find(e => e.index === index)?.message}
+              error={itemErrorsMap.get(index)}
             />
           ))}
           {errors.items && <p className="text-xs text-red-500 font-bold text-center">{errors.items}</p>}
