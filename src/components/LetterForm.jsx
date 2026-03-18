@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, memo, useMemo } from 'react';
-import { FiBriefcase, FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
+import { FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
