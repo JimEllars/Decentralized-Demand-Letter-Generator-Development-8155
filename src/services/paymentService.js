@@ -75,3 +75,39 @@ export const processPayment = async (amount) => {
     }, 1500);
   });
 };
+
+/**
+ * Verifies a payment session ID via the configured backend.
+ *
+ * If VITE_PAYMENT_API_URL is configured, it sends a verification request.
+ * Otherwise, it falls back to a simulation mode where session IDs starting with 'AXM-' are considered valid.
+ *
+ * @param {string} sessionId - The session ID to verify.
+ * @returns {Promise<{isPaid: boolean} | never>}
+ */
+export const verifyPaymentSession = async (sessionId) => {
+  const paymentApiUrl = typeof import.meta.env !== 'undefined'
+    ? import.meta.env.VITE_PAYMENT_API_URL
+    : process.env.VITE_PAYMENT_API_URL;
+
+  if (paymentApiUrl) {
+    try {
+      const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${sessionId}`);
+      if (!response.ok) {
+        throw new Error('Failed to verify payment session');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Payment Verification Error:", error);
+      throw error;
+    }
+  }
+
+  // Fallback: Simulation Mode
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const isValid = typeof sessionId === 'string' && sessionId.startsWith('AXM-');
+      resolve({ isPaid: isValid });
+    }, 500);
+  });
+};
