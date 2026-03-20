@@ -1,8 +1,9 @@
 import { test, describe, it, afterEach } from 'node:test';
 import assert from 'node:assert';
 import React from 'react';
-import { render, cleanup } from '@testing-library/react';
+import { render, cleanup, screen } from '@testing-library/react';
 import FormSection from '../src/components/FormSection.jsx';
+import { FiUser } from 'react-icons/fi';
 
 describe('FormSection', () => {
   afterEach(() => {
@@ -16,8 +17,9 @@ describe('FormSection', () => {
       </FormSection>
     );
 
-    assert.ok(document.body.innerHTML.includes('Test Title'));
-    assert.ok(document.body.innerHTML.includes('Child Content'));
+    assert.ok(screen.getByText('Test Title'));
+    assert.ok(screen.getByTestId('child-element'));
+    assert.strictEqual(screen.getByTestId('child-element').textContent, 'Child Content');
   });
 
   it('should render with correct layout classes', () => {
@@ -33,5 +35,24 @@ describe('FormSection', () => {
 
     const wrapper = container.querySelector('.grid.grid-cols-1.gap-4');
     assert.ok(wrapper, 'Should render children inside a grid wrapper');
+
+    const rootDiv = container.firstChild;
+    assert.ok(rootDiv.className.includes('space-y-4'));
+    assert.ok(rootDiv.className.includes('pt-6'));
+  });
+
+  it('should render the provided icon', () => {
+    const { container } = render(
+      <FormSection title="Icon Title" icon={FiUser}>
+        <div>Content</div>
+      </FormSection>
+    );
+
+    const svgElement = container.querySelector('svg');
+    assert.ok(svgElement, 'Should render an SVG icon');
+
+    const classNameVal = svgElement.className.baseVal || svgElement.className;
+    assert.ok(classNameVal.includes('w-4'));
+    assert.ok(classNameVal.includes('h-4'));
   });
 });
