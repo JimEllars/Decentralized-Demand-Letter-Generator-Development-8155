@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const SummaryCard = ({ calculatedValues, jurisdiction }) => {
