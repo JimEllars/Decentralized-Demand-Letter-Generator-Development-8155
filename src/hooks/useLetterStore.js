@@ -44,11 +44,22 @@ export const useLetterStore = (initialDataOrFn) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
+  const addItem = useCallback(() => {
+    setFormData(prev => ({ ...prev, items: [...(prev.items || []), { id: generateId(), description: '', amount: '' }] }));
+  }, []);
+
+  const removeItem = useCallback((index) => {
+    setFormData(prev => {
+      const currentItems = prev.items || [];
+      return { ...prev, items: currentItems.filter((_, i) => i !== index) };
+    });
+  }, []);
+
   const resetForm = useCallback(() => {
     const newState = typeof initialDataOrFn === 'function' ? initialDataOrFn() : initialDataOrFn;
     setFormData(newState);
     localStorage.removeItem(STORAGE_KEY);
   }, [initialDataOrFn]);
 
-  return { formData, updateField, resetForm, isInitialized };
+  return { formData, updateField, addItem, removeItem, resetForm, isInitialized };
 };
