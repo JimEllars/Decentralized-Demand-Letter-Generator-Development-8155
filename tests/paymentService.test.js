@@ -36,10 +36,10 @@ describe('paymentService', () => {
       // Ensure VITE_PAYMENT_API_URL is undefined
       delete process.env.VITE_PAYMENT_API_URL;
 
-      const amount = 99.99;
+      const productId = 'demand_letter';
       const startTime = Date.now();
 
-      const result = await processPayment(amount);
+      const result = await processPayment(productId);
 
       const endTime = Date.now();
       const duration = endTime - startTime;
@@ -61,8 +61,8 @@ describe('paymentService', () => {
         json: () => Promise.resolve({ success: true, transactionId: 'real-tx-123' })
       }));
 
-      const amount = 50.00;
-      const result = await processPayment(amount);
+      const productId = 'test_product';
+      const result = await processPayment(productId);
 
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.transactionId, 'real-tx-123');
@@ -72,7 +72,7 @@ describe('paymentService', () => {
       const fetchCall = globalThis.fetch.mock.calls[0];
       assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/create-checkout-session');
       assert.strictEqual(fetchCall.arguments[1].method, 'POST');
-      assert.strictEqual(fetchCall.arguments[1].body, JSON.stringify({ amount: 50.00 }));
+      assert.strictEqual(fetchCall.arguments[1].body, JSON.stringify({ productId: 'test_product' }));
     });
     it('should throw an error when fetch fails (response not ok) via processPayment', async () => {
       process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
@@ -82,7 +82,7 @@ describe('paymentService', () => {
       }));
 
       await assert.rejects(
-        async () => await processPayment(50.00),
+        async () => await processPayment('test_product'),
         { message: 'Failed to create payment session' }
       );
     });
@@ -92,7 +92,7 @@ describe('paymentService', () => {
       globalThis.fetch.mock.mockImplementationOnce(() => Promise.reject(new Error('Network error')));
 
       await assert.rejects(
-        async () => await processPayment(50.00),
+        async () => await processPayment('test_product'),
         { message: 'Network error' }
       );
     });
@@ -105,7 +105,7 @@ describe('paymentService', () => {
       }));
 
       await assert.rejects(
-        async () => await processPayment(50.00),
+        async () => await processPayment('test_product'),
         { message: 'Invalid response from payment provider: Missing checkout url' }
       );
     });
@@ -119,7 +119,7 @@ describe('paymentService', () => {
         json: () => Promise.resolve({ success: true, transactionId: 'test-tx-123' })
       }));
 
-      const result = await initiateBackendTransaction('http://test.api', 100);
+      const result = await initiateBackendTransaction('http://test.api', 'test_product');
 
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.transactionId, 'test-tx-123');
@@ -132,7 +132,7 @@ describe('paymentService', () => {
       }));
 
       // initiateBackendTransaction returns a Promise that never resolves in this case,
-      initiateBackendTransaction('http://test.api', 100);
+      initiateBackendTransaction('http://test.api', 'test_product');
 
       // Wait a tick for promises to resolve
       await new Promise(resolve => setTimeout(resolve, 0));
@@ -147,7 +147,7 @@ describe('paymentService', () => {
       }));
 
       await assert.rejects(
-        async () => await initiateBackendTransaction('http://test.api', 100),
+        async () => await initiateBackendTransaction('http://test.api', 'test_product'),
         { message: 'API rate limit exceeded' }
       );
     });
@@ -159,7 +159,7 @@ describe('paymentService', () => {
       }));
 
       await assert.rejects(
-        async () => await initiateBackendTransaction('http://test.api', 100),
+        async () => await initiateBackendTransaction('http://test.api', 'test_product'),
         { message: 'Invalid response from payment provider: Missing checkout url' }
       );
     });
@@ -168,7 +168,7 @@ describe('paymentService', () => {
       globalThis.fetch.mock.mockImplementationOnce(() => Promise.reject(new Error('Network error')));
 
       await assert.rejects(
-        async () => await initiateBackendTransaction('http://test.api', 100),
+        async () => await initiateBackendTransaction('http://test.api', 'test_product'),
         { message: 'Network error' }
       );
     });
