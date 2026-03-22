@@ -77,7 +77,7 @@ export const usePayment = () => {
 
     setIsProcessing(true);
     try {
-      const result = await processPayment(9.00);
+      const result = await processPayment('demand_letter');
       if (result.success) {
         setIsPaid(true);
         if (result.transactionId) {

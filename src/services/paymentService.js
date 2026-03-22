@@ -7,16 +7,16 @@
 /**
  * Initiates a transaction via the configured backend.
  * @param {string} apiUrl
- * @param {number} amount
+ * @param {string} productId
  */
-export const initiateBackendTransaction = async (apiUrl, amount) => {
+export const initiateBackendTransaction = async (apiUrl, productId) => {
   try {
     const response = await fetch(`${apiUrl}/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ productId }),
     });
 
     if (!response.ok) {
@@ -45,21 +45,21 @@ export const initiateBackendTransaction = async (apiUrl, amount) => {
 };
 
 /**
- * Processes a payment for the specified amount.
+ * Processes a payment for the specified product.
  *
  * If VITE_PAYMENT_API_URL is configured, it initiates a real transaction.
  * Otherwise, it falls back to a simulation mode for development/demo.
  *
- * @param {number} amount - The amount to charge (e.g., 9.00).
+ * @param {string} productId - The product ID to charge for (e.g., 'demand_letter').
  * @returns {Promise<{success: boolean, transactionId?: string} | never>}
  */
-export const processPayment = async (amount) => {
+export const processPayment = async (productId) => {
   const paymentApiUrl = typeof import.meta.env !== 'undefined'
     ? import.meta.env.VITE_PAYMENT_API_URL
     : process.env.VITE_PAYMENT_API_URL;
 
   if (paymentApiUrl) {
-    return initiateBackendTransaction(paymentApiUrl, amount);
+    return initiateBackendTransaction(paymentApiUrl, productId);
   }
 
   // Fallback: Simulation Mode (No Backend Configured)
