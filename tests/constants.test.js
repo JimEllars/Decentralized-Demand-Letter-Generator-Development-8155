@@ -3,11 +3,20 @@ import assert from 'node:assert';
 import * as constants from '../src/utils/constants.js';
 
 describe('constants', () => {
-  it('STATE_NAMES should be an object with 51 entries', () => {
+  it('STATE_NAMES should be an object with 51 valid entries', () => {
     assert.strictEqual(typeof constants.STATE_NAMES, 'object');
     assert.strictEqual(Object.keys(constants.STATE_NAMES).length, 51);
     assert.strictEqual(constants.STATE_NAMES['CA'], 'California');
     assert.strictEqual(constants.STATE_NAMES['NY'], 'New York');
+
+    for (const [key, value] of Object.entries(constants.STATE_NAMES)) {
+      // Keys should be exactly 2 uppercase letters
+      assert.match(key, /^[A-Z]{2}$/);
+      // Values should be strings containing alphabetic characters and optional spaces
+      assert.strictEqual(typeof value, 'string');
+      assert.ok(value.length > 0);
+      assert.match(value, /^[A-Za-z\s]+$/);
+    }
   });
 
   it('STATE_LEGAL_DETAILS should contain all states plus DEFAULT', () => {
@@ -24,14 +33,6 @@ describe('constants', () => {
     assert.ok(keys.includes('DEFAULT'));
     assert.strictEqual(typeof constants.STATE_LEGAL_DETAILS['DEFAULT'].rate, 'number');
     assert.strictEqual(typeof constants.STATE_LEGAL_DETAILS['DEFAULT'].statute, 'string');
-  });
-
-  it('STATE_INTEREST_RATES should map correctly from STATE_LEGAL_DETAILS', { skip: "Refactored out" }, () => {
-    assert.strictEqual(typeof constants.STATE_INTEREST_RATES, 'object');
-    const keys = Object.keys(constants.STATE_LEGAL_DETAILS);
-    keys.forEach(key => {
-      assert.strictEqual(constants.STATE_INTEREST_RATES[key], constants.STATE_LEGAL_DETAILS[key].rate);
-    });
   });
 
   it('TONE_TEMPLATES should contain 4 valid tones', () => {
