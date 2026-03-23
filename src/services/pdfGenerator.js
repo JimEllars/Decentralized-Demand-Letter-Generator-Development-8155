@@ -11,11 +11,16 @@ const dateCache = new Map();
 /**
  * Helper to format date YYYY-MM-DD to Locale Date String
  */
-const formatDate = (dateString) => {
+export const formatDate = (dateString) => {
   if (!dateString) return dateFormatter.format(new Date());
 
   const cached = dateCache.get(dateString);
-  if (cached) return cached;
+  if (cached) {
+    // Maintain LRU order by deleting and re-inserting
+    dateCache.delete(dateString);
+    dateCache.set(dateString, cached);
+    return cached;
+  }
 
   const [year, month, day] = dateString.split('-');
   const date = new Date(year, month - 1, day);
