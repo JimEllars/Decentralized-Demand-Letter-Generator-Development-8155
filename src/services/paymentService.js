@@ -92,7 +92,7 @@ export const verifyPaymentSession = async (sessionId) => {
 
   if (paymentApiUrl) {
     try {
-      const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${sessionId}`);
+      const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${encodeURIComponent(sessionId)}`);
       if (!response.ok) {
         throw new Error('Failed to verify payment session');
       }
