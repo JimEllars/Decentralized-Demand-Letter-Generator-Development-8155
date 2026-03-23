@@ -203,6 +203,22 @@ describe('paymentService', () => {
       assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/verify-session?session_id=real-session-id');
     });
 
+    it('should encode session ID with special characters', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ isPaid: true })
+      }));
+
+      const sessionId = 'session&id=injection';
+      await verifyPaymentSession(sessionId);
+
+      // Verify fetch was called with encoded parameter
+      assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
+      const fetchCall = globalThis.fetch.mock.calls[0];
+      assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/verify-session?session_id=session%26id%3Dinjection');
+    });
+
     it('should throw an error when fetch fails to verify', async () => {
       process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
       globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
