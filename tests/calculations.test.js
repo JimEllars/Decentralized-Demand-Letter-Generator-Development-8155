@@ -54,12 +54,12 @@ describe('calculateTotal', () => {
 
   it('should handle negative days overdue (future due date) as zero interest', () => {
     const items = [{ amount: '1000' }];
-    const dueDate = '2023-02-01';
+    const dueDate = '2099-01-01'; // Date set far in the future
     const letterDate = '2023-01-01'; // Before due date
     const result = calculateTotal(items, 0, dueDate, 'DEFAULT', letterDate);
 
     assert.strictEqual(result.interest, 0);
-    assert.strictEqual(result.daysOverdue, 0); // Or negative depending on implementation, but logic says diff > 0 check
+    assert.strictEqual(result.daysOverdue, 0);
   });
 
   it('should handle state-specific rates', () => {
