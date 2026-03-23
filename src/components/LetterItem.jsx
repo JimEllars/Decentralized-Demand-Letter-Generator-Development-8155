@@ -2,7 +2,13 @@ import React from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
-const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, error }) => {
+const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, itemErrors = {} }) => {
+  const getInputClass = (hasError) => {
+    const base = "w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
+    if (hasError) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
+    return `${base} border-slate-300 focus:border-blue-500`;
+  };
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex gap-2 items-start">
@@ -12,8 +18,8 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, er
             placeholder="Description (e.g. Invoice #101)"
             value={item.description}
             onChange={(e) => onChange(index, 'description', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${error && error.includes('Description') ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300'}`}
-            aria-invalid={!!(error && error.includes('Description'))}
+            className={getInputClass(!!itemErrors.description)}
+            aria-invalid={!!itemErrors.description}
           />
         </div>
         <div className="flex flex-col w-24">
@@ -23,8 +29,8 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, er
             placeholder="0.00"
             value={item.amount}
             onChange={(e) => onChange(index, 'amount', e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none ${error && error.includes('Amount') ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-slate-300'}`}
-            aria-invalid={!!(error && error.includes('Amount'))}
+            className={getInputClass(!!itemErrors.amount)}
+            aria-invalid={!!itemErrors.amount}
           />
         </div>
         {showRemove && (
@@ -33,7 +39,13 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, er
           </button>
         )}
       </div>
-      {error && <p className="text-[10px] text-red-500 font-bold text-right pr-12">{error}</p>}
+      {Object.values(itemErrors).length > 0 && (
+        <div className="text-[10px] text-red-500 font-bold text-right pr-12 space-y-0.5">
+          {Object.values(itemErrors).map((msg, i) => (
+            <p key={i}>{msg}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 });

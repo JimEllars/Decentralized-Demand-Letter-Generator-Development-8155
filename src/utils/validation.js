@@ -31,14 +31,16 @@ export const validateForm = (formData) => {
     errors.items = "At least one item is required.";
   } else {
     formData.items.forEach((item, index) => {
-      let message = null;
+      const itemError = {};
       if (!item.description || !item.description.trim()) {
-        message = "Description is required.";
-      } else if (!item.amount || parseFloat(item.amount) <= 0) {
-        message = "Amount must be greater than 0.";
+        itemError.description = "Description is required.";
       }
-      if (message) {
-        itemErrors.push({ index, message });
+      if (!item.amount || parseFloat(item.amount) <= 0) {
+        itemError.amount = "Amount must be greater than 0.";
+      }
+
+      if (Object.keys(itemError).length > 0) {
+        itemErrors.push({ index, errors: itemError });
       }
     });
     if (itemErrors.length > 0) {

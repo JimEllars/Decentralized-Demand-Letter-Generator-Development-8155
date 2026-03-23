@@ -17,7 +17,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
     const map = new Map();
     if (errors?.itemErrors) {
       for (const e of errors.itemErrors) {
-        map.set(e.index, e.message);
+        map.set(e.index, e.errors);
       }
     }
     return map;
@@ -238,7 +238,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               onChange={handleItemChange}
               onRemove={handleRemoveItem}
               showRemove={formData.items.length > 1}
-              error={itemErrorsMap.get(index)}
+              itemErrors={itemErrorsMap.get(index)}
             />
           ))}
           {errors.items && <p className="text-xs text-red-500 font-bold text-center">{errors.items}</p>}
