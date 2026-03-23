@@ -68,6 +68,24 @@ describe('validateForm', () => {
     assert.strictEqual(result.isValid, false);
     assert.ok(result.errors.itemErrors);
     assert.strictEqual(result.errors.itemErrors[0].index, 0);
+    assert.ok(result.errors.itemErrors[0].errors.amount);
+  });
+
+  it('should invalidate items with missing description', () => {
+    const form = {
+      creditorName: 'Creditor',
+      creditorAddress: 'Address 1',
+      debtorName: 'Debtor',
+      debtorAddress: 'Address 2',
+      dueDate: '2023-01-01',
+      letterDate: '2023-01-01',
+      items: [{ description: '', amount: '100' }]
+    };
+    const result = validateForm(form);
+    assert.strictEqual(result.isValid, false);
+    assert.ok(result.errors.itemErrors);
+    assert.strictEqual(result.errors.itemErrors[0].index, 0);
+    assert.ok(result.errors.itemErrors[0].errors.description);
   });
 });
 
@@ -108,7 +126,7 @@ describe('getFirstErrorFieldId', () => {
   });
 
   it('should return items-section if itemErrors has an error', () => {
-    const errors = { itemErrors: [{ index: 0, message: 'Error' }] };
+    const errors = { itemErrors: [{ index: 0, errors: { description: 'Error' } }] };
     assert.strictEqual(getFirstErrorFieldId(errors), 'items-section');
   });
 
