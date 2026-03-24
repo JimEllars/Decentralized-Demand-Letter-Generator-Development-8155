@@ -9,48 +9,60 @@ describe('PaymentModal', () => {
     cleanup();
   });
 
-  it('renders correctly with initial state', () => {
+  it('should render standard modal elements correctly', () => {
     render(<PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={() => {}} />);
 
+    // Renders headings and static text
     assert.ok(screen.getByText('Secure Checkout'));
+    assert.ok(screen.getByText('AXiM Encryption Active'));
+    assert.ok(screen.getByText('Document Access'));
     assert.ok(screen.getByText('$9.00'));
-    assert.ok(screen.getByText('All sales are final. No refunds.'));
-    assert.ok(screen.getByText('Pay $9.00 Now'));
-    assert.ok(screen.getByText('Cancel'));
 
+    // Renders disclaimer
+    assert.ok(screen.getByText('All sales are final. No refunds.'));
+
+    // Renders buttons
+    const payButton = screen.getByText('Pay $9.00 Now');
+    assert.ok(payButton);
+    const cancelButton = screen.getByText('Cancel');
+    assert.ok(cancelButton);
+
+    // Dialog accessibility attributes
     const dialog = screen.getByRole('dialog');
     assert.strictEqual(dialog.getAttribute('aria-modal'), 'true');
     assert.strictEqual(dialog.getAttribute('aria-labelledby'), 'modal-title');
     assert.strictEqual(screen.getByRole('heading', { level: 3 }).id, 'modal-title');
   });
 
-  it('calls onConfirm when pay button is clicked', () => {
-    const onConfirm = mock.fn();
-    render(<PaymentModal isProcessing={false} onConfirm={onConfirm} onCancel={() => {}} />);
+  it('should trigger onConfirm when the pay button is clicked', () => {
+    const onConfirmMock = mock.fn();
+    render(<PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} />);
 
     const payButton = screen.getByText('Pay $9.00 Now').closest('button');
     fireEvent.click(payButton);
-    assert.strictEqual(onConfirm.mock.callCount(), 1);
+    assert.strictEqual(onConfirmMock.mock.callCount(), 1);
   });
 
-  it('calls onCancel when cancel button is clicked', () => {
-    const onCancel = mock.fn();
-    render(<PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={onCancel} />);
+  it('should trigger onCancel when the cancel button is clicked', () => {
+    const onCancelMock = mock.fn();
+    render(<PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={onCancelMock} />);
 
     const cancelButton = screen.getByText('Cancel').closest('button');
     fireEvent.click(cancelButton);
-    assert.strictEqual(onCancel.mock.callCount(), 1);
+    assert.strictEqual(onCancelMock.mock.callCount(), 1);
   });
 
-  it('shows processing state correctly', () => {
+  it('should disable buttons and show verifying text when isProcessing is true', () => {
     render(<PaymentModal isProcessing={true} onConfirm={() => {}} onCancel={() => {}} />);
 
+    // Verifying text should be present, standard Pay text shouldn't
     assert.ok(screen.getByText(/Verifying\.\.\./));
-    assert.ok(!screen.queryByText('Pay $9.00 Now'));
+    assert.strictEqual(screen.queryByText('Pay $9.00 Now'), null);
 
     const payButton = screen.getByText(/Verifying\.\.\./).closest('button');
     const cancelButton = screen.getByText('Cancel').closest('button');
 
+    // Both buttons should be disabled
     assert.ok(payButton.disabled);
     assert.ok(cancelButton.disabled);
   });
