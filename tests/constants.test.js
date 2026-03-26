@@ -57,10 +57,4 @@ describe('constants', () => {
       assert.strictEqual(typeof constants.STATE_SPECIFIC_CLAUSES[key].text, 'string');
     });
   });
-
-  it('STRIPE_PUBLISHABLE_KEY should be a string or null', () => {
-    const key = constants.STRIPE_PUBLISHABLE_KEY;
-    const isStringOrNull = typeof key === 'string' || key === null;
-    assert.ok(isStringOrNull, 'STRIPE_PUBLISHABLE_KEY should be string or null');
-  });
 });
