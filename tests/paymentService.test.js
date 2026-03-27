@@ -110,6 +110,21 @@ describe('paymentService', () => {
       );
     });
 
+    it('should throw an error in production without VITE_PAYMENT_API_URL', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      delete process.env.VITE_PAYMENT_API_URL;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        await assert.rejects(
+          async () => await processPayment('test_product'),
+          { message: 'Payment API URL is not configured in production environment.' }
+        );
+      } finally {
+        process.env.NODE_ENV = originalNodeEnv;
+      }
+    });
+
   });
 
   describe('initiateBackendTransaction', () => {
@@ -229,6 +244,21 @@ describe('paymentService', () => {
         async () => await verifyPaymentSession('real-session-id'),
         { message: 'Failed to verify payment session' }
       );
+    });
+
+    it('should throw an error in production without VITE_PAYMENT_API_URL', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      delete process.env.VITE_PAYMENT_API_URL;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        await assert.rejects(
+          async () => await verifyPaymentSession('AXM-123456'),
+          { message: 'Payment API URL is not configured in production environment.' }
+        );
+      } finally {
+        process.env.NODE_ENV = originalNodeEnv;
+      }
     });
   });
 });

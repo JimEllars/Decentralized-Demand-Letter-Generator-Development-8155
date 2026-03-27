@@ -62,6 +62,14 @@ export const processPayment = async (productId) => {
     return initiateBackendTransaction(paymentApiUrl, productId);
   }
 
+  const isProd = typeof import.meta.env !== 'undefined' && typeof import.meta.env.PROD !== 'undefined'
+    ? import.meta.env.PROD
+    : process.env.NODE_ENV === 'production';
+
+  if (isProd) {
+    throw new Error('Payment API URL is not configured in production environment.');
+  }
+
   // Fallback: Simulation Mode (No Backend Configured)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -101,6 +109,14 @@ export const verifyPaymentSession = async (sessionId) => {
       console.error("Payment Verification Error:", error);
       throw error;
     }
+  }
+
+  const isProd = typeof import.meta.env !== 'undefined' && typeof import.meta.env.PROD !== 'undefined'
+    ? import.meta.env.PROD
+    : process.env.NODE_ENV === 'production';
+
+  if (isProd) {
+    throw new Error('Payment API URL is not configured in production environment.');
   }
 
   // Fallback: Simulation Mode
