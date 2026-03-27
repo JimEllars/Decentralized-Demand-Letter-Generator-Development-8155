@@ -9,10 +9,28 @@ describe('Header', () => {
     cleanup();
   });
 
-  it('should render the AXiM Documents title', () => {
-    render(<Header />);
-    assert.ok(screen.getByText(/AXiM/i));
-    assert.ok(screen.getByText(/Documents/i));
+  it('should render a semantic header element with appropriate classes', () => {
+    const { container } = render(<Header />);
+    const headerElement = container.querySelector('header');
+    assert.ok(headerElement, 'Should render a <header> element');
+    assert.strictEqual(
+      headerElement.className,
+      'max-w-7xl mx-auto px-4 py-8',
+      'Should have the correct layout classes'
+    );
+  });
+
+  it('should render the AXiM Documents title as an h1', () => {
+    const { container } = render(<Header />);
+    const h1Element = container.querySelector('h1');
+    assert.ok(h1Element, 'Should render an <h1> element');
+    assert.ok(h1Element.textContent.includes('AXiM'), 'Title should include AXiM');
+    assert.ok(h1Element.textContent.includes('Documents'), 'Title should include Documents');
+    assert.strictEqual(
+      h1Element.className,
+      'text-2xl font-bold text-blue-950 flex items-center gap-1',
+      'Should have correct title styling'
+    );
   });
 
   it('should render the subtitle', () => {
