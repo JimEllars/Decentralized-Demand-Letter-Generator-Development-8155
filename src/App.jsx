@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
@@ -7,7 +7,6 @@ import LetterForm from './components/LetterForm';
 import SummaryCard from './components/SummaryCard';
 import UpsellCard from './components/UpsellCard';
 import PaymentModal from './components/PaymentModal';
-import { useState } from 'react';
 import { useLetterStore } from './hooks/useLetterStore';
 import { usePayment } from './hooks/usePayment';
 import { usePdfGenerator } from './hooks/usePdfGenerator';
