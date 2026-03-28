@@ -154,4 +154,22 @@ describe('LetterItem', () => {
     assert.strictEqual(amountInput.getAttribute('aria-invalid'), 'false');
     assert.ok(!amountInput.className.includes('border-red-300'));
   });
+
+  it('renders correctly with default itemErrors object', () => {
+    // Tests the `itemErrors = {}` default parameter explicitly
+    const { container } = render(
+      <LetterItem
+        item={defaultItem}
+        index={0}
+        onChange={() => {}}
+        onRemove={() => {}}
+        showRemove={false}
+        itemErrors={undefined}
+      />
+    );
+
+    // Should not render the error message container
+    const errorContainer = container.querySelector('.text-red-500.text-right');
+    assert.strictEqual(errorContainer, null);
+  });
 });
