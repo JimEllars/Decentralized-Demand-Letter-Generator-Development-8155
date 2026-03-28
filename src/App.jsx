@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SafeIcon from './common/SafeIcon';
 import Header from './components/Header';
@@ -68,7 +68,8 @@ const App = () => {
   const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
   // Robust Validation Check
-  const { isValid, errors } = useMemo(() => validateForm(formData), [formData]);
+  const deferredFormData = useDeferredValue(formData);
+  const { isValid, errors } = useMemo(() => validateForm(deferredFormData), [deferredFormData]);
 
   const displayedErrors = hasAttemptedSubmit ? errors : {};
 
