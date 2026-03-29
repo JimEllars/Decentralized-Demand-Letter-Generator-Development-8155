@@ -69,7 +69,26 @@ const App = () => {
 
   // Robust Validation Check
   const deferredFormData = useDeferredValue(formData);
-  const { isValid, errors } = useMemo(() => validateForm(deferredFormData), [deferredFormData]);
+
+  const validationData = useMemo(() => ({
+    creditorName: deferredFormData.creditorName,
+    creditorAddress: deferredFormData.creditorAddress,
+    debtorName: deferredFormData.debtorName,
+    debtorAddress: deferredFormData.debtorAddress,
+    dueDate: deferredFormData.dueDate,
+    letterDate: deferredFormData.letterDate,
+    items: deferredFormData.items
+  }), [
+    deferredFormData.creditorName,
+    deferredFormData.creditorAddress,
+    deferredFormData.debtorName,
+    deferredFormData.debtorAddress,
+    deferredFormData.dueDate,
+    deferredFormData.letterDate,
+    deferredFormData.items
+  ]);
+
+  const { isValid, errors } = useMemo(() => validateForm(validationData), [validationData]);
 
   const displayedErrors = hasAttemptedSubmit ? errors : {};
 
