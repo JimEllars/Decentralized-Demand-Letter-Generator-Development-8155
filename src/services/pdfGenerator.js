@@ -1,12 +1,12 @@
 
 import { formatCurrency } from '../utils/formatters.js';
 import { STATE_SPECIFIC_CLAUSES } from '../utils/constants.js';
+import { parseISO, isValid } from 'date-fns';
 
 /**
- * Shared formatters and cache to improve performance
+ * Shared formatters to improve performance
  */
 const dateFormatter = new Intl.DateTimeFormat(undefined);
-const dateCache = new Map();
 
 /**
  * Helper to format date YYYY-MM-DD to Locale Date String
@@ -14,31 +14,14 @@ const dateCache = new Map();
 export const formatDate = (dateString) => {
   if (!dateString) return dateFormatter.format(new Date());
 
-  const cached = dateCache.get(dateString);
-  if (cached) {
-    // Maintain LRU order by deleting and re-inserting
-    dateCache.delete(dateString);
-    dateCache.set(dateString, cached);
-    return cached;
-  }
-
-  const [year, month, day] = dateString.split('-');
-  const date = new Date(year, month - 1, day);
+  const date = parseISO(dateString);
 
   // Guard against invalid dates to match original toLocaleDateString() behavior
-  if (isNaN(date.getTime())) {
+  if (!isValid(date)) {
     return "Invalid Date";
   }
 
-  const formatted = dateFormatter.format(date);
-
-  if (dateCache.size >= 1000) {
-    const firstKey = dateCache.keys().next().value;
-    dateCache.delete(firstKey);
-  }
-
-  dateCache.set(dateString, formatted);
-  return formatted;
+  return dateFormatter.format(date);
 };
 
 /**
