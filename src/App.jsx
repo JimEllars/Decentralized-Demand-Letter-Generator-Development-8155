@@ -70,22 +70,26 @@ const App = () => {
   // Robust Validation Check
   const deferredFormData = useDeferredValue(formData);
 
+  // Defer validation while typing to improve performance, unless the user has attempted to submit
+  // where we want immediate feedback for error corrections.
+  const validationSource = hasAttemptedSubmit ? formData : deferredFormData;
+
   const validationData = useMemo(() => ({
-    creditorName: deferredFormData.creditorName,
-    creditorAddress: deferredFormData.creditorAddress,
-    debtorName: deferredFormData.debtorName,
-    debtorAddress: deferredFormData.debtorAddress,
-    dueDate: deferredFormData.dueDate,
-    letterDate: deferredFormData.letterDate,
-    items: deferredFormData.items
+    creditorName: validationSource.creditorName,
+    creditorAddress: validationSource.creditorAddress,
+    debtorName: validationSource.debtorName,
+    debtorAddress: validationSource.debtorAddress,
+    dueDate: validationSource.dueDate,
+    letterDate: validationSource.letterDate,
+    items: validationSource.items
   }), [
-    deferredFormData.creditorName,
-    deferredFormData.creditorAddress,
-    deferredFormData.debtorName,
-    deferredFormData.debtorAddress,
-    deferredFormData.dueDate,
-    deferredFormData.letterDate,
-    deferredFormData.items
+    validationSource.creditorName,
+    validationSource.creditorAddress,
+    validationSource.debtorName,
+    validationSource.debtorAddress,
+    validationSource.dueDate,
+    validationSource.letterDate,
+    validationSource.items
   ]);
 
   const { isValid, errors } = useMemo(() => validateForm(validationData), [validationData]);
