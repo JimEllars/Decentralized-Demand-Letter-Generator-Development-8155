@@ -172,4 +172,53 @@ describe('LetterItem', () => {
     const errorContainer = container.querySelector('.text-red-500.text-right');
     assert.strictEqual(errorContainer, null);
   });
+
+  it('renders correctly for different index values', () => {
+    render(
+      <LetterItem
+        item={defaultItem}
+        index={5}
+        onChange={() => {}}
+        onRemove={() => {}}
+        showRemove={false}
+      />
+    );
+
+    const descInput = screen.getByLabelText('Description for item 6');
+    const amountInput = screen.getByLabelText('Amount for item 6');
+
+    assert.ok(descInput);
+    assert.ok(amountInput);
+  });
+
+  it('applies the correct classes for success and error states', () => {
+    const itemErrors = { description: 'Error' }; // Amount has no error
+    render(
+      <LetterItem
+        item={defaultItem}
+        index={0}
+        onChange={() => {}}
+        onRemove={() => {}}
+        showRemove={false}
+        itemErrors={itemErrors}
+      />
+    );
+
+    const descInput = screen.getByLabelText('Description for item 1');
+    const amountInput = screen.getByLabelText('Amount for item 1');
+
+    // Description has error
+    assert.ok(descInput.className.includes('border-red-300'));
+    assert.ok(descInput.className.includes('bg-red-50'));
+    assert.ok(descInput.className.includes('focus:border-red-500'));
+    assert.ok(!descInput.className.includes('border-slate-300'));
+    assert.ok(!descInput.className.includes('focus:border-blue-500'));
+
+    // Amount does not have error
+    assert.ok(!amountInput.className.includes('border-red-300'));
+    assert.ok(!amountInput.className.includes('bg-red-50'));
+    assert.ok(!amountInput.className.includes('focus:border-red-500'));
+    assert.ok(amountInput.className.includes('border-slate-300'));
+    assert.ok(amountInput.className.includes('focus:border-blue-500'));
+  });
 });
