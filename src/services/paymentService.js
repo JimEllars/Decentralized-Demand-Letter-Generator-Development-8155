@@ -28,6 +28,17 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
 
     // Modern Stripe redirect: Just go directly to the Checkout URL provided by the backend
     if (data.url) {
+      try {
+        const parsedUrl = new URL(data.url);
+        const isTrustedStripeDomain = parsedUrl.hostname === 'stripe.com' || parsedUrl.hostname.endsWith('.stripe.com');
+        if (parsedUrl.protocol !== 'https:' || !isTrustedStripeDomain) {
+          throw new Error('Security Error: Invalid redirect URL');
+        }
+      } catch (err) {
+        console.error("Security Validation Error:", err.message);
+        throw new Error('Security Error: Invalid redirect URL');
+      }
+
       window.location.href = data.url;
       // Return a promise that never resolves to prevent UI state changes during redirect
       return new Promise(() => {});
