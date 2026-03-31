@@ -57,4 +57,49 @@ describe('constants', () => {
       assert.strictEqual(typeof constants.STATE_SPECIFIC_CLAUSES[key].text, 'string');
     });
   });
+
+  it('STATE_OPTIONS should be a sorted array of 51 state objects', () => {
+    assert.ok(Array.isArray(constants.STATE_OPTIONS));
+    assert.strictEqual(constants.STATE_OPTIONS.length, 51);
+
+    // Verify structure of first element
+    assert.strictEqual(typeof constants.STATE_OPTIONS[0].code, 'string');
+    assert.strictEqual(typeof constants.STATE_OPTIONS[0].name, 'string');
+    assert.match(constants.STATE_OPTIONS[0].code, /^[A-Z]{2}$/);
+
+    // Verify alphabetical sorting by state name
+    for (let i = 0; i < constants.STATE_OPTIONS.length - 1; i++) {
+      const current = constants.STATE_OPTIONS[i].name;
+      const next = constants.STATE_OPTIONS[i + 1].name;
+      assert.ok(current.localeCompare(next) <= 0, `STATE_OPTIONS is not sorted: ${current} vs ${next}`);
+    }
+
+    // Verify some specific entries
+    const california = constants.STATE_OPTIONS.find(s => s.code === 'CA');
+    assert.ok(california);
+    assert.strictEqual(california.name, 'California (10%)');
+
+    const florida = constants.STATE_OPTIONS.find(s => s.code === 'FL');
+    assert.ok(florida);
+    assert.strictEqual(florida.name, 'Florida (4.75%)');
+  });
+
+  it('STATE_OPTIONS should be in sync with STATE_NAMES and STATE_LEGAL_DETAILS', () => {
+    // Dynamically compute what the options should be
+    const expectedOptions = Object.keys(constants.STATE_NAMES)
+      .sort((a, b) => constants.STATE_NAMES[a].localeCompare(constants.STATE_NAMES[b]))
+      .map(code => ({
+        code,
+        name: `${constants.STATE_NAMES[code]} (${constants.STATE_LEGAL_DETAILS[code]?.rate}%)`
+      }));
+
+    // Deep equality check
+    assert.strictEqual(constants.STATE_OPTIONS.length, expectedOptions.length);
+
+    expectedOptions.forEach((expected, index) => {
+      const actual = constants.STATE_OPTIONS[index];
+      assert.strictEqual(actual.code, expected.code, `Mismatch at index ${index}: expected code ${expected.code}, got ${actual.code}`);
+      assert.strictEqual(actual.name, expected.name, `Mismatch at index ${index}: expected name ${expected.name}, got ${actual.name}`);
+    });
+  });
 });

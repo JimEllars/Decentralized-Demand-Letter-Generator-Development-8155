@@ -13,6 +13,213 @@ export const STATE_NAMES = {
   'WY': 'Wyoming'
 };
 
+export const STATE_OPTIONS = [
+  {
+    "code": "AL",
+    "name": "Alabama (7.5%)"
+  },
+  {
+    "code": "AK",
+    "name": "Alaska (10.5%)"
+  },
+  {
+    "code": "AZ",
+    "name": "Arizona (10%)"
+  },
+  {
+    "code": "AR",
+    "name": "Arkansas (6%)"
+  },
+  {
+    "code": "CA",
+    "name": "California (10%)"
+  },
+  {
+    "code": "CO",
+    "name": "Colorado (8%)"
+  },
+  {
+    "code": "CT",
+    "name": "Connecticut (8%)"
+  },
+  {
+    "code": "DE",
+    "name": "Delaware (5%)"
+  },
+  {
+    "code": "DC",
+    "name": "District of Columbia (6%)"
+  },
+  {
+    "code": "FL",
+    "name": "Florida (4.75%)"
+  },
+  {
+    "code": "GA",
+    "name": "Georgia (7%)"
+  },
+  {
+    "code": "HI",
+    "name": "Hawaii (10%)"
+  },
+  {
+    "code": "ID",
+    "name": "Idaho (12%)"
+  },
+  {
+    "code": "IL",
+    "name": "Illinois (5%)"
+  },
+  {
+    "code": "IN",
+    "name": "Indiana (8%)"
+  },
+  {
+    "code": "IA",
+    "name": "Iowa (5%)"
+  },
+  {
+    "code": "KS",
+    "name": "Kansas (10%)"
+  },
+  {
+    "code": "KY",
+    "name": "Kentucky (6%)"
+  },
+  {
+    "code": "LA",
+    "name": "Louisiana (5%)"
+  },
+  {
+    "code": "ME",
+    "name": "Maine (6%)"
+  },
+  {
+    "code": "MD",
+    "name": "Maryland (6%)"
+  },
+  {
+    "code": "MA",
+    "name": "Massachusetts (12%)"
+  },
+  {
+    "code": "MI",
+    "name": "Michigan (5%)"
+  },
+  {
+    "code": "MN",
+    "name": "Minnesota (4%)"
+  },
+  {
+    "code": "MS",
+    "name": "Mississippi (8%)"
+  },
+  {
+    "code": "MO",
+    "name": "Missouri (9%)"
+  },
+  {
+    "code": "MT",
+    "name": "Montana (10%)"
+  },
+  {
+    "code": "NE",
+    "name": "Nebraska (12%)"
+  },
+  {
+    "code": "NV",
+    "name": "Nevada (5.25%)"
+  },
+  {
+    "code": "NH",
+    "name": "New Hampshire (5%)"
+  },
+  {
+    "code": "NJ",
+    "name": "New Jersey (2.5%)"
+  },
+  {
+    "code": "NM",
+    "name": "New Mexico (8.75%)"
+  },
+  {
+    "code": "NY",
+    "name": "New York (9%)"
+  },
+  {
+    "code": "NC",
+    "name": "North Carolina (8%)"
+  },
+  {
+    "code": "ND",
+    "name": "North Dakota (6.5%)"
+  },
+  {
+    "code": "OH",
+    "name": "Ohio (5%)"
+  },
+  {
+    "code": "OK",
+    "name": "Oklahoma (6%)"
+  },
+  {
+    "code": "OR",
+    "name": "Oregon (9%)"
+  },
+  {
+    "code": "PA",
+    "name": "Pennsylvania (6%)"
+  },
+  {
+    "code": "RI",
+    "name": "Rhode Island (12%)"
+  },
+  {
+    "code": "SC",
+    "name": "South Carolina (7.25%)"
+  },
+  {
+    "code": "SD",
+    "name": "South Dakota (10%)"
+  },
+  {
+    "code": "TN",
+    "name": "Tennessee (10%)"
+  },
+  {
+    "code": "TX",
+    "name": "Texas (6%)"
+  },
+  {
+    "code": "UT",
+    "name": "Utah (10%)"
+  },
+  {
+    "code": "VT",
+    "name": "Vermont (12%)"
+  },
+  {
+    "code": "VA",
+    "name": "Virginia (6%)"
+  },
+  {
+    "code": "WA",
+    "name": "Washington (12%)"
+  },
+  {
+    "code": "WV",
+    "name": "West Virginia (7%)"
+  },
+  {
+    "code": "WI",
+    "name": "Wisconsin (5%)"
+  },
+  {
+    "code": "WY",
+    "name": "Wyoming (7%)"
+  }
+];
+
 export const STATE_LEGAL_DETAILS = {
   'AL': { rate: 7.5, statute: 'Ala. Code § 8-8-10' },
   'AK': { rate: 10.5, statute: 'Alaska Stat. § 45.45.010' },

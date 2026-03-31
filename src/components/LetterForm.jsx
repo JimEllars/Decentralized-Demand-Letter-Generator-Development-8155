@@ -3,14 +3,8 @@ import { FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
-import { STATE_NAMES, STATE_LEGAL_DETAILS } from '../utils/constants';
+import { STATE_NAMES, STATE_LEGAL_DETAILS, STATE_OPTIONS } from '../utils/constants';
 import { generateId, getLocalDateString } from '../utils/helpers';
-
-// Sort states alphabetically by name
-const stateOptions = Object.keys(STATE_NAMES).sort((a, b) => STATE_NAMES[a].localeCompare(STATE_NAMES[b])).map(code => ({
-  code,
-  name: `${STATE_NAMES[code]} (${STATE_LEGAL_DETAILS[code]?.rate}%)`
-}));
 
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
   const itemErrorsMap = useMemo(() => {
@@ -92,7 +86,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               onChange={handleChange}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
             >
-              {stateOptions.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
+              {STATE_OPTIONS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
               <option value="DEFAULT">Other / International (6%)</option>
             </select>
             {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
