@@ -4,9 +4,9 @@ import SafeIcon from '../common/SafeIcon';
 
 const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, itemErrors = {} }) => {
   const getInputClass = (hasError) => {
-    const base = "w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
-    if (hasError) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
-    return `${base} border-slate-300 focus:border-blue-500`;
+    const base = "bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600";
+    if (hasError) return `${base} border-red-500/50 bg-red-900/10 focus:border-red-500`;
+    return base;
   };
 
   return (
@@ -22,25 +22,28 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, it
             aria-invalid={!!itemErrors.description}
           />
         </div>
-        <div className="flex flex-col w-24">
+        <div className="flex flex-col w-32 relative">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-mono">
+            $
+          </div>
           <input
             aria-label={`Amount for item ${index + 1}`}
             type="number"
             placeholder="0.00"
             value={item.amount}
             onChange={(e) => onChange(index, 'amount', e.target.value)}
-            className={getInputClass(!!itemErrors.amount)}
+            className={`${getInputClass(!!itemErrors.amount)} pl-8`}
             aria-invalid={!!itemErrors.amount}
           />
         </div>
         {showRemove && (
-          <button onClick={() => onRemove(index)} className="p-2 text-slate-400 hover:text-red-500" aria-label="Remove item">
+          <button onClick={() => onRemove(index)} className="p-3 text-zinc-500 hover:text-red-400 hover:bg-red-900/20 rounded-sm transition-colors mt-1" aria-label="Remove item">
             <SafeIcon icon={FiTrash2} />
           </button>
         )}
       </div>
       {Object.values(itemErrors).length > 0 && (
-        <div className="text-[10px] text-red-500 font-bold text-right pr-12 space-y-0.5">
+        <div className="font-mono text-[0.65rem] text-red-400 text-right pr-12 space-y-0.5 tracking-wide mt-1">
           {Object.values(itemErrors).map((msg, i) => (
             <p key={i}>{msg}</p>
           ))}

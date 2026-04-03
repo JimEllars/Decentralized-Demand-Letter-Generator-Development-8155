@@ -14,46 +14,46 @@ const SummaryCard = ({ calculatedValues, jurisdiction }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden"
+      className="bg-glass rounded-sm shadow-lg border border-subtle overflow-hidden backdrop-blur-sm"
     >
-      <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-        <h3 className="font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wider text-xs">
+      <div className="bg-black/40 border-b border-subtle px-6 py-4 flex items-center justify-between">
+        <h3 className="font-mono text-axim-gold text-[0.7rem] uppercase tracking-widest flex items-center gap-2">
           <SafeIcon icon={FiTrendingUp} /> Financial Summary
         </h3>
-        <span className="text-xs font-semibold text-slate-500 bg-slate-200 px-2 py-1 rounded">
+        <span className="font-mono text-[0.65rem] text-axim-teal bg-black border border-subtle px-2 py-1 uppercase tracking-widest">
           {jurisdiction} Law Applied
         </span>
       </div>
 
-      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-subtle">
 
         {/* Principal */}
         <div className="space-y-1 text-center md:text-left">
-          <p className="text-xs font-bold text-slate-400 uppercase">Principal Amount</p>
-          <p className="text-xl font-bold text-slate-800">{formattedPrincipal}</p>
+          <p className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Principal Amount</p>
+          <p className="text-xl font-mono text-white">{formattedPrincipal}</p>
         </div>
 
         {/* Interest Calculation */}
         <div className="space-y-1 text-center md:text-left md:pl-6 pt-4 md:pt-0">
-          <p className="text-xs font-bold text-slate-400 uppercase flex items-center justify-center md:justify-start gap-1">
+          <p className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest flex items-center justify-center md:justify-start gap-1">
             Statutory Interest
-            {daysOverdue > 0 && <span className="text-emerald-600 bg-emerald-50 px-1.5 rounded text-[10px]">{daysOverdue} Days</span>}
+            {daysOverdue > 0 && <span className="text-axim-teal bg-black border border-subtle px-1.5 py-0.5 text-[0.6rem]">{daysOverdue} Days</span>}
           </p>
-          <p className="text-xl font-bold text-emerald-600">{formattedInterest}</p>
-          <p className="text-[10px] text-slate-500 mt-1 leading-tight">
-            {rateUsed}% per annum via <span className="italic">{statuteUsed}</span>
+          <p className="text-xl font-mono text-axim-teal">{formattedInterest}</p>
+          <p className="font-mono text-[0.65rem] text-zinc-500 mt-1 leading-tight tracking-wide">
+            {rateUsed}% per annum via <span className="italic text-zinc-400">{statuteUsed}</span>
           </p>
           {daysOverdue <= 0 && (
-             <p className="text-[10px] text-amber-500 mt-1 flex items-center justify-center md:justify-start gap-1">
+             <p className="font-mono text-[0.65rem] text-amber-500 mt-1 flex items-center justify-center md:justify-start gap-1 tracking-wide">
                <SafeIcon icon={FiAlertCircle} /> No overdue days calculated
              </p>
           )}
         </div>
 
         {/* Total Due */}
-        <div className="space-y-1 text-center md:text-right md:pl-6 pt-4 md:pt-0 bg-blue-50/50 -mx-6 px-6 md:mx-0 md:px-0 md:bg-transparent rounded-b-2xl md:rounded-none flex flex-col justify-center">
-          <p className="text-xs font-bold text-blue-400 uppercase">Total Recoverable</p>
-          <p className="text-3xl font-black text-blue-900">{formattedTotal}</p>
+        <div className="space-y-1 text-center md:text-right md:pl-6 pt-4 md:pt-0 bg-black/20 -mx-6 px-6 md:mx-0 md:px-0 md:bg-transparent flex flex-col justify-center">
+          <p className="font-mono text-[0.65rem] text-axim-gold uppercase tracking-widest">Total Recoverable</p>
+          <p className="text-3xl font-black font-mono text-axim-gold">{formattedTotal}</p>
         </div>
 
       </div>

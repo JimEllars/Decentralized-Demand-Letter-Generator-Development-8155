@@ -122,23 +122,25 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20">
+    <div className="min-h-screen bg-bg-void text-white font-inter pb-20 bg-grid relative">
       <Header />
-      <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8">
+      <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8 relative z-10">
 
         {/* Instructions Section */}
         <Instructions />
 
-        <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b flex justify-between items-center">
-            <h2 className="font-bold text-slate-700 flex items-center gap-2 uppercase tracking-wider text-xs">
+        <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-glass border border-subtle rounded-sm overflow-hidden p-0 md:p-2 shadow-2xl backdrop-blur-sm">
+          <div className="p-4 border-b border-subtle flex justify-between items-center bg-black/40">
+            <h2 className="font-mono text-axim-gold text-[0.7rem] uppercase tracking-widest flex items-center gap-2">
               <SafeIcon name="FiEdit3" /> Demand Letter Configuration
             </h2>
-            <button onClick={resetForm} className="text-slate-400 hover:text-red-500 transition-colors text-xs flex items-center gap-1 font-bold">
+            <button onClick={resetForm} className="font-mono text-[0.65rem] text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1 tracking-widest uppercase">
               <SafeIcon name="FiTrash2" /> RESET FORM
             </button>
           </div>
-          <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} />
+          <div className="bg-black/20">
+            <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} />
+          </div>
         </motion.section>
 
         {/* Live Financial Summary */}
@@ -158,11 +160,11 @@ const App = () => {
                   <button
                     onClick={onDownloadClick}
                     disabled={isGenerating}
-                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+                    className={`w-full ${isValid && !isGenerating ? 'bg-axim-gold text-black border border-axim-gold shadow-[0_10px_20px_-10px_rgba(255,234,0,0.3)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white' : 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'} px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2`}
                   >
                     {isGenerating ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
                         GENERATING PDF...
                       </>
                     ) : (
@@ -174,7 +176,7 @@ const App = () => {
                   <button
                     onClick={resetForm}
                     disabled={isGenerating}
-                    className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-3 rounded-sm font-mono text-xs flex items-center justify-center gap-2 text-red-500 hover:text-red-400 hover:bg-red-900/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest border border-transparent hover:border-red-900/30"
                   >
                     <SafeIcon name="FiTrash2" /> CLEAR DATA & RESET
                   </button>
@@ -184,11 +186,11 @@ const App = () => {
                   <button
                     onClick={onCheckoutClick}
                     disabled={isProcessing}
-                    className={`w-full py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg transition-all transform ${isValid && !isProcessing ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-[1.01] active:scale-[0.99]' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+                    className={`w-full ${isValid && !isProcessing ? 'bg-axim-gold text-black border border-axim-gold shadow-[0_10px_20px_-10px_rgba(255,234,0,0.3)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white' : 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'} px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2`}
                   >
                     {isProcessing ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
                         PROCESSING...
                       </>
                     ) : (
@@ -201,7 +203,7 @@ const App = () => {
                     <button
                       onClick={onDownloadClick}
                       disabled={isGenerating}
-                      className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-4 rounded-sm font-mono text-xs flex items-center justify-center gap-2 text-zinc-400 hover:text-white hover:bg-glass border border-subtle hover:border-active transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest"
                     >
                       {isGenerating ? "GENERATING PREVIEW..." : <> <SafeIcon name="FiDownload" /> DOWNLOAD WATERMARKED PREVIEW </>}
                     </button>
@@ -209,10 +211,10 @@ const App = () => {
                 </>
               )}
 
-              <div className="text-center text-xs text-slate-400 mt-2">
+              <div className="text-center font-mono text-[0.65rem] text-zinc-500 tracking-widest mt-4 uppercase">
                 Secure 256-bit SSL Encrypted Payment via Stripe
               </div>
-              <div className="text-center text-xs text-slate-500 font-bold mt-1">
+              <div className="text-center font-mono text-[0.65rem] text-zinc-400 font-bold mt-1 tracking-widest uppercase">
                 All sales are final. No refunds.
               </div>
             </div>
