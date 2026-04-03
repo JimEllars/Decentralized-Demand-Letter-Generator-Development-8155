@@ -3,24 +3,24 @@ import { FiShield, FiCheckCircle } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const Header = () => (
-  <header className="max-w-7xl mx-auto px-4 py-8">
-    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-      <div className="flex items-center gap-3">
-        <div className="bg-blue-900 text-white p-2.5 rounded-xl shadow-lg">
-          <SafeIcon icon={FiShield} className="w-6 h-6" />
+  <header className="max-w-7xl mx-auto px-4 py-8 relative z-10">
+    <div className="flex flex-col justify-center items-center gap-6 text-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="bg-glass text-axim-gold p-3 border border-subtle rounded-sm shadow-lg mb-2">
+          <SafeIcon icon={FiShield} className="w-8 h-8" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-blue-950 flex items-center gap-1">
-            AXiM <span className="text-blue-600">Documents</span>
-          </h1>
-          <p className="text-[10px] uppercase tracking-widest font-black text-slate-400">
+          <span className="font-mono text-axim-gold text-[0.7rem] tracking-[3px] uppercase block mb-2">
             Professional Template Engine
-          </p>
+          </span>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white">
+            AXiM <span className="text-axim-teal">Documents</span>
+          </h1>
         </div>
       </div>
       
       <div className="flex items-center gap-4">
-        <div className="hidden md:flex items-center gap-2 text-xs bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-100 shadow-sm">
+        <div className="hidden md:flex items-center gap-2 text-xs bg-glass text-axim-teal px-4 py-2 rounded-sm border border-subtle shadow-sm font-mono">
           <SafeIcon icon={FiCheckCircle} /> 
           <span className="font-bold">Secure Local Processing</span>
         </div>

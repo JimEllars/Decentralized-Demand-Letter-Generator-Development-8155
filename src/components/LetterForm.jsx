@@ -60,14 +60,14 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
     // Only show error class if errors object explicitly contains an error for this field
     // The errors object passed down will only be populated if hasAttemptedSubmit is true
     const hasError = errors && errors[field];
-    const base = "w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors";
-    if (hasError) return `${base} border-red-300 bg-red-50 focus:border-red-500`;
-    return `${base} border-slate-300 focus:border-blue-500`;
+    const base = "bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600";
+    if (hasError) return `${base} border-red-500/50 bg-red-900/10 focus:border-red-500`;
+    return base;
   };
 
   const ErrorMessage = ({ error, id }) => {
     if (!error) return null;
-    return <p id={id} className="text-[10px] text-red-500 mt-1 font-bold">{error}</p>;
+    return <p id={id} className="text-[10px] text-red-400 mt-1 font-mono tracking-wide">{error}</p>;
   };
 
   return (
@@ -75,46 +75,46 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
       <FormSection title="Legal Strategy" icon={FiZap}>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="jurisdiction" className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+            <label htmlFor="jurisdiction" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-1">
               Jurisdiction
-              <span className="text-[9px] text-slate-300 font-normal normal-case">(Governing Law)</span>
+              <span className="text-[9px] text-zinc-600 font-normal normal-case">(Governing Law)</span>
             </label>
             <select
               id="jurisdiction"
               name="jurisdiction"
               value={formData.jurisdiction}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+              className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors"
             >
-              {STATE_OPTIONS.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}
-              <option value="DEFAULT">Other / International (6%)</option>
+              {STATE_OPTIONS.map(s => <option key={s.code} value={s.code} className="bg-black text-white">{s.name}</option>)}
+              <option value="DEFAULT" className="bg-black text-white">Other / International (6%)</option>
             </select>
             {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
-               <p className="text-[10px] text-slate-500 italic mt-1">
+               <p className="font-mono text-[0.65rem] text-zinc-500 mt-1">
                   Legal Basis: {STATE_LEGAL_DETAILS[formData.jurisdiction].statute}
                </p>
             )}
           </div>
           <div className="space-y-1">
-            <label htmlFor="tone" className="text-[10px] font-bold text-slate-400 uppercase">Document Tone</label>
+            <label htmlFor="tone" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Document Tone</label>
             <select
               id="tone"
               name="tone"
               value={formData.tone}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-semibold"
+              className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors"
             >
-              <option value="soft">Friendly Reminder</option>
-              <option value="professional">Professional</option>
-              <option value="firm">Firm / Standard</option>
-              <option value="aggressive">Aggressive / Intent to Sue</option>
+              <option value="soft" className="bg-black text-white">Friendly Reminder</option>
+              <option value="professional" className="bg-black text-white">Professional</option>
+              <option value="firm" className="bg-black text-white">Firm / Standard</option>
+              <option value="aggressive" className="bg-black text-white">Aggressive / Intent to Sue</option>
             </select>
           </div>
         </div>
 
         <div className="space-y-1 mt-4">
-            <label htmlFor="statutoryInterest" className="text-[10px] font-bold text-slate-400 uppercase">
-              Custom Interest Rate Override <span className="text-slate-300 font-normal normal-case">(Optional - leave 0 to use state default)</span>
+            <label htmlFor="statutoryInterest" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">
+              Custom Interest Rate Override <span className="text-zinc-600 font-normal normal-case">(Optional - leave 0 to use state default)</span>
             </label>
             <div className="relative">
                 <input
@@ -124,22 +124,22 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
                   placeholder={`Current Default: ${STATE_LEGAL_DETAILS[formData.jurisdiction]?.rate || 6}%`}
                   value={formData.statutoryInterest}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none pr-8"
+                  className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600 pr-8"
                 />
-                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-slate-400 pointer-events-none font-light">
+                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-zinc-500 pointer-events-none font-mono">
                     %
                  </div>
             </div>
         </div>
 
          <div className="space-y-1 mt-4">
-            <div className="flex justify-between items-center">
-                <label htmlFor="letterDate" className="text-[10px] font-bold text-slate-400 uppercase">
+            <div className="flex justify-between items-center mb-2">
+                <label htmlFor="letterDate" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
                 Letter Date
                 </label>
                 <button
                   onClick={() => handleSetToday('letterDate')}
-                  className="text-[10px] text-blue-500 hover:text-blue-700 font-bold uppercase transition-colors"
+                  className="font-mono text-[0.65rem] text-axim-teal hover:text-white uppercase transition-colors"
                   type="button"
                 >
                   Set to Today
@@ -162,7 +162,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
       <FormSection title="Parties" icon={FiUser}>
         <div className="space-y-4">
           <div>
-            <label htmlFor="creditorName" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Creditor Name</label>
+            <label htmlFor="creditorName" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Creditor Name</label>
             <input
               id="creditorName"
               name="creditorName"
@@ -176,7 +176,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="creditorName-error" error={errors.creditorName} />
           </div>
           <div>
-            <label htmlFor="creditorAddress" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Creditor Address</label>
+            <label htmlFor="creditorAddress" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Creditor Address</label>
             <textarea
               id="creditorAddress"
               name="creditorAddress"
@@ -191,7 +191,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="creditorAddress-error" error={errors.creditorAddress} />
           </div>
           <div>
-            <label htmlFor="debtorName" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Debtor Name</label>
+            <label htmlFor="debtorName" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Debtor Name</label>
             <input
               id="debtorName"
               name="debtorName"
@@ -205,7 +205,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="debtorName-error" error={errors.debtorName} />
           </div>
           <div>
-            <label htmlFor="debtorAddress" className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Debtor Address</label>
+            <label htmlFor="debtorAddress" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Debtor Address</label>
             <textarea
               id="debtorAddress"
               name="debtorAddress"
@@ -235,19 +235,19 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               itemErrors={itemErrorsMap.get(index)}
             />
           ))}
-          {errors.items && <p className="text-xs text-red-500 font-bold text-center">{errors.items}</p>}
+          {errors.items && <p className="font-mono text-[0.65rem] text-red-400 tracking-wide text-center">{errors.items}</p>}
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleAddItem}
-              className="flex-1 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-blue-400 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
+              className="flex-1 py-3 border border-subtle border-dashed rounded-sm font-mono text-[0.65rem] tracking-widest text-zinc-400 hover:border-axim-teal hover:text-axim-teal transition-all flex items-center justify-center gap-2 uppercase"
             >
               <SafeIcon icon={FiPlus} /> ADD LINE ITEM
             </button>
             <button
               type="button"
               onClick={handleAddLateFee}
-              className="flex-shrink-0 px-4 py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-bold text-slate-400 hover:border-amber-400 hover:text-amber-600 transition-all flex items-center justify-center gap-2"
+              className="flex-shrink-0 px-4 py-3 border border-subtle border-dashed rounded-sm font-mono text-[0.65rem] tracking-widest text-zinc-400 hover:border-axim-gold hover:text-axim-gold transition-all flex items-center justify-center gap-2 uppercase"
               title="Add 5% Late Fee"
             >
               <SafeIcon icon={FiPlus} /> +5% FEE
@@ -255,13 +255,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
           </div>
         </div>
         <div className="pt-4 space-y-2">
-          <div className="flex justify-between items-center">
-            <label htmlFor="dueDate" className="text-[10px] font-bold text-slate-400 uppercase">
-              Original Due Date <span className="text-slate-300 font-normal normal-case">(Used for interest calc)</span>
+          <div className="flex justify-between items-center mb-2">
+            <label htmlFor="dueDate" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+              Original Due Date <span className="text-zinc-600 font-normal normal-case">(Used for interest calc)</span>
             </label>
             <button
                 onClick={() => handleSetPastDate('dueDate', 30)}
-                className="text-[10px] text-blue-500 hover:text-blue-700 font-bold uppercase transition-colors"
+                className="font-mono text-[0.65rem] text-axim-teal hover:text-white uppercase transition-colors"
                 type="button"
             >
                 Set to 30 Days Ago

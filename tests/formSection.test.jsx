@@ -30,7 +30,8 @@ describe('FormSection', () => {
     );
 
     const titleElement = container.querySelector('h3');
-    assert.ok(titleElement.className.includes('text-slate-500'));
+    assert.ok(titleElement.className.includes('font-mono'));
+    assert.ok(titleElement.className.includes('text-axim-gold'));
     assert.ok(titleElement.className.includes('uppercase'));
 
     const wrapper = container.querySelector('.grid.grid-cols-1.gap-4');

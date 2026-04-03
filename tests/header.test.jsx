@@ -15,7 +15,7 @@ describe('Header', () => {
     assert.ok(headerElement, 'Should render a <header> element');
     assert.strictEqual(
       headerElement.className,
-      'max-w-7xl mx-auto px-4 py-8',
+      'max-w-7xl mx-auto px-4 py-8 relative z-10',
       'Should have the correct layout classes'
     );
   });
@@ -28,7 +28,7 @@ describe('Header', () => {
     assert.ok(h1Element.textContent.includes('Documents'), 'Title should include Documents');
     assert.strictEqual(
       h1Element.className,
-      'text-2xl font-bold text-blue-950 flex items-center gap-1',
+      'text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white',
       'Should have correct title styling'
     );
   });
