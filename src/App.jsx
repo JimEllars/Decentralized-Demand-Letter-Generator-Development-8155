@@ -122,7 +122,8 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-void text-white font-inter pb-20 bg-grid relative">
+    <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
+      <div className="absolute inset-0 bg-grid pointer-events-none z-0"></div>
       <Header />
       <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8 relative z-10">
 
