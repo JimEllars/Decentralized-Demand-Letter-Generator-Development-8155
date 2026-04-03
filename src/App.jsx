@@ -193,7 +193,7 @@ const App = () => {
                       </>
                     ) : (
                       <>
-                        <SafeIcon name="FiCreditCard" /> PROCEED TO CHECKOUT ($9.00)
+                        <SafeIcon name="FiCreditCard" /> PROCEED TO CHECKOUT ($4.00)
                       </>
                     )}
                   </button>

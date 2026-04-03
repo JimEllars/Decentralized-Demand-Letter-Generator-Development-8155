@@ -16,13 +16,13 @@ describe('PaymentModal', () => {
     assert.ok(screen.getByText('Secure Checkout'));
     assert.ok(screen.getByText('AXiM Encryption Active'));
     assert.ok(screen.getByText('Document Access'));
-    assert.ok(screen.getByText('$9.00'));
+    assert.ok(screen.getByText('$4.00'));
 
     // Renders disclaimer
     assert.ok(screen.getByText('All sales are final. No refunds.'));
 
     // Renders buttons
-    const payButton = screen.getByText('Pay $9.00 Now');
+    const payButton = screen.getByText('Pay $4.00 Now');
     assert.ok(payButton);
     const cancelButton = screen.getByText('Cancel');
     assert.ok(cancelButton);
@@ -38,7 +38,7 @@ describe('PaymentModal', () => {
     const onConfirmMock = mock.fn();
     render(<PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} />);
 
-    const payButton = screen.getByText('Pay $9.00 Now').closest('button');
+    const payButton = screen.getByText('Pay $4.00 Now').closest('button');
     fireEvent.click(payButton);
     assert.strictEqual(onConfirmMock.mock.callCount(), 1);
   });
@@ -57,7 +57,7 @@ describe('PaymentModal', () => {
 
     // Verifying text should be present, standard Pay text shouldn't
     assert.ok(screen.getByText(/Verifying\.\.\./));
-    assert.strictEqual(screen.queryByText('Pay $9.00 Now'), null);
+    assert.strictEqual(screen.queryByText('Pay $4.00 Now'), null);
 
     const payButton = screen.getByText(/Verifying\.\.\./).closest('button');
     const cancelButton = screen.getByText('Cancel').closest('button');
