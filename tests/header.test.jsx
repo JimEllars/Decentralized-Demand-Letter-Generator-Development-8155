@@ -34,8 +34,9 @@ describe('Header', () => {
 
   it('should render the AXiM Documents minor logo', () => {
     render(<Header />);
+    // The logo text is split into two elements (AXiM and Documents), so we test for the wrapper text
     assert.ok(screen.getByText((content, element) => {
-      return element.tagName.toLowerCase() === 'span' && content.includes('AXiM') && content.includes('Documents');
+      return element.tagName.toLowerCase() === 'span' && element.textContent.includes('AXiM') && element.textContent.includes('Documents');
     }));
   });
 
