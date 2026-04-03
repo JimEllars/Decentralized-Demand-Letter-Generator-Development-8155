@@ -28,7 +28,7 @@ describe('Header', () => {
     assert.ok(h1Element.textContent.includes('Documents'), 'Title should include Documents');
     assert.strictEqual(
       h1Element.className,
-      'text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white',
+      'text-4xl md:text-5xl font-black tracking-tight mb-4 text-white',
       'Should have correct title styling'
     );
   });

@@ -72,12 +72,16 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
 
   return (
     <div className="p-6 space-y-8">
-      <FormSection title="Legal Strategy" icon={FiZap}>
+      <FormSection
+        title="Legal Strategy"
+        icon={FiZap}
+        description="Select the governing law and tone for your document. This applies appropriate statutory interest defaults."
+      >
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="jurisdiction" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+            <label htmlFor="jurisdiction" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1">
               Jurisdiction
-              <span className="text-[9px] text-zinc-600 font-normal normal-case">(Governing Law)</span>
+              <span className="text-[10px] text-zinc-500 font-normal normal-case">(Governing Law)</span>
             </label>
             <select
               id="jurisdiction"
@@ -90,13 +94,14 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               <option value="DEFAULT" className="bg-black text-white">Other / International (6%)</option>
             </select>
             {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
-               <p className="font-mono text-[0.65rem] text-zinc-500 mt-1">
+               <p className="font-inter text-xs text-zinc-400 mt-1 flex items-center gap-1 bg-black/40 p-1.5 rounded-sm border border-subtle">
+                  <SafeIcon name="FiInfo" className="text-axim-teal w-3 h-3" />
                   Legal Basis: {STATE_LEGAL_DETAILS[formData.jurisdiction].statute}
                </p>
             )}
           </div>
           <div className="space-y-1">
-            <label htmlFor="tone" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Document Tone</label>
+            <label htmlFor="tone" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Document Tone</label>
             <select
               id="tone"
               name="tone"
@@ -113,8 +118,8 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
         </div>
 
         <div className="space-y-1 mt-4">
-            <label htmlFor="statutoryInterest" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">
-              Custom Interest Rate Override <span className="text-zinc-600 font-normal normal-case">(Optional - leave 0 to use state default)</span>
+            <label htmlFor="statutoryInterest" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">
+              Custom Interest Rate Override <span className="text-zinc-500 font-normal normal-case">(Optional - leave 0 to use state default)</span>
             </label>
             <div className="relative">
                 <input
@@ -134,12 +139,12 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
 
          <div className="space-y-1 mt-4">
             <div className="flex justify-between items-center mb-2">
-                <label htmlFor="letterDate" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
+                <label htmlFor="letterDate" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider">
                 Letter Date
                 </label>
                 <button
                   onClick={() => handleSetToday('letterDate')}
-                  className="font-mono text-[0.65rem] text-axim-teal hover:text-white uppercase transition-colors"
+                  className="font-inter text-[0.65rem] font-bold text-axim-teal hover:text-white uppercase transition-colors tracking-wide"
                   type="button"
                 >
                   Set to Today
@@ -159,10 +164,14 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
         </div>
       </FormSection>
 
-      <FormSection title="Parties" icon={FiUser}>
+      <FormSection
+        title="Parties"
+        icon={FiUser}
+        description="Enter the exact legal names and valid mailing addresses for both parties. This ensures proper legal service."
+      >
         <div className="space-y-4">
           <div>
-            <label htmlFor="creditorName" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Creditor Name</label>
+            <label htmlFor="creditorName" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Creditor Name</label>
             <input
               id="creditorName"
               name="creditorName"
@@ -176,7 +185,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="creditorName-error" error={errors.creditorName} />
           </div>
           <div>
-            <label htmlFor="creditorAddress" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Creditor Address</label>
+            <label htmlFor="creditorAddress" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Creditor Address</label>
             <textarea
               id="creditorAddress"
               name="creditorAddress"
@@ -191,7 +200,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="creditorAddress-error" error={errors.creditorAddress} />
           </div>
           <div>
-            <label htmlFor="debtorName" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Debtor Name</label>
+            <label htmlFor="debtorName" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Debtor Name</label>
             <input
               id="debtorName"
               name="debtorName"
@@ -205,7 +214,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <ErrorMessage id="debtorName-error" error={errors.debtorName} />
           </div>
           <div>
-            <label htmlFor="debtorAddress" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest mb-2 block">Debtor Address</label>
+            <label htmlFor="debtorAddress" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Debtor Address</label>
             <textarea
               id="debtorAddress"
               name="debtorAddress"
@@ -222,7 +231,11 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
         </div>
       </FormSection>
 
-      <FormSection title="Itemized Debt Specifics" icon={FiDollarSign}>
+      <FormSection
+        title="Itemized Debt Specifics"
+        icon={FiDollarSign}
+        description="List the unpaid invoices, services, or damages. You can easily apply a 5% late fee if applicable to your contract."
+      >
         <div id="items-section" className="space-y-3">
           {(formData.items || []).map((item, index) => (
             <LetterItem
@@ -240,14 +253,14 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
             <button
               type="button"
               onClick={handleAddItem}
-              className="flex-1 py-3 border border-subtle border-dashed rounded-sm font-mono text-[0.65rem] tracking-widest text-zinc-400 hover:border-axim-teal hover:text-axim-teal transition-all flex items-center justify-center gap-2 uppercase"
+              className="flex-1 py-3 border border-subtle border-dashed rounded-sm font-inter text-xs font-semibold tracking-wider text-zinc-400 hover:border-axim-teal hover:text-axim-teal transition-all flex items-center justify-center gap-2 uppercase"
             >
               <SafeIcon icon={FiPlus} /> ADD LINE ITEM
             </button>
             <button
               type="button"
               onClick={handleAddLateFee}
-              className="flex-shrink-0 px-4 py-3 border border-subtle border-dashed rounded-sm font-mono text-[0.65rem] tracking-widest text-zinc-400 hover:border-axim-gold hover:text-axim-gold transition-all flex items-center justify-center gap-2 uppercase"
+              className="flex-shrink-0 px-4 py-3 border border-subtle border-dashed rounded-sm font-inter text-xs font-semibold tracking-wider text-zinc-400 hover:border-axim-gold hover:text-axim-gold transition-all flex items-center justify-center gap-2 uppercase"
               title="Add 5% Late Fee"
             >
               <SafeIcon icon={FiPlus} /> +5% FEE
@@ -256,12 +269,12 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
         </div>
         <div className="pt-4 space-y-2">
           <div className="flex justify-between items-center mb-2">
-            <label htmlFor="dueDate" className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">
-              Original Due Date <span className="text-zinc-600 font-normal normal-case">(Used for interest calc)</span>
+            <label htmlFor="dueDate" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              Original Due Date <span className="text-zinc-500 font-normal normal-case">(Used for interest calc)</span>
             </label>
             <button
                 onClick={() => handleSetPastDate('dueDate', 30)}
-                className="font-mono text-[0.65rem] text-axim-teal hover:text-white uppercase transition-colors"
+                className="font-inter text-[0.65rem] font-bold text-axim-teal hover:text-white uppercase transition-colors tracking-wide"
                 type="button"
             >
                 Set to 30 Days Ago
