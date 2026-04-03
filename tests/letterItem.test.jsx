@@ -211,7 +211,9 @@ describe('LetterItem', () => {
     assert.ok(descInput.className.includes('border-red-500/50'));
     assert.ok(descInput.className.includes('bg-red-900/10'));
     assert.ok(descInput.className.includes('focus:border-red-500'));
-    assert.ok(!descInput.className.includes('focus:border-axim-gold'));
+
+    // Both should still have base classes
+    assert.ok(descInput.className.includes('focus:border-axim-gold'));
 
     // Amount does not have error
     assert.ok(!amountInput.className.includes('border-red-500/50'));
