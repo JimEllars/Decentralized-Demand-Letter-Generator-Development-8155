@@ -50,8 +50,14 @@ export const formatDate = (dateString) => {
  */
 export const generatePdfDefinition = (formData, calculatedValues, tone, options = {}) => {
   const { formattedTotal, formattedInterest, rateUsed, statuteUsed } = calculatedValues;
+  const items = Array.isArray(formData.items) ? formData.items : [];
 
   const legalDisclosure = STATE_SPECIFIC_CLAUSES[formData.jurisdiction] || STATE_SPECIFIC_CLAUSES['DEFAULT'];
+
+  const itemRows = items.map(i => [
+    i.description || 'Item',
+    formatCurrency(parseFloat(i.amount || 0))
+  ]);
 
   const docDefinition = {
     content: [
@@ -69,10 +75,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       { text: '\n' },
       { table: { widths: ['*', 'auto'], body: [
         [{ text: 'Description', bold: true }, { text: 'Amount', bold: true }],
-        ...(Array.isArray(formData.items) ? formData.items : []).map(i => [
-          i.description || 'Item',
-          formatCurrency(parseFloat(i.amount || 0))
-        ]),
+        ...itemRows,
         [{ text: `Statutory Interest (${rateUsed}%)`, italic: true }, formattedInterest],
         [{ text: 'TOTAL DUE', bold: true, fillColor: '#f1f5f9' }, { text: formattedTotal, bold: true, fillColor: '#f1f5f9' }]
       ]}},
