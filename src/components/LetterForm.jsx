@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, memo, useMemo } from 'react';
+import React, { useCallback, memo, useMemo } from 'react';
 import { FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
