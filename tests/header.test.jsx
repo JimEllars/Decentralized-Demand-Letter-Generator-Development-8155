@@ -20,17 +20,23 @@ describe('Header', () => {
     );
   });
 
-  it('should render the AXiM Documents title as an h1', () => {
+  it('should render the Demand Letter Generator title as an h1', () => {
     const { container } = render(<Header />);
     const h1Element = container.querySelector('h1');
     assert.ok(h1Element, 'Should render an <h1> element');
-    assert.ok(h1Element.textContent.includes('AXiM'), 'Title should include AXiM');
-    assert.ok(h1Element.textContent.includes('Documents'), 'Title should include Documents');
+    assert.ok(h1Element.textContent.includes('Demand Letter Generator'), 'Title should include Demand Letter Generator');
     assert.strictEqual(
       h1Element.className,
       'text-4xl md:text-5xl font-black tracking-tight mb-4 text-white',
       'Should have correct title styling'
     );
+  });
+
+  it('should render the AXiM Documents minor logo', () => {
+    render(<Header />);
+    assert.ok(screen.getByText((content, element) => {
+      return element.tagName.toLowerCase() === 'span' && content.includes('AXiM') && content.includes('Documents');
+    }));
   });
 
   it('should render the subtitle', () => {
