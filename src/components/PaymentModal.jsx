@@ -16,7 +16,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => (
       <div className="p-8 space-y-6">
         <div className="flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
           <span className="text-slate-600 font-medium">Document Access</span>
-          <span className="font-bold text-3xl text-blue-900">$9.00</span>
+          <span className="font-bold text-3xl text-blue-900">$4.00</span>
         </div>
         <div className="space-y-3">
           <div className="text-center text-xs text-slate-500 font-bold mb-2">
@@ -26,7 +26,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => (
             {isProcessing ? (
               <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Verifying...</>
             ) : (
-              <><SafeIcon icon={FiCreditCard} /> Pay $9.00 Now</>
+              <><SafeIcon icon={FiCreditCard} /> Pay $4.00 Now</>
             )}
           </button>
           <button onClick={onCancel} disabled={isProcessing} className="w-full py-2 text-slate-400 font-medium hover:text-slate-600 transition-colors">
