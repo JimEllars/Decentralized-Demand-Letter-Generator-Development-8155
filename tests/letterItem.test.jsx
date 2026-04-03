@@ -125,10 +125,10 @@ describe('LetterItem', () => {
     const amountInput = screen.getByLabelText('Amount for item 1');
 
     assert.strictEqual(descInput.getAttribute('aria-invalid'), 'true');
-    assert.ok(descInput.className.includes('border-red-300'));
+    assert.ok(descInput.className.includes('border-red-500/50'));
 
     assert.strictEqual(amountInput.getAttribute('aria-invalid'), 'true');
-    assert.ok(amountInput.className.includes('border-red-300'));
+    assert.ok(amountInput.className.includes('border-red-500/50'));
 
     assert.ok(screen.getByText('Description is required'));
     assert.ok(screen.getByText('Amount must be greater than 0'));
@@ -149,10 +149,10 @@ describe('LetterItem', () => {
     const amountInput = screen.getByLabelText('Amount for item 1');
 
     assert.strictEqual(descInput.getAttribute('aria-invalid'), 'false');
-    assert.ok(!descInput.className.includes('border-red-300'));
+    assert.ok(!descInput.className.includes('border-red-500/50'));
 
     assert.strictEqual(amountInput.getAttribute('aria-invalid'), 'false');
-    assert.ok(!amountInput.className.includes('border-red-300'));
+    assert.ok(!amountInput.className.includes('border-red-500/50'));
   });
 
   it('renders correctly with default itemErrors object', () => {
@@ -169,7 +169,7 @@ describe('LetterItem', () => {
     );
 
     // Should not render the error message container
-    const errorContainer = container.querySelector('.text-red-500.text-right');
+    const errorContainer = container.querySelector('.text-red-400');
     assert.strictEqual(errorContainer, null);
   });
 
@@ -208,17 +208,16 @@ describe('LetterItem', () => {
     const amountInput = screen.getByLabelText('Amount for item 1');
 
     // Description has error
-    assert.ok(descInput.className.includes('border-red-300'));
-    assert.ok(descInput.className.includes('bg-red-50'));
+    assert.ok(descInput.className.includes('border-red-500/50'));
+    assert.ok(descInput.className.includes('bg-red-900/10'));
     assert.ok(descInput.className.includes('focus:border-red-500'));
-    assert.ok(!descInput.className.includes('border-slate-300'));
-    assert.ok(!descInput.className.includes('focus:border-blue-500'));
+    assert.ok(!descInput.className.includes('focus:border-axim-gold'));
 
     // Amount does not have error
-    assert.ok(!amountInput.className.includes('border-red-300'));
-    assert.ok(!amountInput.className.includes('bg-red-50'));
+    assert.ok(!amountInput.className.includes('border-red-500/50'));
+    assert.ok(!amountInput.className.includes('bg-red-900/10'));
     assert.ok(!amountInput.className.includes('focus:border-red-500'));
-    assert.ok(amountInput.className.includes('border-slate-300'));
-    assert.ok(amountInput.className.includes('focus:border-blue-500'));
+    assert.ok(amountInput.className.includes('border-subtle'));
+    assert.ok(amountInput.className.includes('focus:border-axim-gold'));
   });
 });
