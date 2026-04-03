@@ -7,10 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        'axim-gold': '#FFD700', // Slightly warmer gold
+        'axim-gold': '#FFD700',
         'axim-purple': '#8A2BE2',
         'axim-teal': '#00E5FF',
-        'bg-void': '#0A0A0A', // Slightly lighter to make colors pop more
+        'bg-void': '#030303', // Deep, near-black for maximum contrast and enterprise feel
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],

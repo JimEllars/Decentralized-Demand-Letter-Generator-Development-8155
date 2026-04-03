@@ -12,21 +12,24 @@ const Header = () => (
       </span>
     </div>
 
-    <div className="flex flex-col justify-center items-center gap-6 text-center mt-12 md:mt-4">
+    {/* Subtle Background Glow behind the header */}
+    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-32 bg-axim-teal/5 blur-[100px] rounded-full pointer-events-none z-[-1]"></div>
+
+    <div className="flex flex-col justify-center items-center gap-6 text-center mt-12 md:mt-4 relative">
       <div className="flex flex-col items-center gap-3">
         <div>
-          <span className="font-inter text-axim-gold text-sm font-semibold tracking-[2px] uppercase block mb-2">
+          <span className="font-inter text-axim-gold text-sm font-semibold tracking-[2px] uppercase block mb-2 drop-shadow-sm">
             Professional Template Engine
           </span>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-white">
+          <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 drop-shadow-lg">
             Demand Letter Generator
           </h1>
         </div>
       </div>
       
       <div className="flex items-center gap-4">
-        <div className="hidden md:flex items-center gap-2 text-xs bg-black/40 text-axim-teal px-4 py-2 rounded-full border border-subtle shadow-sm font-inter font-medium">
-          <SafeIcon icon={FiCheckCircle} /> 
+        <div className="hidden md:flex items-center gap-2 text-xs bg-black/60 text-axim-teal px-5 py-2.5 rounded-full border border-axim-teal/20 shadow-[0_0_15px_rgba(0,229,255,0.1)] font-inter font-medium backdrop-blur-sm">
+          <SafeIcon icon={FiCheckCircle} className="w-4 h-4" />
           <span>Secure Local Processing</span>
         </div>
       </div>
