@@ -129,13 +129,13 @@ const App = () => {
         {/* Instructions Section */}
         <Instructions />
 
-        <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-glass border border-subtle rounded-sm overflow-hidden p-0 md:p-2 shadow-2xl backdrop-blur-sm">
-          <div className="p-4 border-b border-subtle flex justify-between items-center bg-black/40">
-            <h2 className="font-mono text-axim-gold text-[0.7rem] uppercase tracking-widest flex items-center gap-2">
+        <motion.section initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-black/40 border border-subtle rounded-2xl overflow-hidden shadow-2xl">
+          <div className="p-5 border-b border-subtle flex justify-between items-center bg-black/60">
+            <h2 className="font-inter font-semibold text-axim-gold text-sm tracking-wide flex items-center gap-2 uppercase">
               <SafeIcon name="FiEdit3" /> Demand Letter Configuration
             </h2>
-            <button onClick={resetForm} className="font-mono text-[0.65rem] text-zinc-500 hover:text-red-400 transition-colors flex items-center gap-1 tracking-widest uppercase">
-              <SafeIcon name="FiTrash2" /> RESET FORM
+            <button onClick={resetForm} className="font-inter text-xs font-medium text-zinc-400 hover:text-red-400 transition-colors flex items-center gap-1 uppercase tracking-wider">
+              <SafeIcon name="FiTrash2" /> Reset Form
             </button>
           </div>
           <div className="bg-black/20">

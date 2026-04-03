@@ -30,16 +30,16 @@ describe('FormSection', () => {
     );
 
     const titleElement = container.querySelector('h3');
-    assert.ok(titleElement.className.includes('font-mono'));
+    assert.ok(titleElement.className.includes('font-inter'));
     assert.ok(titleElement.className.includes('text-axim-gold'));
     assert.ok(titleElement.className.includes('uppercase'));
 
-    const wrapper = container.querySelector('.grid.grid-cols-1.gap-4');
+    const wrapper = container.querySelector('.grid.grid-cols-1.gap-5');
     assert.ok(wrapper, 'Should render children inside a grid wrapper');
 
     const rootDiv = container.firstChild;
     assert.ok(rootDiv.className.includes('space-y-4'));
-    assert.ok(rootDiv.className.includes('pt-6'));
+    assert.ok(rootDiv.className.includes('pt-8'));
   });
 
   it('should render the provided icon', () => {
