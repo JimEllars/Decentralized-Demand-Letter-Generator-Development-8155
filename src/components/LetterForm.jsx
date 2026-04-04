@@ -3,7 +3,7 @@ import { FiUser, FiDollarSign, FiZap, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
-import { STATE_NAMES, STATE_LEGAL_DETAILS, STATE_OPTIONS } from '../utils/constants';
+import { STATE_LEGAL_DETAILS, STATE_OPTIONS } from '../utils/constants';
 import { generateId, getLocalDateString } from '../utils/helpers';
 
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
