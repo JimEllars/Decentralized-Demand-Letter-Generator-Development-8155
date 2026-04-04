@@ -27,7 +27,7 @@ describe('Header', () => {
     assert.ok(h1Element.textContent.includes('Demand Letter Generator'), 'Title should include Demand Letter Generator');
     assert.strictEqual(
       h1Element.className,
-      'text-4xl md:text-5xl font-black tracking-tight mb-4 text-white',
+      'text-4xl md:text-6xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-b from-white to-white/70 drop-shadow-lg',
       'Should have correct title styling'
     );
   });
