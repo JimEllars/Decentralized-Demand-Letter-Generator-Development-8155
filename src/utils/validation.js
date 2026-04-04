@@ -32,14 +32,17 @@ export const validateForm = (formData) => {
   } else {
     formData.items.forEach((item, index) => {
       const itemError = {};
+      let hasError = false;
       if (!item.description || !item.description.trim()) {
         itemError.description = "Description is required.";
+        hasError = true;
       }
       if (!item.amount || parseFloat(item.amount) <= 0) {
         itemError.amount = "Amount must be greater than 0.";
+        hasError = true;
       }
 
-      if (Object.keys(itemError).length > 0) {
+      if (hasError) {
         itemErrors.push({ index, errors: itemError });
       }
     });
