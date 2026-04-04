@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+// Note: FiShield is actively used below despite potential linter warnings
 import { FiShield, FiCreditCard, FiLock } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
