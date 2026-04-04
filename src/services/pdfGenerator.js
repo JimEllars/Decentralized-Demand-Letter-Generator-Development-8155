@@ -75,6 +75,7 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
       { text: '\n' },
       { table: { widths: ['*', 'auto'], body: [
         [{ text: 'Description', bold: true }, { text: 'Amount', bold: true }],
+        // Optimized: pre-calculated itemRows used instead of redundant inline map
         ...itemRows,
         [{ text: `Statutory Interest (${rateUsed}%)`, italic: true }, formattedInterest],
         [{ text: 'TOTAL DUE', bold: true, fillColor: '#f1f5f9' }, { text: formattedTotal, bold: true, fillColor: '#f1f5f9' }]
