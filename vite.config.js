@@ -14,6 +14,13 @@ export default defineConfig({
   },
   server: {
     historyApiFallback: true,
+    proxy: {
+      '/api': {
+        target: 'https://axim-payment-backend.jrellars.workers.dev',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
    build: {
     outDir: 'dist',
