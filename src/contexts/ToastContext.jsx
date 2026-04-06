@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import Toast from '../components/Toast';
 import { generateId } from '../utils/helpers';
 
-const ToastContext = createContext(null);
+export const ToastContext = createContext(null);
 
 export const useToast = () => {
   const context = useContext(ToastContext);
