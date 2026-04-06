@@ -1,0 +1,15 @@
+{
+  "short_name": "Demand Letter",
+  "name": "AXiM Demand Letter Generator",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1e3a8a",
+  "background_color": "#0A0A0A"
+}
