@@ -6,6 +6,12 @@ import SafeIcon from '../common/SafeIcon';
 import { STATE_LEGAL_DETAILS, STATE_OPTIONS } from '../utils/constants';
 import { generateId, getLocalDateString } from '../utils/helpers';
 
+const PRECOMPUTED_STATE_OPTIONS = STATE_OPTIONS.map(s => (
+  <option key={s.code} value={s.code} className="bg-black text-white">
+    {s.name}
+  </option>
+));
+
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
   const itemErrorsMap = useMemo(() => {
     const map = new Map();
@@ -90,7 +96,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
               onChange={handleChange}
               className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors"
             >
-              {STATE_OPTIONS.map(s => <option key={s.code} value={s.code} className="bg-black text-white">{s.name}</option>)}
+              {PRECOMPUTED_STATE_OPTIONS}
               <option value="DEFAULT" className="bg-black text-white">Other / International (6%)</option>
             </select>
             {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
