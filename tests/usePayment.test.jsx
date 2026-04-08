@@ -101,6 +101,31 @@ describe('usePayment', () => {
         unmount();
     });
 
+    it('handlePayment handles payment processing error', async () => {
+        globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+            ok: false,
+            json: () => Promise.resolve({ message: 'Payment processing failed' })
+        }));
+
+        const { result, unmount } = renderHook(() => usePayment(), { wrapper });
+
+        const onError = mock.fn();
+
+        await act(async () => {
+            await result.current.handlePayment(true, onError);
+        });
+
+        assert.strictEqual(onError.mock.callCount(), 0);
+        assert.strictEqual(result.current.isProcessing, false);
+        assert.strictEqual(result.current.isPaid, false);
+        assert.strictEqual(result.current.showPaymentModal, false);
+
+        assert.strictEqual(mockToast.error.mock.callCount(), 1);
+        assert.strictEqual(mockToast.error.mock.calls[0].arguments[0], 'Payment processing failed');
+
+        unmount();
+    });
+
     it('handlePayment calls onError when not valid', async () => {
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
