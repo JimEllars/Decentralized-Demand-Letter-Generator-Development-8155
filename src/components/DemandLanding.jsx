@@ -110,7 +110,7 @@ const DemandLanding = () => {
               to="/app/demand-generator"
               className="w-full sm:w-auto px-10 py-5 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group"
             >
-              INITIALIZE PROTOCOL
+              START MY DEMAND LETTER
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
             <div className="mt-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest flex items-center gap-2">
@@ -142,35 +142,32 @@ const DemandLanding = () => {
         </div>
       </section>
 
-      {/* 3. Interactive App Teaser */}
-      <section className="py-24 px-4 relative z-10">
-        <div className="max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative"
-          >
-            {/* Terminal Header */}
-            <div className="bg-black/80 px-4 py-3 border-b border-white/10 flex items-center gap-2">
-              <Terminal size={14} className="text-zinc-500" />
-              <span className="font-mono text-xs text-zinc-500">AXiM_Engine_v2.0</span>
-              <div className="ml-auto flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
-                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
-                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
-              </div>
-            </div>
-            {/* Terminal Body */}
-            <div className="p-6 relative min-h-[200px] overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-[2px] bg-axim-teal/30 shadow-[0_0_10px_rgba(0,229,255,0.5)] animate-scanline z-10 pointer-events-none"></div>
+      {/* 3. Operational Sequence */}
+      <section className="py-24 px-4 relative z-10 overflow-hidden">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-20">Operational Sequence</h2>
 
-              <TerminalLine text="> AXiM_ENGINE: Secure upload initiated... OK." delay={500} />
-              <TerminalLine text="> EXTRACT: Parsing chronological facts & damages... OK." delay={2000} />
-              <TerminalLine text="> VALIDATE: Cross-referencing state jurisdiction bounds... OK." delay={4500} />
-              <TerminalLine text="> OUTPUT: demand_draft_final.pdf [READY FOR DOWNLOAD]" delay={7500} />
-            </div>
-          </motion.div>
+          <div className="relative grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-axim-teal/30 to-transparent -translate-y-1/2 z-0"></div>
+
+            {/* Steps */}
+            {[
+              { num: '01', title: 'Upload Evidence', desc: 'Drop records directly into the encrypted, zero-retention vault.' },
+              { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
+              { num: '03', title: 'State Formatting', desc: 'Automatically cross-references local jurisdictional requirements.' },
+              { num: '04', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }
+            ].map((step, idx) => (
+              <div key={idx} className="relative z-10 bg-[#0A0A0A] border border-white/10 p-8 rounded-xl text-center shadow-xl group hover:border-white/20 transition-colors">
+                <div className="absolute top-2 right-4 text-[80px] font-black font-mono text-white/[0.03] select-none pointer-events-none group-hover:text-white/[0.05] transition-colors">{step.num}</div>
+                <div className="w-12 h-12 bg-black border border-white/10 rounded-full flex items-center justify-center font-mono text-axim-teal text-lg font-bold mx-auto mb-6 relative shadow-[0_0_15px_rgba(0,229,255,0.1)]">
+                  {idx + 1}
+                </div>
+                <h3 className="text-lg font-bold mb-3 uppercase tracking-wide">{step.title}</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -218,10 +215,11 @@ const DemandLanding = () => {
       {/* 5. Supported Contexts */}
       <section className="py-24 px-4 relative z-10">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-16">Supported Architectures</h2>
+          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-16">Supported Demands</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {useCases.map((useCase, idx) => (
-              <div
+              <Link
+                to="/app/demand-generator"
                 key={idx}
                 className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-lg flex flex-col items-center justify-center text-center gap-4 transition-all duration-300 hover:bg-white/10 hover:border-axim-gold/50 group"
               >
@@ -229,37 +227,41 @@ const DemandLanding = () => {
                   {useCase.icon}
                 </div>
                 <span className="font-semibold text-sm text-zinc-300 group-hover:text-white transition-colors">{useCase.title}</span>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 6. Operational Sequence */}
-      <section className="py-24 px-4 relative z-10 overflow-hidden">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-20">Operational Sequence</h2>
-
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Connecting Line (Desktop) */}
-            <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-axim-teal/30 to-transparent -translate-y-1/2 z-0"></div>
-
-            {/* Steps */}
-            {[
-              { num: '01', title: 'Upload Evidence', desc: 'Drop records directly into the encrypted, zero-retention vault.' },
-              { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
-              { num: '03', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }
-            ].map((step, idx) => (
-              <div key={idx} className="relative z-10 bg-[#0A0A0A] border border-white/10 p-8 rounded-xl text-center shadow-xl group hover:border-white/20 transition-colors">
-                <div className="absolute top-2 right-4 text-[80px] font-black font-mono text-white/[0.03] select-none pointer-events-none group-hover:text-white/[0.05] transition-colors">{step.num}</div>
-                <div className="w-12 h-12 bg-black border border-white/10 rounded-full flex items-center justify-center font-mono text-axim-teal text-lg font-bold mx-auto mb-6 relative shadow-[0_0_15px_rgba(0,229,255,0.1)]">
-                  {idx + 1}
-                </div>
-                <h3 className="text-xl font-bold mb-3 uppercase tracking-wide">{step.title}</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
+      {/* 6. Interactive App Teaser */}
+      <section className="py-24 px-4 relative z-10">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="bg-[#0A0A0A] border border-white/10 rounded-xl overflow-hidden shadow-2xl relative"
+          >
+            {/* Terminal Header */}
+            <div className="bg-black/80 px-4 py-3 border-b border-white/10 flex items-center gap-2">
+              <Terminal size={14} className="text-zinc-500" />
+              <span className="font-mono text-xs text-zinc-500">AXiM_Engine_v2.0</span>
+              <div className="ml-auto flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
+                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
+                <div className="w-3 h-3 rounded-full bg-zinc-800"></div>
               </div>
-            ))}
-          </div>
+            </div>
+            {/* Terminal Body */}
+            <div className="p-6 relative min-h-[200px] overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-axim-teal/30 shadow-[0_0_10px_rgba(0,229,255,0.5)] animate-scanline z-10 pointer-events-none"></div>
+
+              <TerminalLine text="> AXiM_ENGINE: Secure upload initiated... OK." delay={500} />
+              <TerminalLine text="> EXTRACT: Parsing chronological facts & damages... OK." delay={2000} />
+              <TerminalLine text="> VALIDATE: Cross-referencing state jurisdiction bounds... OK." delay={4500} />
+              <TerminalLine text="> OUTPUT: demand_draft_final.pdf [READY FOR DOWNLOAD]" delay={7500} />
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -315,7 +317,7 @@ const DemandLanding = () => {
             to="/app/demand-generator"
             className="w-full sm:w-auto px-12 py-6 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_40px_rgba(255,234,0,0.5)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group mx-auto"
           >
-            INITIALIZE PROTOCOL
+            START MY DEMAND LETTER
             <span className="group-hover:translate-x-1 transition-transform">→</span>
           </Link>
         </div>
