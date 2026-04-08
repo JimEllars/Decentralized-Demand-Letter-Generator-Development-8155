@@ -120,6 +120,50 @@ const DemandLanding = () => {
         </div>
       </section>
 
+      {/* 1.5 Educational Section - Why Demand Letter */}
+      <section className="py-24 px-4 relative z-10 bg-black/40 border-y border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold uppercase tracking-tight mb-4">Why Send a Demand Letter?</h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+              A formal demand letter is the critical first step in debt recovery and legal dispute resolution. It establishes a paper trail, signals serious intent, and often forces a settlement without the need for costly litigation.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-[#0A0A0A] p-8 border border-white/10 rounded-xl hover:border-axim-gold/30 transition-colors">
+              <div className="w-12 h-12 bg-axim-gold/10 rounded-full flex items-center justify-center mb-6 text-axim-gold">
+                <FileText size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Establish Leverage</h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Transform a casual dispute into a formal legal matter. A structured demand clearly outlines the facts, damages, and consequences of non-compliance.
+              </p>
+            </div>
+
+            <div className="bg-[#0A0A0A] p-8 border border-white/10 rounded-xl hover:border-axim-teal/30 transition-colors">
+              <div className="w-12 h-12 bg-axim-teal/10 rounded-full flex items-center justify-center mb-6 text-axim-teal">
+                <ShieldCheck size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Preserve Rights</h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Many jurisdictions require a formal demand letter before you can file a lawsuit or claim statutory interest on unpaid debts.
+              </p>
+            </div>
+
+            <div className="bg-[#0A0A0A] p-8 border border-white/10 rounded-xl hover:border-axim-purple/30 transition-colors">
+              <div className="w-12 h-12 bg-axim-purple/10 rounded-full flex items-center justify-center mb-6 text-axim-purple">
+                <DollarSign size={24} />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Force Resolution</h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Over 30% of disputes are resolved immediately after receiving a professionally drafted demand letter, avoiding court entirely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 2. Social Proof & Compliance Strip */}
       <section className="border-y border-white/5 bg-black/50 overflow-hidden relative z-10 py-4">
         <div className="flex gap-12 items-center justify-center animate-scroll whitespace-nowrap opacity-80 font-mono text-xs uppercase tracking-widest text-zinc-400">
@@ -167,6 +211,63 @@ const DemandLanding = () => {
                 <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3.5 Use Case Studies */}
+      <section className="py-24 px-4 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-16">Recovery Architectures</h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/[0.02] border border-white/10 rounded-xl p-8 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-axim-teal/5 rounded-bl-full pointer-events-none"></div>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 bg-axim-teal/10 rounded-lg text-axim-teal">
+                  <Briefcase size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">B2B Contract Breach</h3>
+                  <p className="text-zinc-500 text-sm font-mono">Recovery Target: $14,500</p>
+                </div>
+              </div>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                "A client refused payment on a completed software development milestone. The AXiM engine generated a structured demand citing specific breach-of-contract statutes for California. The client settled the invoice within 48 hours to avoid litigation."
+              </p>
+              <div className="flex items-center gap-2 text-xs font-mono text-axim-teal uppercase tracking-wider">
+                <ShieldCheck size={14} /> Successful Resolution
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-white/[0.02] border border-white/10 rounded-xl p-8 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-axim-gold/5 rounded-bl-full pointer-events-none"></div>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="p-3 bg-axim-gold/10 rounded-lg text-axim-gold">
+                  <Home size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Security Deposit Withheld</h3>
+                  <p className="text-zinc-500 text-sm font-mono">Recovery Target: $2,800</p>
+                </div>
+              </div>
+              <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                "Landlord unlawfully retained a security deposit without providing an itemized list of deductions. The generated letter utilized New York tenant protection formatting, resulting in a full refund of the deposit plus statutory damages."
+              </p>
+              <div className="flex items-center gap-2 text-xs font-mono text-axim-gold uppercase tracking-wider">
+                <ShieldCheck size={14} /> Successful Resolution
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
