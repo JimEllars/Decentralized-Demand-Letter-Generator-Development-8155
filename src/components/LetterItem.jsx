@@ -9,6 +9,8 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, it
     return base;
   };
 
+  const errorValues = Object.values(itemErrors);
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex gap-2 items-start">
@@ -42,9 +44,9 @@ const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, it
           </button>
         )}
       </div>
-      {Object.values(itemErrors).length > 0 && (
+      {errorValues.length > 0 && (
         <div className="font-mono text-[0.65rem] text-red-400 text-right pr-12 space-y-0.5 tracking-wide mt-1">
-          {Object.values(itemErrors).map((msg, i) => (
+          {errorValues.map((msg, i) => (
             <p key={i}>{msg}</p>
           ))}
         </div>
