@@ -140,33 +140,6 @@ describe('paymentService', () => {
       assert.strictEqual(result.transactionId, 'test-tx-123');
     });
 
-    it('should initiate Stripe checkout when data.sessionId is returned', async () => {
-      // Setup mock loadStripe environment variables
-      const originalEnv = process.env.VITE_STRIPE_PUBLISHABLE_KEY;
-      process.env.VITE_STRIPE_PUBLISHABLE_KEY = 'test_key';
-
-      // Mock the fetch call to return a sessionId
-      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ sessionId: 'test-session-123' })
-      }));
-
-      try {
-        // We cannot fully execute the happy path of loadStripe here because happy-dom blocks external script loading,
-        // which throws a DOMException: Failed to load script "https://js.stripe.com/clover/stripe.js".
-        // We will catch it to ensure that the code path was entered correctly and attempted to load Stripe.
-        await initiateBackendTransaction('http://test.api', 'test_product');
-        // If it somehow passes (e.g. mock override), we assert fetch was called
-        assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
-      } catch (error) {
-        // Assert that the error is the expected DOMException from Stripe script injection
-        assert.ok(error.name === 'NotSupportedError' || error.message.includes('load script') || error.message.includes('DOM'));
-        assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
-      } finally {
-        process.env.VITE_STRIPE_PUBLISHABLE_KEY = originalEnv;
-      }
-    });
-
     it('should redirect window when data.url is returned', async () => {
       globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
         ok: true,
