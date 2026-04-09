@@ -70,6 +70,8 @@ export const usePayment = () => {
   };
 
   const handlePayment = async (isValid, onError) => {
+    if (isProcessing) return; // Prevent double submission
+
     if (!isValid) {
       onError();
       return;
@@ -77,8 +79,16 @@ export const usePayment = () => {
 
     setIsProcessing(true);
     try {
-      const result = await processPayment('demand_letter');
-      if (result.success) {
+      let timeoutId;
+      const result = await Promise.race([
+        processPayment('demand_letter'),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('Payment request timed out. Please try again.')), 15000);
+        })
+      ]);
+      clearTimeout(timeoutId);
+
+      if (result && result.success) {
         if (result.transactionId) {
           // If simulating or not returning a direct redirect URL, simulate redirect
           window.location.href = `/success?session_id=${result.transactionId}`;
