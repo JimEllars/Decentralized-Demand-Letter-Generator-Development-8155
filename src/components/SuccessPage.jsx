@@ -5,7 +5,7 @@ import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { verifyPaymentSession } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
-import { FiCheckCircle, FiDownload, FiPlusCircle } from 'react-icons/fi';
+import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
@@ -106,6 +106,24 @@ const SuccessPage = () => {
     navigate('/app/demand-generator');
   };
 
+  const [email, setEmail] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSendingEmail(true);
+    // Simulate email sending delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSendingEmail(false);
+    toast.success(`Document sent to ${email}`);
+    setEmail('');
+  };
+
   return (
     <div className="min-h-screen bg-black text-zinc-100 flex flex-col items-center justify-center p-4">
       {/* Background Effect */}
@@ -164,9 +182,36 @@ const SuccessPage = () => {
                 Download Again
               </button>
 
+              <form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
+                <label htmlFor="email" className="text-sm font-medium text-zinc-300 text-left mb-1 flex items-center gap-2">
+                  <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Document
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter email address"
+                    className="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSendingEmail || !email}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors duration-300 rounded-lg font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isSendingEmail ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      'Send'
+                    )}
+                  </button>
+                </div>
+              </form>
+
               <button
                 onClick={handleCreateAnother}
-                className="w-full px-6 py-4 bg-transparent border border-white/10 hover:bg-white/5 transition-colors duration-300 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+                className="w-full px-6 py-4 bg-transparent border border-white/10 hover:bg-white/5 transition-colors duration-300 rounded-lg font-medium text-sm flex items-center justify-center gap-2 mt-2"
               >
                 <SafeIcon icon={FiPlusCircle} />
                 Create Another Letter

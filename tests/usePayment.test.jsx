@@ -30,6 +30,15 @@ describe('usePayment', () => {
             }
             if (globalThis.window.location) {
                 globalThis.window.location.search = '';
+                // Since we simulate window.location.href assignment now
+                Object.defineProperty(globalThis.window, 'location', {
+                    value: {
+                        ...globalThis.window.location,
+                        href: 'about:blank',
+                        search: ''
+                    },
+                    writable: true
+                });
             }
         }
 
@@ -170,13 +179,8 @@ describe('usePayment', () => {
 
         assert.strictEqual(onError.mock.callCount(), 0);
         assert.strictEqual(result.current.isProcessing, false);
-        assert.strictEqual(result.current.isPaid, true);
-        assert.strictEqual(result.current.showPaymentModal, false);
+        assert.strictEqual(globalThis.window.location.href, '/success?session_id=AXM-123');
 
-        const storedId = globalThis.window.localStorage.getItem('axim_demand_letter_paid_status');
-        assert.strictEqual(storedId, 'AXM-123');
-
-        assert.strictEqual(mockToast.success.mock.callCount(), 1);
         unmount();
     });
 
