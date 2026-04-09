@@ -1,16 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FiShield, FiCheckCircle } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const Header = () => (
   <header className="max-w-7xl mx-auto px-4 py-8 relative z-10">
     {/* Minor Logo Top Left */}
-    <div className="absolute top-8 left-4 md:left-8 flex items-center gap-2">
+    <Link to="/start" className="absolute top-8 left-4 md:left-8 flex items-center gap-2 hover:opacity-80 transition-opacity">
       <SafeIcon icon={FiShield} className="text-axim-gold w-5 h-5" />
       <span className="font-inter font-bold tracking-tight text-white text-lg">
         AXiM <span className="text-axim-teal font-medium">Documents</span>
       </span>
-    </div>
+    </Link>
 
     {/* Subtle Background Glow behind the header */}
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-32 bg-axim-teal/5 blur-[100px] rounded-full pointer-events-none z-[-1]"></div>
