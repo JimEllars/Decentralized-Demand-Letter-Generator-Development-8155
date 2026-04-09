@@ -1,3 +1,16 @@
+import { loadStripe } from '@stripe/stripe-js/pure';
+
+let stripePromise;
+const getStripe = () => {
+  if (!stripePromise) {
+    const key = typeof import.meta.env !== 'undefined' ? import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY : process.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (key) {
+      stripePromise = loadStripe(key);
+    }
+  }
+  return stripePromise;
+};
+
 /**
  * AXiM Payment Bridge
  * * To integrate a real provider:
@@ -25,6 +38,17 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
     }
 
     const data = await response.json();
+
+    if (data.sessionId) {
+      const stripe = await getStripe();
+      if (stripe) {
+        const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+        if (error) {
+          throw new Error(error.message);
+        }
+        return new Promise(() => {}); // Prevent UI state changes during redirect
+      }
+    }
 
     // Modern Stripe redirect: Just go directly to the Checkout URL provided by the backend
     if (data.url) {
