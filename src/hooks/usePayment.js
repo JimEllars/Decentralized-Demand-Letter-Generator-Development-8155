@@ -79,12 +79,15 @@ export const usePayment = () => {
     try {
       const result = await processPayment('demand_letter');
       if (result.success) {
-        setIsPaid(true);
         if (result.transactionId) {
-          localStorage.setItem(PAYMENT_STORAGE_KEY, result.transactionId);
+          // If simulating or not returning a direct redirect URL, simulate redirect
+          window.location.href = `/success?session_id=${result.transactionId}`;
+        } else {
+          // Fallback if no transactionId is provided
+          setIsPaid(true);
+          setShowPaymentModal(false);
+          toast.success("Payment successful!");
         }
-        setShowPaymentModal(false);
-        toast.success("Payment successful!");
       }
     } catch (error) {
       toast.error(error.message);
