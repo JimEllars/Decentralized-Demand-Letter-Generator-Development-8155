@@ -1,0 +1,182 @@
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useLetterStore } from '../hooks/useLetterStore';
+import { usePdfGenerator } from '../hooks/usePdfGenerator';
+import { verifyPaymentSession } from '../services/paymentService';
+import { calculateTotal } from '../utils/calculations';
+import { TONE_TEMPLATES } from '../utils/constants';
+import { FiCheckCircle, FiDownload, FiPlusCircle } from 'react-icons/fi';
+import SafeIcon from '../common/SafeIcon';
+import { useToast } from '../contexts/ToastContext';
+import { motion } from 'framer-motion';
+
+const DEFAULT_FORM_DATA = {
+  creditorName: '',
+  creditorAddress: '',
+  debtorName: '',
+  debtorAddress: '',
+  items: [],
+  dueDate: '',
+  letterDate: '',
+  jurisdiction: '',
+  statutoryInterest: '0',
+  tone: 'firm'
+};
+
+const SuccessPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
+  const { handleDownload, isGenerating } = usePdfGenerator();
+  const toast = useToast();
+
+  const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    let isMounted = true;
+    const sessionId = searchParams.get('session_id');
+
+    if (!sessionId) {
+      if (isMounted) setVerificationStatus('failed');
+      return;
+    }
+
+    const verifyAndDownload = async () => {
+      try {
+        const data = await verifyPaymentSession(sessionId);
+        if (!isMounted) return;
+
+        if (data.isPaid) {
+          setVerificationStatus('success');
+          localStorage.setItem('axim_demand_letter_paid_status', sessionId);
+
+          // Trigger download automatically
+          const calculatedValues = calculateTotal(
+            formData.items,
+            formData.statutoryInterest,
+            formData.dueDate,
+            formData.jurisdiction,
+            formData.letterDate
+          );
+          const toneTemplate = TONE_TEMPLATES[formData.tone];
+
+          // Delay download slightly to ensure UI updates and is perceived as a smooth transition
+          setTimeout(() => {
+            if (isMounted) {
+              handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, false);
+            }
+          }, 1000);
+
+        } else {
+          setVerificationStatus('failed');
+          toast.error("Payment verification failed.");
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        setVerificationStatus('failed');
+        console.error("Verification error:", err);
+        toast.error("Payment verification failed.");
+      }
+    };
+
+    verifyAndDownload();
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized]);
+
+  const handleDownloadAgain = () => {
+    const calculatedValues = calculateTotal(
+      formData.items,
+      formData.statutoryInterest,
+      formData.dueDate,
+      formData.jurisdiction,
+      formData.letterDate
+    );
+    const toneTemplate = TONE_TEMPLATES[formData.tone];
+    handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, false);
+  };
+
+  const handleCreateAnother = () => {
+    resetForm();
+    navigate('/app/demand-generator');
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-zinc-100 flex flex-col items-center justify-center p-4">
+      {/* Background Effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-axim-teal/5 rounded-full blur-[120px]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="max-w-md w-full bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-xl shadow-2xl relative z-10 text-center"
+      >
+        {verificationStatus === 'verifying' && (
+          <div className="flex flex-col items-center py-8">
+            <div className="w-12 h-12 border-4 border-axim-teal/30 border-t-axim-teal rounded-full animate-spin mb-6" />
+            <h2 className="text-xl font-bold tracking-tight">Verifying Payment...</h2>
+            <p className="text-zinc-400 mt-2 text-sm">Please do not close this window.</p>
+          </div>
+        )}
+
+        {verificationStatus === 'failed' && (
+          <div className="flex flex-col items-center py-8">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
+              <span className="text-red-500 text-3xl">✕</span>
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-red-500">Verification Failed</h2>
+            <p className="text-zinc-400 mt-2 text-sm mb-8">We could not verify your payment session.</p>
+            <button
+              onClick={() => navigate('/start')}
+              className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg font-medium w-full"
+            >
+              Return Home
+            </button>
+          </div>
+        )}
+
+        {verificationStatus === 'success' && (
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 bg-axim-teal/10 rounded-full flex items-center justify-center mb-6 border border-axim-teal/20 shadow-[0_0_30px_rgba(0,229,255,0.2)]">
+              <SafeIcon icon={FiCheckCircle} className="w-10 h-10 text-axim-teal" />
+            </div>
+
+            <h2 className="text-2xl font-bold tracking-tight text-white mb-2">Payment Successful</h2>
+            <p className="text-zinc-400 text-sm leading-relaxed mb-8">
+              Your compliant Demand Letter is downloading...
+              {isGenerating && <span className="block mt-2 text-axim-teal animate-pulse">Generating PDF...</span>}
+            </p>
+
+            <div className="w-full space-y-3">
+              <button
+                onClick={handleDownloadAgain}
+                disabled={isGenerating}
+                className="w-full px-6 py-4 bg-axim-teal text-black font-bold uppercase tracking-wide text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all duration-300 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <SafeIcon icon={FiDownload} />
+                Download Again
+              </button>
+
+              <button
+                onClick={handleCreateAnother}
+                className="w-full px-6 py-4 bg-transparent border border-white/10 hover:bg-white/5 transition-colors duration-300 rounded-lg font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <SafeIcon icon={FiPlusCircle} />
+                Create Another Letter
+              </button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+};
+
+export default SuccessPage;
