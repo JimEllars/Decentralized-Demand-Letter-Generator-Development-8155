@@ -145,7 +145,7 @@ export const verifyPaymentSession = async (sessionId) => {
     setTimeout(() => {
       const isValid = typeof sessionId === 'string' && sessionId.startsWith('AXM-');
       if (isValid) {
-        const mockToken = 'mock-jwt-token-for-development';
+        const mockToken = `dev-token-${crypto.randomUUID()}`;
         const mockExpiry = new Date(Date.now() + 3600000).toISOString();
         sessionStorage.setItem(PAYMENT_TOKEN_KEY, mockToken);
         sessionStorage.setItem(TOKEN_EXPIRY_KEY, mockExpiry);
