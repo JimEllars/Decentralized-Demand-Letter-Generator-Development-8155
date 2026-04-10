@@ -40,8 +40,32 @@ describe('usePdfGenerator', () => {
         assert.strictEqual(result.current.isGenerating, false);
     });
 
+    it('blocks download and shows error if token is missing when isPaid is true', async () => {
+        const { result } = renderHook(() => usePdfGenerator(), { wrapper });
+
+        const onError = mock.fn();
+        const formData = { jurisdiction: 'CA' };
+        const calculatedValues = {};
+        const toneTemplate = {};
+
+        // We don't set a mock token in sessionStorage
+
+        await act(async () => {
+            await result.current.handleDownload(true, onError, formData, calculatedValues, toneTemplate, true);
+        });
+
+        assert.strictEqual(onError.mock.callCount(), 0);
+        assert.strictEqual(result.current.isGenerating, false);
+
+        const toast = await screen.findByText('Payment session expired. Please complete payment again.');
+        assert.ok(toast);
+    });
+
     it('generates pdf successfully and shows success toast', async () => {
         const { result } = renderHook(() => usePdfGenerator(), { wrapper });
+
+        globalThis.window.sessionStorage.setItem('axim_access_token', 'mock-token');
+        globalThis.window.sessionStorage.setItem('axim_token_expiry', new Date(Date.now() + 3600000).toISOString());
 
         const onError = mock.fn();
         const formData = { jurisdiction: 'CA' };

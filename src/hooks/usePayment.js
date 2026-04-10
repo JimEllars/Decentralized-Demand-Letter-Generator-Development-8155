@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
-import { processPayment, verifyPaymentSession } from '../services/paymentService';
-
-const PAYMENT_STORAGE_KEY = 'axim_demand_letter_paid_status';
+import { processPayment, verifyPaymentSession, getValidAccessToken, clearAccessToken } from '../services/paymentService';
 
 export const usePayment = () => {
   const [isPaid, setIsPaid] = useState(false);
@@ -15,22 +13,20 @@ export const usePayment = () => {
       setIsProcessing(true);
       try {
         const data = await verifyPaymentSession(sessionId);
-        if (data.isPaid) {
+        if (data.isPaid && data.accessToken) {
           setIsPaid(true);
-          localStorage.setItem(PAYMENT_STORAGE_KEY, sessionId);
           if (isFromRedirect) {
             toast.success("Payment verified! You can now download your document.");
           }
         } else {
           // Clean up invalid session
-          if (!isFromRedirect) {
-            localStorage.removeItem(PAYMENT_STORAGE_KEY);
-          }
+          clearAccessToken();
         }
       } catch (err) {
         if (isFromRedirect) {
           toast.error("Payment verification failed.");
         }
+        clearAccessToken();
       } finally {
         setIsProcessing(false);
         if (isFromRedirect) {
@@ -42,14 +38,13 @@ export const usePayment = () => {
     // Check for payment parameters from Stripe redirect
     const query = new URLSearchParams(window.location.search);
     const urlSessionId = query.get('session_id');
-    const savedSessionId = localStorage.getItem(PAYMENT_STORAGE_KEY);
+    const hasValidToken = !!getValidAccessToken();
 
     if (urlSessionId) {
       verifySession(urlSessionId, true);
-    } else if (savedSessionId && savedSessionId !== 'true') {
-      // If we have a stored session ID, verify it's still valid
-      // Note: we ignore the old insecure 'true' value if it exists
-      verifySession(savedSessionId, false);
+    } else if (hasValidToken) {
+      // If we have a valid token, we're paid
+      setIsPaid(true);
     } else if (query.get('canceled') === 'true') {
       toast.error("Payment was canceled.");
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -57,7 +52,7 @@ export const usePayment = () => {
   }, [toast]);
 
   const resetPayment = () => {
-    localStorage.removeItem(PAYMENT_STORAGE_KEY);
+    clearAccessToken();
     setIsPaid(false);
   };
 
