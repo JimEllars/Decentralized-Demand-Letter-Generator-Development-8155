@@ -30,38 +30,45 @@ const TerminalLine = ({ text, delay }) => {
   );
 };
 
+const USE_CASES = [
+  { title: 'Personal Injury', icon: <FileWarning size={20} className="text-axim-teal" /> },
+  { title: 'Breach of Contract', icon: <Briefcase size={20} className="text-axim-purple" /> },
+  { title: 'Property Damage', icon: <Home size={20} className="text-axim-gold" /> },
+  { title: 'Debt Collection', icon: <DollarSign size={20} className="text-axim-teal" /> },
+  { title: 'Landlord/Tenant', icon: <Map size={20} className="text-axim-purple" /> },
+  { title: 'Small Claims', icon: <Gavel size={20} className="text-axim-gold" /> },
+  { title: 'Insurance Claims', icon: <AlertTriangle size={20} className="text-axim-teal" /> },
+  { title: 'Cease & Desist', icon: <XOctagon size={20} className="text-axim-purple" /> },
+];
+
+const FAQS = [
+  {
+    question: "Is my data used for training?",
+    answer: "Absolute Zero Retention. We use a Zero-Knowledge Architecture. All data resides securely in your browser and is destroyed upon session close. We don't possess your data, so it cannot be used for training or exposure."
+  },
+  {
+    question: "Will it work in my state?",
+    answer: "Yes. The AXiM engine cross-references procedural formatting bounds to generate structurally compliant letters across all 50 U.S. states and jurisdictions."
+  },
+  {
+    question: "Are there hidden subscriptions?",
+    answer: "No. Flat $4.00 per final rendered draft. We removed human operational overhead and pass the compute savings directly to you. No recurring fees, retainers, or hidden charges."
+  }
+];
+
+const OPERATIONAL_STEPS = [
+  { num: '01', title: 'Upload Evidence', desc: 'Drop records directly into the encrypted, zero-retention vault.' },
+  { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
+  { num: '03', title: 'State Formatting', desc: 'Automatically cross-references local jurisdictional requirements.' },
+  { num: '04', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }
+];
+
 const DemandLanding = () => {
   const [faqOpen, setFaqOpen] = useState(null);
 
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);
   };
-
-  const useCases = [
-    { title: 'Personal Injury', icon: <FileWarning size={20} className="text-axim-teal" /> },
-    { title: 'Breach of Contract', icon: <Briefcase size={20} className="text-axim-purple" /> },
-    { title: 'Property Damage', icon: <Home size={20} className="text-axim-gold" /> },
-    { title: 'Debt Collection', icon: <DollarSign size={20} className="text-axim-teal" /> },
-    { title: 'Landlord/Tenant', icon: <Map size={20} className="text-axim-purple" /> },
-    { title: 'Small Claims', icon: <Gavel size={20} className="text-axim-gold" /> },
-    { title: 'Insurance Claims', icon: <AlertTriangle size={20} className="text-axim-teal" /> },
-    { title: 'Cease & Desist', icon: <XOctagon size={20} className="text-axim-purple" /> },
-  ];
-
-  const faqs = [
-    {
-      question: "Is my data used for training?",
-      answer: "Absolute Zero Retention. We use a Zero-Knowledge Architecture. All data resides securely in your browser and is destroyed upon session close. We don't possess your data, so it cannot be used for training or exposure."
-    },
-    {
-      question: "Will it work in my state?",
-      answer: "Yes. The AXiM engine cross-references procedural formatting bounds to generate structurally compliant letters across all 50 U.S. states and jurisdictions."
-    },
-    {
-      question: "Are there hidden subscriptions?",
-      answer: "No. Flat $4.00 per final rendered draft. We removed human operational overhead and pass the compute savings directly to you. No recurring fees, retainers, or hidden charges."
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-inter selection:bg-axim-gold selection:text-black overflow-x-hidden">
@@ -196,12 +203,7 @@ const DemandLanding = () => {
             <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-axim-teal/30 to-transparent -translate-y-1/2 z-0"></div>
 
             {/* Steps */}
-            {[
-              { num: '01', title: 'Upload Evidence', desc: 'Drop records directly into the encrypted, zero-retention vault.' },
-              { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
-              { num: '03', title: 'State Formatting', desc: 'Automatically cross-references local jurisdictional requirements.' },
-              { num: '04', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }
-            ].map((step, idx) => (
+            {OPERATIONAL_STEPS.map((step, idx) => (
               <div key={idx} className="relative z-10 bg-[#0A0A0A] border border-white/10 p-8 rounded-xl text-center shadow-xl group hover:border-white/20 transition-colors">
                 <div className="absolute top-2 right-4 text-[80px] font-black font-mono text-white/[0.03] select-none pointer-events-none group-hover:text-white/[0.05] transition-colors">{step.num}</div>
                 <div className="w-12 h-12 bg-black border border-white/10 rounded-full flex items-center justify-center font-mono text-axim-teal text-lg font-bold mx-auto mb-6 relative shadow-[0_0_15px_rgba(0,229,255,0.1)]">
@@ -318,7 +320,7 @@ const DemandLanding = () => {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-16">Supported Demands</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {useCases.map((useCase, idx) => (
+            {USE_CASES.map((useCase, idx) => (
               <Link
                 to="/app/demand-generator"
                 key={idx}
@@ -371,7 +373,7 @@ const DemandLanding = () => {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-12">Protocol Queries</h2>
           <div className="space-y-4">
-            {faqs.map((faq, idx) => (
+            {FAQS.map((faq, idx) => (
               <div
                 key={idx}
                 className={`bg-black/40 border border-white/10 rounded-lg overflow-hidden transition-all duration-300 ${faqOpen === idx ? 'border-l-2 border-l-axim-gold' : ''}`}
