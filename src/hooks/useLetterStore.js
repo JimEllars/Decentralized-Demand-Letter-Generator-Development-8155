@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { generateId } from '../utils/helpers';
+import { loadAndMigrateData } from '../utils/storeHelpers';
 
 const STORAGE_KEY = 'axim_demand_letter_draft_v2';
 
@@ -9,21 +9,8 @@ export const useLetterStore = (initialDataOrFn) => {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Migration: Ensure all items have IDs
-        if (parsed.items && Array.isArray(parsed.items)) {
-          parsed.items = parsed.items.map(item => ({
-            ...item,
-            id: item.id || generateId()
-          }));
-        }
-        setFormData(parsed);
-      } catch (error) {
-        // Silently ignore parsing errors
-      }
-    }
+    const data = loadAndMigrateData(saved, initialDataOrFn);
+    setFormData(data);
     setIsInitialized(true);
   }, []);
 
