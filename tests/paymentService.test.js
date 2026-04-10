@@ -11,24 +11,54 @@ describe('paymentService', () => {
     // Mock fetch
     globalThis.fetch = mock.fn();
 
-    // Mock window.location
-    globalThis.window = {
-      location: {
-        href: ''
+    // Safely mock window.location if not already present or if we need to control it
+    if (!globalThis.window) {
+      globalThis.window = { location: { href: '' } };
+    } else {
+      // In happy-dom environments, location might be read-only
+      try {
+        globalThis.window.location.href = '';
+      } catch (e) {
+        // Fallback for strict environments
+        Object.defineProperty(globalThis.window, 'location', {
+          value: { ...globalThis.window.location, href: '' },
+          writable: true,
+          configurable: true
+        });
       }
-    };
-
-    // Mock crypto.randomUUID
-    if (!globalThis.crypto) {
-      globalThis.crypto = {};
     }
-    globalThis.crypto.randomUUID = mock.fn(() => '12345678-abcd-efgh-ijkl-mnopqrstuvwx');
+
+    // Ensure sessionStorage exists for tests
+    if (typeof globalThis.sessionStorage === 'undefined') {
+        const storage = new Map();
+        globalThis.sessionStorage = {
+            getItem: mock.fn((key) => storage.get(key) || null),
+            setItem: mock.fn((key, value) => storage.set(key, String(value))),
+            removeItem: mock.fn((key) => storage.delete(key)),
+            clear: mock.fn(() => storage.clear()),
+        };
+    }
+
+    // Mock crypto.randomUUID safely
+    const mockUUID = '12345678-abcd-efgh-ijkl-mnopqrstuvwx';
+    if (!globalThis.crypto) {
+      globalThis.crypto = { randomUUID: mock.fn(() => mockUUID) };
+    } else {
+      try {
+        globalThis.crypto.randomUUID = mock.fn(() => mockUUID);
+      } catch (e) {
+        Object.defineProperty(globalThis.crypto, 'randomUUID', {
+            value: mock.fn(() => mockUUID),
+            configurable: true
+        });
+      }
+    }
   });
 
   afterEach(() => {
     process.env = originalEnv;
+    mock.restoreAll();
     delete globalThis.fetch;
-    delete globalThis.window;
   });
 
   describe('processPayment', () => {

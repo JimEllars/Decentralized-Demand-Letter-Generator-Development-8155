@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { loadAndMigrateData } from '../utils/storeHelpers';
+import { loadAndMigrateData } from '../utils/storeHelpers.js';
 
 const STORAGE_KEY = 'axim_demand_letter_draft_v2';
 
