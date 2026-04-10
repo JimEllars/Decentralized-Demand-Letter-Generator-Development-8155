@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { generatePdfDefinition } from '../services/pdfGenerator';
+import { getValidAccessToken } from '../services/paymentService';
 
 export const usePdfGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -10,6 +11,15 @@ export const usePdfGenerator = () => {
     if (!isValid) {
       onError();
       return;
+    }
+
+    let accessToken = null;
+    if (isPaid) {
+      accessToken = getValidAccessToken();
+      if (!accessToken) {
+        toast.error("Payment session expired. Please complete payment again.");
+        return;
+      }
     }
 
     setIsGenerating(true);

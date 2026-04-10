@@ -104,6 +104,9 @@ export const processPayment = async (productId) => {
  * @param {string} sessionId - The session ID to verify.
  * @returns {Promise<{isPaid: boolean} | never>}
  */
+const PAYMENT_TOKEN_KEY = 'axim_access_token';
+const TOKEN_EXPIRY_KEY = 'axim_token_expiry';
+
 export const verifyPaymentSession = async (sessionId) => {
   const paymentApiUrl = typeof import.meta.env !== 'undefined'
     ? import.meta.env.VITE_PAYMENT_API_URL
@@ -115,7 +118,14 @@ export const verifyPaymentSession = async (sessionId) => {
       if (!response.ok) {
         throw new Error('Failed to verify payment session');
       }
-      return await response.json();
+      const data = await response.json();
+
+      if (data.accessToken) {
+        sessionStorage.setItem(PAYMENT_TOKEN_KEY, data.accessToken);
+        sessionStorage.setItem(TOKEN_EXPIRY_KEY, data.expiresAt);
+      }
+
+      return data;
     } catch (error) {
       console.error("Payment Verification Error:", error);
       throw error;
@@ -134,7 +144,34 @@ export const verifyPaymentSession = async (sessionId) => {
   return new Promise((resolve) => {
     setTimeout(() => {
       const isValid = typeof sessionId === 'string' && sessionId.startsWith('AXM-');
-      resolve({ isPaid: isValid });
+      if (isValid) {
+        const mockToken = 'mock-jwt-token-for-development';
+        const mockExpiry = new Date(Date.now() + 3600000).toISOString();
+        sessionStorage.setItem(PAYMENT_TOKEN_KEY, mockToken);
+        sessionStorage.setItem(TOKEN_EXPIRY_KEY, mockExpiry);
+        resolve({ isPaid: true, accessToken: mockToken, expiresAt: mockExpiry });
+      } else {
+        resolve({ isPaid: false });
+      }
     }, 500);
   });
+};
+
+export const getValidAccessToken = () => {
+  const token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
+  const expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
+
+  if (!token || !expiry) return null;
+
+  if (new Date(expiry) <= new Date()) {
+    clearAccessToken();
+    return null;
+  }
+
+  return token;
+};
+
+export const clearAccessToken = () => {
+  sessionStorage.removeItem(PAYMENT_TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
 };

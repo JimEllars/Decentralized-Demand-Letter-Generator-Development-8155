@@ -25,6 +25,9 @@ describe('usePayment', () => {
             if (globalThis.window.localStorage) {
                 globalThis.window.localStorage.clear();
             }
+            if (globalThis.window.sessionStorage) {
+                globalThis.window.sessionStorage.clear();
+            }
             if (globalThis.window.history) {
                 globalThis.window.history.replaceState = mock.fn();
             }
@@ -44,7 +47,7 @@ describe('usePayment', () => {
 
         globalThis.fetch = mock.fn(() => Promise.resolve({
             ok: true,
-            json: () => Promise.resolve({ success: true, transactionId: 'AXM-123', isPaid: true })
+            json: () => Promise.resolve({ success: true, transactionId: 'AXM-123', isPaid: true, accessToken: 'mock-token', expiresAt: new Date(Date.now() + 3600000).toISOString() })
         }));
 
         mockToast = {
@@ -155,7 +158,8 @@ describe('usePayment', () => {
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
         act(() => {
-            globalThis.window.localStorage.setItem('axim_demand_letter_paid_status', 'something');
+            globalThis.window.sessionStorage.setItem('axim_access_token', 'mock-token');
+            globalThis.window.sessionStorage.setItem('axim_token_expiry', new Date(Date.now() + 3600000).toISOString());
         });
 
         act(() => {
@@ -163,7 +167,8 @@ describe('usePayment', () => {
         });
 
         assert.strictEqual(result.current.isPaid, false);
-        assert.strictEqual(globalThis.window.localStorage.getItem('axim_demand_letter_paid_status'), null);
+        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), null);
+        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_token_expiry'), null);
 
         unmount();
     });
@@ -193,7 +198,7 @@ describe('usePayment', () => {
             assert.strictEqual(result.current.isPaid, true);
         });
 
-        assert.strictEqual(globalThis.window.localStorage.getItem('axim_demand_letter_paid_status'), 'AXM-valid-session');
+        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), 'mock-token');
         assert.strictEqual(globalThis.window.history.replaceState.mock.callCount(), 1);
 
         assert.strictEqual(mockToast.success.mock.callCount(), 1);
@@ -220,8 +225,9 @@ describe('usePayment', () => {
         unmount();
     });
 
-    it('verifies session from localstorage', async () => {
-        globalThis.window.localStorage.setItem('axim_demand_letter_paid_status', 'AXM-saved-session-valid');
+    it('verifies session from sessionstorage', async () => {
+        globalThis.window.sessionStorage.setItem('axim_access_token', 'mock-token');
+        globalThis.window.sessionStorage.setItem('axim_token_expiry', new Date(Date.now() + 3600000).toISOString());
 
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
@@ -232,18 +238,18 @@ describe('usePayment', () => {
         unmount();
     });
 
-    it('clears invalid localstorage session', async () => {
+    it('clears invalid sessionstorage session', async () => {
         globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ isPaid: false })
         }));
 
-        globalThis.window.localStorage.setItem('axim_demand_letter_paid_status', 'saved-session-invalid');
+        globalThis.window.location.search = '?session_id=invalid-session';
 
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
         await waitFor(() => {
-            assert.strictEqual(globalThis.window.localStorage.getItem('axim_demand_letter_paid_status'), null);
+            assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), null);
         });
         assert.strictEqual(result.current.isPaid, false);
 

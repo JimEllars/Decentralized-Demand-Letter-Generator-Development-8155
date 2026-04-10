@@ -50,7 +50,6 @@ const SuccessPage = () => {
 
         if (data.isPaid) {
           setVerificationStatus('success');
-          localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           // Trigger download automatically
           const calculatedValues = calculateTotal(
