@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
@@ -31,9 +31,12 @@ const SuccessPage = () => {
   const toast = useToast();
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
+  const hasVerified = useRef(false);
 
   useEffect(() => {
     if (!isInitialized) return;
+    if (hasVerified.current) return;
+    hasVerified.current = true;
 
     let isMounted = true;
     const sessionId = searchParams.get('session_id');
@@ -85,8 +88,7 @@ const SuccessPage = () => {
     return () => {
       isMounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialized]);
+  }, [isInitialized, searchParams, formData, handleDownload, toast]);
 
   const handleDownloadAgain = () => {
     const calculatedValues = calculateTotal(
