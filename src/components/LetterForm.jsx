@@ -13,15 +13,10 @@ const PRECOMPUTED_STATE_OPTIONS = STATE_OPTIONS.map(s => (
 ));
 
 const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
-  const itemErrorsMap = useMemo(() => {
-    const map = new Map();
-    if (errors?.itemErrors) {
-      for (const e of errors.itemErrors) {
-        map.set(e.index, e.errors);
-      }
-    }
-    return map;
-  }, [errors?.itemErrors]);
+  const itemErrorsMap = useMemo(
+    () => errors?.itemErrors?.reduce((acc, curr) => acc.set(curr.index, curr.errors), new Map()) || new Map(),
+    [errors?.itemErrors]
+  );
 
   const handleChange = (e) => onUpdate(e.target.name, e.target.value);
 
