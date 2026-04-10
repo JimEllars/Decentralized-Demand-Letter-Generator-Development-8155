@@ -19,11 +19,15 @@ describe('paymentService', () => {
     };
 
     // Mock sessionStorage
-    globalThis.sessionStorage = {
-      setItem: mock.fn(),
-      getItem: mock.fn(),
-      removeItem: mock.fn()
-    };
+    Object.defineProperty(globalThis, 'sessionStorage', {
+      value: {
+        setItem: mock.fn(),
+        getItem: mock.fn(),
+        removeItem: mock.fn()
+      },
+      writable: true,
+      configurable: true
+    });
 
     // Mock crypto.randomUUID
     if (!globalThis.crypto) {
