@@ -18,6 +18,13 @@ describe('paymentService', () => {
       }
     };
 
+    // Mock sessionStorage
+    globalThis.sessionStorage = {
+      setItem: mock.fn(),
+      getItem: mock.fn(),
+      removeItem: mock.fn()
+    };
+
     // Mock crypto.randomUUID
     if (!globalThis.crypto) {
       globalThis.crypto = {};
