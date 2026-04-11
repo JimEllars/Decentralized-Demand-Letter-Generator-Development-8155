@@ -110,7 +110,14 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
-  const onPaymentConfirm = () => handlePayment(isValid, onValidationFail);
+  const onPaymentConfirm = (email) => {
+    if (email) {
+      sessionStorage.setItem('axim_delivery_email', email);
+    } else {
+      sessionStorage.removeItem('axim_delivery_email');
+    }
+    handlePayment(isValid, onValidationFail);
+  };
   const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid);
 
   if (!isInitialized) {

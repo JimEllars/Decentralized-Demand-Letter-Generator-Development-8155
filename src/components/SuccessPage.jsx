@@ -107,8 +107,25 @@ const SuccessPage = () => {
     navigate('/app/demand-generator');
   };
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => sessionStorage.getItem('axim_delivery_email') || '');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const hasSentInitialEmail = useRef(false);
+
+  // Auto-send email if user provided one during checkout
+  useEffect(() => {
+    if (verificationStatus === 'success' && email && !hasSentInitialEmail.current) {
+      hasSentInitialEmail.current = true;
+      const sendInitialEmail = async () => {
+        setIsSendingEmail(true);
+        // Simulate email sending delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        setIsSendingEmail(false);
+        toast.success(`Document automatically sent to ${email}`);
+        sessionStorage.removeItem('axim_delivery_email');
+      };
+      sendInitialEmail();
+    }
+  }, [verificationStatus, email, toast]);
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
