@@ -81,7 +81,8 @@ describe('SuccessPage', () => {
 
     // Wait for successful verification state
     await waitFor(() => {
-      assert.ok(screen.queryByText('Payment Successful'));
+      const el = screen.queryByText('Payment Successful');
+      if (!el) throw new Error('Not found');
     });
 
     // Try to send without typing an email by circumventing the disabled attribute
@@ -117,7 +118,8 @@ describe('SuccessPage', () => {
 
     // Wait for successful verification state
     await waitFor(() => {
-      assert.ok(screen.queryByText('Payment Successful'));
+      const el = screen.queryByText('Payment Successful');
+      if (!el) throw new Error('Not found');
     });
 
     const emailInput = screen.getByPlaceholderText('Enter email address');
