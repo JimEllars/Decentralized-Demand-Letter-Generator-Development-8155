@@ -20,6 +20,7 @@ describe('SuccessPage', () => {
 
     // Fall back to mocking fetch since mocking ES module exports natively fails in node:test
     originalFetch = globalThis.fetch;
+    if (globalThis.window && globalThis.window.localStorage) { globalThis.window.localStorage.clear(); }
   });
 
   afterEach(() => {
@@ -66,7 +67,7 @@ describe('SuccessPage', () => {
 
     globalThis.fetch = mock.fn(() => Promise.resolve({
       ok: true,
-      json: () => Promise.resolve({ isPaid: true })
+      json: () => Promise.resolve({ isPaid: true, accessToken: 'mock-token', expiresAt: new Date(Date.now() + 3600000).toISOString() })
     }));
 
     render(
@@ -102,7 +103,7 @@ describe('SuccessPage', () => {
 
     globalThis.fetch = mock.fn(() => Promise.resolve({
       ok: true,
-      json: () => Promise.resolve({ isPaid: true })
+      json: () => Promise.resolve({ isPaid: true, accessToken: 'mock-token', expiresAt: new Date(Date.now() + 3600000).toISOString() })
     }));
 
     render(
