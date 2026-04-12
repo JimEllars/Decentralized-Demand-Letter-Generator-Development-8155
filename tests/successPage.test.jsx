@@ -57,6 +57,55 @@ describe('SuccessPage', () => {
     assert.strictEqual(mockToastError.mock.calls.length, 1, 'toast.error should be called once');
     assert.strictEqual(mockToastError.mock.calls[0].arguments[0], 'Payment verification failed.', 'toast.error should receive the correct message');
 
+    // Assert console.error was called with the correct message by the component
+    const componentErrorCalls = console.error.mock.calls.filter(call => call.arguments[0] === 'Verification error:');
+    assert.strictEqual(componentErrorCalls.length, 1, 'SuccessPage console.error should be called when mounted');
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
+  it('does not update state or show toast if unmounted during verifyPaymentSession error', async () => {
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    // Create a promise that we can reject manually to control timing
+    let rejectPromise;
+    const fetchPromise = new Promise((resolve, reject) => {
+      rejectPromise = reject;
+    });
+
+    globalThis.fetch = mock.fn(() => fetchPromise);
+
+    const { unmount } = render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mock.fn(), info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Unmount before the promise settles
+    unmount();
+
+    // Now reject the promise
+    rejectPromise(new Error('Network error after unmount'));
+
+    // Wait a tick for the microtask queue to process the rejection
+    await act(async () => {
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    // Assert that no error toast was called
+    // In SuccessPage.jsx: `if (!isMounted) return;` happens before `console.error` and `toast.error` inside the catch block.
+    assert.strictEqual(mockToastError.mock.calls.length, 0, 'toast.error should not be called if unmounted');
+
+    // Note: console.error is still called once by verifyPaymentSession itself internally before it throws to the component
+    // But the component's own console.error ("Verification error:") should not be called.
+    const componentErrorCalls = console.error.mock.calls.filter(call => call.arguments[0] === 'Verification error:');
+    assert.strictEqual(componentErrorCalls.length, 0, 'SuccessPage console.error should not be called if unmounted');
+
     process.env.VITE_PAYMENT_API_URL = originalUrl;
   });
 
