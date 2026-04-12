@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
-import { verifyPaymentSession } from '../services/paymentService';
+import { verifyPaymentSession, clearAccessToken } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail } from 'react-icons/fi';
@@ -53,6 +53,7 @@ const SuccessPage = () => {
 
         if (data.isPaid) {
           setVerificationStatus('success');
+          localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           // Trigger download automatically
           const calculatedValues = calculateTotal(
@@ -104,6 +105,8 @@ const SuccessPage = () => {
 
   const handleCreateAnother = () => {
     resetForm();
+    localStorage.removeItem('axim_demand_letter_paid_status');
+    clearAccessToken();
     navigate('/app/demand-generator');
   };
 
@@ -186,7 +189,7 @@ const SuccessPage = () => {
 
             <h2 className="text-2xl font-bold tracking-tight text-white mb-2">Payment Successful</h2>
             <p className="text-zinc-400 text-sm leading-relaxed mb-8">
-              Your compliant Demand Letter is downloading...
+              Your compliant Demand Letter is generating. If your browser blocks the automatic download, please click the Download button below.
               {isGenerating && <span className="block mt-2 text-axim-teal animate-pulse">Generating PDF...</span>}
             </p>
 
