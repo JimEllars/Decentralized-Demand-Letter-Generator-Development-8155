@@ -28,7 +28,10 @@ export const useLetterStore = (initialDataOrFn) => {
   }, [formData, isInitialized]);
 
   const updateField = useCallback((name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: typeof value === 'function' ? value(prev[name]) : value
+    }));
   }, []);
 
   const resetForm = useCallback(() => {
