@@ -6,7 +6,37 @@ export default {
       const backendUrl = new URL(url.pathname.replace(/^\/api/, ''), 'https://axim-payment-backend.jrellars.workers.dev');
       backendUrl.search = url.search;
 
-      const newRequest = new Request(backendUrl.toString(), request);
+      let fetchOptions = {
+        method: request.method,
+        headers: new Headers(request.headers),
+      };
+
+      // Override headers to ensure backend sees the correct origin
+      fetchOptions.headers.set('Origin', 'https://quickdemandletter.com');
+      fetchOptions.headers.set('Referer', 'https://quickdemandletter.com/');
+
+      if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
+        if (url.pathname === '/api/create-checkout-session') {
+          try {
+            const body = await request.clone().json();
+
+            // Inject the correct success and cancel URLs into the payload
+            body.success_url = 'https://quickdemandletter.com/success?session_id={CHECKOUT_SESSION_ID}';
+            body.cancel_url = 'https://quickdemandletter.com/app/demand-generator?canceled=true';
+
+            fetchOptions.body = JSON.stringify(body);
+            // Ensure Content-Type is application/json after modifying the body
+            fetchOptions.headers.set('Content-Type', 'application/json');
+          } catch (e) {
+            console.error('Failed to parse request body for URL injection', e);
+            fetchOptions.body = request.clone().body;
+          }
+        } else {
+            fetchOptions.body = request.clone().body;
+        }
+      }
+
+      const newRequest = new Request(backendUrl.toString(), fetchOptions);
 
       try {
         const response = await fetch(newRequest);
