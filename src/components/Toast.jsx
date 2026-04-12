@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FiCheckCircle, FiAlertCircle, FiInfo, FiX } from 'react-icons/fi';
 
 const icons = {
