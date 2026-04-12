@@ -109,6 +109,161 @@ describe('SuccessPage', () => {
     process.env.VITE_PAYMENT_API_URL = originalUrl;
   });
 
+  it('handles Download Again button successfully', async () => {
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    globalThis.fetch = mock.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isPaid: true })
+    }));
+
+    const { unmount } = render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Wait for successful verification state
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Payment Successful'));
+    });
+
+    const downloadButton = screen.getByRole('button', { name: /Download Again/i });
+    fireEvent.click(downloadButton);
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
+  it('handles Create Another Letter button successfully', async () => {
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    globalThis.fetch = mock.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isPaid: true })
+    }));
+
+    const { unmount } = render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Wait for successful verification state
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Payment Successful'));
+    });
+
+    const createAnotherButton = screen.getByRole('button', { name: /Create Another Letter/i });
+    fireEvent.click(createAnotherButton);
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
+  it('fails gracefully when session_id is missing', async () => {
+    render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mock.fn(), info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    await waitFor(() => {
+      const failedText = screen.queryByText('Verification Failed');
+      assert.ok(failedText, 'Verification Failed text should be displayed');
+    });
+  });
+
+  it('fails gracefully when payment verification returns false', async () => {
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    globalThis.fetch = mock.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isPaid: false })
+    }));
+
+    render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Wait for successful verification state
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Verification Failed'));
+    });
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
+  it('handles Return Home button on failure', async () => {
+    render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mock.fn(), info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Verification Failed'));
+    });
+
+    const returnHomeButton = screen.getByRole('button', { name: /Return Home/i });
+    fireEvent.click(returnHomeButton);
+  });
+
+  it('triggers auto-download after successful verification', async () => {
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    globalThis.fetch = mock.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isPaid: true })
+    }));
+
+    render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Wait for successful verification state
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Payment Successful'));
+    });
+
+    // Wait for the setTimeout in auto-download to trigger
+    await act(async () => {
+      await new Promise(r => setTimeout(r, 1100));
+    });
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
   it('handles empty email error when sending email', async () => {
     const originalUrl = process.env.VITE_PAYMENT_API_URL;
     process.env.VITE_PAYMENT_API_URL = 'http://test.api';
@@ -149,6 +304,9 @@ describe('SuccessPage', () => {
   });
 
   it('handles email sending simulation successfully', async () => {
+    // We want to test the manual send, so we start with no email in sessionStorage to bypass auto-send
+    sessionStorage.removeItem('axim_delivery_email');
+
     const originalUrl = process.env.VITE_PAYMENT_API_URL;
     process.env.VITE_PAYMENT_API_URL = 'http://test.api';
 
