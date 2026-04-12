@@ -22,30 +22,31 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
 
   const handleAddItem = useCallback(() => {
     // Generate unique ID for new item to ensure stable rendering
-    const newItems = [...(formData.items || []), { id: generateId(), description: '', amount: '' }];
-    onUpdate('items', newItems);
-  }, [formData.items, onUpdate]);
+    onUpdate('items', (prevItems = []) => [
+      ...prevItems,
+      { id: generateId(), description: '', amount: '' }
+    ]);
+  }, [onUpdate]);
 
   const handleAddLateFee = useCallback(() => {
-    // Calculate 5% of current principal
-    const principal = (formData.items || []).reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
-    const fee = (principal * 0.05).toFixed(2);
+    onUpdate('items', (prevItems = []) => {
+      // Calculate 5% of current principal
+      const principal = prevItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+      const fee = (principal * 0.05).toFixed(2);
 
-    const newItems = [...(formData.items || []), { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
-    onUpdate('items', newItems);
-  }, [formData.items, onUpdate]);
+      return [...prevItems, { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
+    });
+  }, [onUpdate]);
 
   const handleRemoveItem = useCallback((index) => {
-    const newItems = formData.items.filter((_, i) => i !== index);
-    onUpdate('items', newItems);
-  }, [formData.items, onUpdate]);
+    onUpdate('items', (prevItems = []) => prevItems.filter((_, i) => i !== index));
+  }, [onUpdate]);
 
   const handleItemChange = useCallback((index, field, value) => {
-    const newItems = formData.items.map((item, i) =>
+    onUpdate('items', (prevItems = []) => prevItems.map((item, i) =>
       i === index ? { ...item, [field]: value } : item
-    );
-    onUpdate('items', newItems);
-  }, [formData.items, onUpdate]);
+    ));
+  }, [onUpdate]);
 
   const handleSetToday = useCallback((field) => {
     onUpdate(field, getLocalDateString());

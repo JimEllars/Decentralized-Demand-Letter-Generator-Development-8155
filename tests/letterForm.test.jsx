@@ -103,7 +103,8 @@ describe('LetterForm', () => {
 
     assert.strictEqual(onUpdateMock.mock.callCount(), 1);
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[0], 'items');
-    const newItems = onUpdateMock.mock.calls[0].arguments[1];
+    const updateFn = onUpdateMock.mock.calls[0].arguments[1];
+    const newItems = typeof updateFn === 'function' ? updateFn(defaultFormData.items) : updateFn;
     assert.strictEqual(newItems.length, 2);
     assert.strictEqual(newItems[1].description, '');
     assert.strictEqual(newItems[1].amount, '');
@@ -120,7 +121,8 @@ describe('LetterForm', () => {
 
     assert.strictEqual(onUpdateMock.mock.callCount(), 1);
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[0], 'items');
-    const newItems = onUpdateMock.mock.calls[0].arguments[1];
+    const updateFn = onUpdateMock.mock.calls[0].arguments[1];
+    const newItems = typeof updateFn === 'function' ? updateFn(defaultFormData.items) : updateFn;
     assert.strictEqual(newItems.length, 2);
     assert.strictEqual(newItems[1].description, 'Late Payment Fee (5%)');
     assert.strictEqual(newItems[1].amount, '5.00'); // 5% of 100.00
@@ -137,7 +139,8 @@ describe('LetterForm', () => {
 
     assert.strictEqual(onUpdateMock.mock.callCount(), 1);
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[0], 'items');
-    const newItems = onUpdateMock.mock.calls[0].arguments[1];
+    const updateFn = onUpdateMock.mock.calls[0].arguments[1];
+    const newItems = typeof updateFn === 'function' ? updateFn(defaultFormData.items) : updateFn;
     assert.strictEqual(newItems[0].description, 'Updated Item');
   });
 
@@ -161,7 +164,8 @@ describe('LetterForm', () => {
 
     assert.strictEqual(onUpdateMock.mock.callCount(), 1);
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[0], 'items');
-    const newItems = onUpdateMock.mock.calls[0].arguments[1];
+    const updateFn = onUpdateMock.mock.calls[0].arguments[1];
+    const newItems = typeof updateFn === 'function' ? updateFn(dataWithTwoItems.items) : updateFn;
     assert.strictEqual(newItems.length, 1);
     assert.strictEqual(newItems[0].id, '2');
   });
