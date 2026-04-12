@@ -146,7 +146,7 @@ const DemandGenerator = () => {
             </button>
           </div>
           <div className="bg-black/20">
-            <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} />
+            <LetterForm formData={formData} onUpdate={updateField} errors={displayedErrors} calculatedValues={calculatedValues} />
           </div>
         </motion.section>
 
