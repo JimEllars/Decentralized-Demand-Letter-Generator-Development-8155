@@ -22,11 +22,13 @@ describe('paymentService', () => {
     };
 
     // Mock sessionStorage
+    const store = new Map();
     Object.defineProperty(globalThis, 'sessionStorage', {
       value: {
-        setItem: mock.fn(),
-        getItem: mock.fn(),
-        removeItem: mock.fn()
+        setItem: mock.fn((key, value) => store.set(key, value)),
+        getItem: mock.fn((key) => store.get(key) || null),
+        removeItem: mock.fn((key) => store.delete(key)),
+        clear: mock.fn(() => store.clear())
       },
       writable: true,
       configurable: true
@@ -207,8 +209,17 @@ describe('paymentService', () => {
   describe('verifyPaymentSession', () => {
     it('should fall back to simulation mode and return isPaid true for valid IDs', async () => {
       delete process.env.VITE_PAYMENT_API_URL;
+      globalThis.sessionStorage.setItem('axim_pending_transaction', 'AXM-123456');
       const result = await verifyPaymentSession('AXM-123456');
       assert.strictEqual(result.isPaid, true);
+      assert.strictEqual(globalThis.sessionStorage.getItem('axim_pending_transaction'), null);
+    });
+
+    it('should fall back to simulation mode and return isPaid false for valid prefix but mismatching pending transaction', async () => {
+      delete process.env.VITE_PAYMENT_API_URL;
+      globalThis.sessionStorage.setItem('axim_pending_transaction', 'AXM-OTHER');
+      const result = await verifyPaymentSession('AXM-123456');
+      assert.strictEqual(result.isPaid, false);
     });
 
     it('should fall back to simulation mode and return isPaid false for invalid IDs', async () => {

@@ -84,9 +84,13 @@ export const processPayment = async (productId) => {
   // Fallback: Simulation Mode (No Backend Configured)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
+      const transactionId = `AXM-${crypto.randomUUID().toUpperCase().split('-')[0]}`;
+      // Store pending transaction to ensure secure verification in simulation mode
+      sessionStorage.setItem('axim_pending_transaction', transactionId);
+
       const mockResponse = {
         success: true,
-        transactionId: `AXM-${crypto.randomUUID().toUpperCase().split('-')[0]}`,
+        transactionId: transactionId,
         timestamp: new Date().toISOString()
       };
       
@@ -143,8 +147,15 @@ export const verifyPaymentSession = async (sessionId) => {
   // Fallback: Simulation Mode
   return new Promise((resolve) => {
     setTimeout(() => {
-      const isValid = typeof sessionId === 'string' && sessionId.startsWith('AXM-');
+      const pendingTransaction = sessionStorage.getItem('axim_pending_transaction');
+      const isValid = typeof sessionId === 'string' &&
+                      sessionId.startsWith('AXM-') &&
+                      sessionId === pendingTransaction;
+
       if (isValid) {
+        // Prevent replay attacks by clearing the pending transaction once verified
+        sessionStorage.removeItem('axim_pending_transaction');
+
         const mockToken = `dev-token-${crypto.randomUUID()}`;
         const mockExpiry = new Date(Date.now() + 3600000).toISOString();
         sessionStorage.setItem(PAYMENT_TOKEN_KEY, mockToken);
