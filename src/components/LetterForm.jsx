@@ -12,7 +12,7 @@ const PRECOMPUTED_STATE_OPTIONS = STATE_OPTIONS.map(s => (
   </option>
 ));
 
-const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
+const LetterForm = memo(({ formData, onUpdate, errors = {}, calculatedValues = {} }) => {
   const itemErrorsMap = useMemo(
     () => errors?.itemErrors?.reduce((acc, curr) => acc.set(curr.index, curr.errors), new Map()) || new Map(),
     [errors?.itemErrors]
@@ -30,13 +30,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {} }) => {
 
   const handleAddLateFee = useCallback(() => {
     onUpdate('items', (prevItems = []) => {
-      // Calculate 5% of current principal
-      const principal = prevItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+      // Use pre-calculated principal to save redundant array traversal
+      const principal = calculatedValues.principal || 0;
       const fee = (principal * 0.05).toFixed(2);
 
       return [...prevItems, { id: generateId(), description: 'Late Payment Fee (5%)', amount: fee }];
     });
-  }, [onUpdate]);
+  }, [onUpdate, calculatedValues.principal]);
 
   const handleRemoveItem = useCallback((index) => {
     onUpdate('items', (prevItems = []) => prevItems.filter((_, i) => i !== index));

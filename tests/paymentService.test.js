@@ -4,9 +4,12 @@ import { processPayment, initiateBackendTransaction, verifyPaymentSession } from
 
 describe('paymentService', () => {
   let originalEnv;
+  let originalConsoleError;
 
   beforeEach(() => {
     originalEnv = { ...process.env };
+    originalConsoleError = console.error;
+    console.error = mock.fn(); // Suppress expected error logs during tests
 
     // Mock fetch
     globalThis.fetch = mock.fn();
@@ -37,6 +40,7 @@ describe('paymentService', () => {
   });
 
   afterEach(() => {
+    console.error = originalConsoleError;
     process.env = originalEnv;
     delete globalThis.fetch;
     delete globalThis.window;

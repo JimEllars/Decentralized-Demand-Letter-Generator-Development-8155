@@ -113,7 +113,7 @@ describe('LetterForm', () => {
   it('handles "+5% FEE" button', () => {
     const onUpdateMock = mock.fn();
     render(
-      <LetterForm formData={defaultFormData} onUpdate={onUpdateMock} />
+      <LetterForm formData={defaultFormData} onUpdate={onUpdateMock} calculatedValues={{ principal: 100 }} />
     );
 
     const addFeeBtn = screen.getByText('+5% FEE');

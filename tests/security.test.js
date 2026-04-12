@@ -3,7 +3,12 @@ import assert from 'node:assert';
 import { initiateBackendTransaction } from '../src/services/paymentService.js';
 
 describe('paymentService security', () => {
+  let originalConsoleError;
+
   beforeEach(() => {
+    originalConsoleError = console.error;
+    console.error = mock.fn(); // Suppress expected error logs during tests
+
     // Mock fetch
     globalThis.fetch = mock.fn();
 
@@ -16,6 +21,7 @@ describe('paymentService security', () => {
   });
 
   afterEach(() => {
+    console.error = originalConsoleError;
     delete globalThis.fetch;
     delete globalThis.window;
   });
