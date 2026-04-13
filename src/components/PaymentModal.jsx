@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// Note: FiShield, FiCreditCard, and FiLock, FiMail are actively used below despite potential linter warnings
+// eslint-disable-next-line no-unused-vars
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
