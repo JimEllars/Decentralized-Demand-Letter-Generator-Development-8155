@@ -246,7 +246,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, calculatedValues = {
               index={index}
               onChange={handleItemChange}
               onRemove={handleRemoveItem}
-              showRemove={formData.items.length > 1}
+              showRemove={(formData.items || []).length > 1}
               itemErrors={itemErrorsMap.get(index)}
             />
           ))}
