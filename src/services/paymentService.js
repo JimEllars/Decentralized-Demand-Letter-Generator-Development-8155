@@ -40,8 +40,8 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
       }
 
       window.location.href = data.url;
-      // Return a promise that never resolves to prevent UI state changes during redirect
-      return new Promise(() => {});
+      // Return the URL and let the caller maintain the UI loading state during redirect
+      return { url: data.url };
     }
 
     if (data.success) {

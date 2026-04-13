@@ -183,7 +183,8 @@ describe('usePayment', () => {
         });
 
         assert.strictEqual(onError.mock.callCount(), 0);
-        assert.strictEqual(result.current.isProcessing, false);
+        // Loading state should be maintained because of redirect to success page
+        assert.strictEqual(result.current.isProcessing, true);
         assert.strictEqual(globalThis.window.location.href, '/success?session_id=AXM-123');
 
         unmount();
