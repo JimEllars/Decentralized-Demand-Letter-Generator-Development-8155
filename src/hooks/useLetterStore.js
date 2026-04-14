@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { loadAndMigrateData } from '../utils/storeHelpers';
 
-const STORAGE_KEY = 'axim_demand_letter_draft_v2';
+const STORAGE_KEY = 'axim_demand_letter_draft';
 
 export const useLetterStore = (initialDataOrFn) => {
   const [formData, setFormData] = useState(initialDataOrFn);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = sessionStorage.getItem(STORAGE_KEY);
     const data = loadAndMigrateData(saved, initialDataOrFn);
     setFormData(data);
     setIsInitialized(true);
@@ -19,7 +19,7 @@ export const useLetterStore = (initialDataOrFn) => {
     if (!isInitialized) return;
 
     const handler = setTimeout(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     }, 500);
 
     return () => {
@@ -37,7 +37,7 @@ export const useLetterStore = (initialDataOrFn) => {
   const resetForm = useCallback(() => {
     const newState = typeof initialDataOrFn === 'function' ? initialDataOrFn() : initialDataOrFn;
     setFormData(newState);
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
   }, [initialDataOrFn]);
 
   return { formData, updateField, resetForm, isInitialized };

@@ -172,10 +172,10 @@ describe('SuccessPage', () => {
       fireEvent.click(createAnotherButton);
 
       // Verify localStorage was cleared
-      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_demand_letter_draft_v2'), 'localStorage draft should be cleared');
       assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_demand_letter_paid_status'), 'localStorage paid status should be cleared');
 
       // Verify sessionStorage was cleared
+      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_demand_letter_draft'), 'sessionStorage draft should be cleared');
       assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_access_token'), 'sessionStorage access token should be cleared');
       assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_token_expiry'), 'sessionStorage token expiry should be cleared');
 
