@@ -148,25 +148,43 @@ describe('SuccessPage', () => {
       json: () => Promise.resolve({ isPaid: true })
     }));
 
+    // We can spy on global objects using mock.method
+    mock.method(Storage.prototype, 'removeItem');
+
     const { unmount } = render(
       <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
         <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
           <Routes>
             <Route path="/" element={<SuccessPage />} />
+            <Route path="/app/demand-generator" element={<div data-testid="generator-page">Generator Page</div>} />
           </Routes>
         </MemoryRouter>
       </ToastContext.Provider>
     );
 
-    // Wait for successful verification state
-    await waitFor(() => {
-      assert.ok(screen.queryByText('Payment Successful'));
-    });
+    try {
+      // Wait for successful verification state
+      await waitFor(() => {
+        assert.ok(screen.queryByText('Payment Successful'));
+      });
 
-    const createAnotherButton = screen.getByRole('button', { name: /Create Another Letter/i });
-    fireEvent.click(createAnotherButton);
+      const createAnotherButton = screen.getByRole('button', { name: /Create Another Letter/i });
+      fireEvent.click(createAnotherButton);
 
-    process.env.VITE_PAYMENT_API_URL = originalUrl;
+      // Verify localStorage was cleared
+      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_demand_letter_draft_v2'), 'localStorage draft should be cleared');
+      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_demand_letter_paid_status'), 'localStorage paid status should be cleared');
+
+      // Verify sessionStorage was cleared
+      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_access_token'), 'sessionStorage access token should be cleared');
+      assert.ok(Storage.prototype.removeItem.mock.calls.some(call => call.arguments[0] === 'axim_token_expiry'), 'sessionStorage token expiry should be cleared');
+
+      // Verify navigation occurred
+      assert.ok(screen.getByTestId('generator-page'), 'Should navigate to generator page');
+    } finally {
+      process.env.VITE_PAYMENT_API_URL = originalUrl;
+      Storage.prototype.removeItem.mock.restore();
+    }
   });
 
   it('fails gracefully when session_id is missing', async () => {
