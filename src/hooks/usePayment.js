@@ -73,6 +73,8 @@ export const usePayment = () => {
     }
 
     setIsProcessing(true);
+    let isRedirecting = false;
+
     try {
       let timeoutId;
       const result = await Promise.race([
@@ -83,9 +85,16 @@ export const usePayment = () => {
       ]);
       clearTimeout(timeoutId);
 
+      if (result && result.url) {
+        // A direct redirect to a payment provider is happening.
+        isRedirecting = true;
+        return;
+      }
+
       if (result && result.success) {
         if (result.transactionId) {
           // If simulating or not returning a direct redirect URL, simulate redirect
+          isRedirecting = true;
           window.location.href = `/success?session_id=${result.transactionId}`;
         } else {
           // Fallback if no transactionId is provided
@@ -97,7 +106,10 @@ export const usePayment = () => {
     } catch (error) {
       toast.error(error.message);
     } finally {
-      setIsProcessing(false);
+      // Maintain loading state if we are redirecting
+      if (!isRedirecting) {
+        setIsProcessing(false);
+      }
     }
   };
 

@@ -163,13 +163,10 @@ describe('paymentService', () => {
         json: () => Promise.resolve({ url: 'https://checkout.stripe.com/test' })
       }));
 
-      // initiateBackendTransaction returns a Promise that never resolves in this case,
-      initiateBackendTransaction('http://test.api', 'test_product');
-
-      // Wait a tick for promises to resolve
-      await new Promise(resolve => setTimeout(resolve, 0));
+      const result = await initiateBackendTransaction('http://test.api', 'test_product');
 
       assert.strictEqual(globalThis.window.location.href, 'https://checkout.stripe.com/test');
+      assert.strictEqual(result.url, 'https://checkout.stripe.com/test');
     });
 
     it('should throw an error when fetch fails (response not ok)', async () => {
