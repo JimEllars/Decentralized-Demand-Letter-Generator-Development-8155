@@ -4,12 +4,10 @@ import { renderHook, act, cleanup, waitFor } from '@testing-library/react';
 import { useLetterStore } from '../src/hooks/useLetterStore.js';
 
 describe('useLetterStore', () => {
-  let originalLocalStorage;
-
   beforeEach(() => {
     if (globalThis.window) {
-      if (globalThis.window.localStorage) {
-        globalThis.window.localStorage.clear();
+      if (globalThis.window.sessionStorage) {
+        globalThis.window.sessionStorage.clear();
       }
     }
   });
@@ -19,7 +17,7 @@ describe('useLetterStore', () => {
     mock.restoreAll();
   });
 
-  it('initializes with initialData if localStorage is empty', () => {
+  it('initializes with initialData if sessionStorage is empty', () => {
     const { result, unmount } = renderHook(() => useLetterStore({ test: 'initial' }));
 
     assert.strictEqual(result.current.formData.test, 'initial');
@@ -28,9 +26,9 @@ describe('useLetterStore', () => {
     unmount();
   });
 
-  it('initializes gracefully when localStorage contains invalid JSON', () => {
-    // Mock localStorage to return invalid JSON
-    globalThis.window.localStorage.setItem('axim_demand_letter_draft_v2', '{invalid_json}');
+  it('initializes gracefully when sessionStorage contains invalid JSON', () => {
+    // Mock sessionStorage to return invalid JSON
+    globalThis.window.sessionStorage.setItem('axim_demand_letter_draft', '{invalid_json}');
 
     const { result, unmount } = renderHook(() => useLetterStore({ test: 'fallback' }));
 
@@ -41,9 +39,9 @@ describe('useLetterStore', () => {
     unmount();
   });
 
-  it('initializes from valid JSON in localStorage', () => {
+  it('initializes from valid JSON in sessionStorage', () => {
     const validData = { test: 'saved_value', items: [] };
-    globalThis.window.localStorage.setItem('axim_demand_letter_draft_v2', JSON.stringify(validData));
+    globalThis.window.sessionStorage.setItem('axim_demand_letter_draft', JSON.stringify(validData));
 
     const { result, unmount } = renderHook(() => useLetterStore({ test: 'fallback' }));
 
@@ -76,7 +74,7 @@ describe('useLetterStore', () => {
     unmount();
   });
 
-  it('saves to localStorage when data changes', async () => {
+  it('saves to sessionStorage when data changes', async () => {
     const { result, unmount } = renderHook(() => useLetterStore({ field: 'initial' }));
 
     act(() => {
@@ -86,15 +84,15 @@ describe('useLetterStore', () => {
     // Wait for the 500ms timeout
     await new Promise(resolve => setTimeout(resolve, 550));
 
-    const saved = globalThis.window.localStorage.getItem('axim_demand_letter_draft_v2');
+    const saved = globalThis.window.sessionStorage.getItem('axim_demand_letter_draft');
     const parsed = JSON.parse(saved);
     assert.strictEqual(parsed.field, 'updated');
 
     unmount();
   });
 
-  it('resets form data and removes from localStorage', () => {
-    globalThis.window.localStorage.setItem('axim_demand_letter_draft_v2', JSON.stringify({ field: 'saved' }));
+  it('resets form data and removes from sessionStorage', () => {
+    globalThis.window.sessionStorage.setItem('axim_demand_letter_draft', JSON.stringify({ field: 'saved' }));
     const { result, unmount } = renderHook(() => useLetterStore({ field: 'initial' }));
 
     act(() => {
@@ -102,7 +100,7 @@ describe('useLetterStore', () => {
     });
 
     assert.strictEqual(result.current.formData.field, 'initial');
-    assert.strictEqual(globalThis.window.localStorage.getItem('axim_demand_letter_draft_v2'), null);
+    assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_demand_letter_draft'), null);
 
     unmount();
   });
