@@ -3,7 +3,14 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith('/api/')) {
-      const backendUrl = new URL(url.pathname.replace(/^\/api/, ''), env.BACKEND_URL);
+      // Ensure the subpath is treated as a path, not a potential URL override
+      // We strip all leading slashes and then prepend './' to ensure it is
+      // interpreted as a relative path component.
+      const subPath = './' + url.pathname.replace(/^\/api/, '').replace(/^\/+/, '');
+
+      // Ensure backendUrl has a trailing slash for proper relative joining
+      const baseUrl = env.BACKEND_URL.endsWith('/') ? env.BACKEND_URL : `${env.BACKEND_URL}/`;
+      const backendUrl = new URL(subPath, baseUrl);
       backendUrl.search = url.search;
 
       let fetchOptions = {
