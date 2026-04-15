@@ -1,4 +1,3 @@
-import React from 'react';
 import SafeIcon from '../common/SafeIcon';
 
 const FormSection = ({ title, icon: Icon, description, children }) => (

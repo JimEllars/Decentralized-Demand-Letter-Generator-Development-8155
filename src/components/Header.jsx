@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiShield, FiCheckCircle } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';

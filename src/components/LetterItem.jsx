@@ -1,8 +1,8 @@
-import React from 'react';
+import { memo } from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
-const LetterItem = React.memo(({ item, index, onChange, onRemove, showRemove, itemErrors = {} }) => {
+const LetterItem = memo(({ item, index, onChange, onRemove, showRemove, itemErrors = {} }) => {
   const getInputClass = (hasError) => {
     const base = "bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600";
     if (hasError) return `${base} border-red-500/50 bg-red-900/10 focus:border-red-500`;

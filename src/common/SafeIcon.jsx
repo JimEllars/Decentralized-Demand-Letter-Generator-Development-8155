@@ -1,4 +1,3 @@
-import React from 'react';
 import * as FiIcons from 'react-icons/fi';
 import { FiAlertTriangle } from 'react-icons/fi';
 
