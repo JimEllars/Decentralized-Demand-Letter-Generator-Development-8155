@@ -1,7 +1,7 @@
-import React from 'react';
+import { Component } from 'react';
 import { FiAlertTriangle } from 'react-icons/fi';
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };

@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { FiLock } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';

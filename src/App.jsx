@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import DemandGenerator from './components/DemandGenerator';
 import DemandLanding from './components/DemandLanding';
