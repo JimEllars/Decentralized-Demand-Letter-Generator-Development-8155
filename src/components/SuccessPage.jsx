@@ -121,7 +121,7 @@ const SuccessPage = () => {
       const sendInitialEmail = async () => {
         setIsSendingEmail(true);
         // Simulate email sending delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise(resolve => setTimeout(resolve, 300));
         setIsSendingEmail(false);
         toast.success(`Document automatically sent to ${email}`);
         sessionStorage.removeItem('axim_delivery_email');
@@ -139,7 +139,7 @@ const SuccessPage = () => {
 
     setIsSendingEmail(true);
     // Simulate email sending delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     setIsSendingEmail(false);
     toast.success(`Document sent to ${email}`);
     setEmail('');
