@@ -12,5 +12,8 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
-  ]
+  ],
+  "vars": {
+    "BACKEND_URL": "https://axim-payment-backend.jrellars.workers.dev"
+  }
 }
