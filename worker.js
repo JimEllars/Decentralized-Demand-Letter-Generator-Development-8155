@@ -3,7 +3,7 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith('/api/')) {
-      const backendUrl = new URL(url.pathname.replace(/^\/api/, ''), 'https://axim-payment-backend.jrellars.workers.dev');
+      const backendUrl = new URL(url.pathname.replace(/^\/api/, ''), env.BACKEND_URL);
       backendUrl.search = url.search;
 
       let fetchOptions = {
