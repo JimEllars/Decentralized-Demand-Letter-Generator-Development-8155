@@ -28,6 +28,18 @@ const getInitialState = () => ({
   statutoryInterest: '0',
 });
 
+/**
+ * Utility to generate Tailwind classes for primary action buttons
+ * to avoid extremely long lines in the JSX.
+ */
+const getActionButtonStyles = (isActive) => {
+  const base = "w-full px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2";
+  const active = "bg-axim-gold text-black border border-axim-gold shadow-[0_10px_20px_-10px_rgba(255,234,0,0.3)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white";
+  const disabled = "bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed";
+
+  return `${base} ${isActive ? active : disabled}`;
+};
+
 const DemandGenerator = () => {
   const { formData, updateField, resetForm: resetStore, isInitialized } = useLetterStore(getInitialState);
   const toast = useToast();
@@ -167,7 +179,7 @@ const DemandGenerator = () => {
                   <button
                     onClick={onDownloadClick}
                     disabled={isGenerating}
-                    className={`w-full ${isValid && !isGenerating ? 'bg-axim-gold text-black border border-axim-gold shadow-[0_10px_20px_-10px_rgba(255,234,0,0.3)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white' : 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'} px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2`}
+                    className={getActionButtonStyles(isValid && !isGenerating)}
                   >
                     {isGenerating ? (
                       <>
@@ -193,7 +205,7 @@ const DemandGenerator = () => {
                   <button
                     onClick={onCheckoutClick}
                     disabled={isProcessing}
-                    className={`w-full ${isValid && !isProcessing ? 'bg-axim-gold text-black border border-axim-gold shadow-[0_10px_20px_-10px_rgba(255,234,0,0.3)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white' : 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'} px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2`}
+                    className={getActionButtonStyles(isValid && !isProcessing)}
                   >
                     {isProcessing ? (
                       <>
