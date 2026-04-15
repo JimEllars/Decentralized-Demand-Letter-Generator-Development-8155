@@ -358,7 +358,7 @@ describe('SuccessPage', () => {
 
     // Wait for the simulated delay in handleSendEmail
     await act(async () => {
-      await new Promise(r => setTimeout(r, 1600));
+      await new Promise(r => setTimeout(r, 400));
     });
 
     // We can check if Send is back
