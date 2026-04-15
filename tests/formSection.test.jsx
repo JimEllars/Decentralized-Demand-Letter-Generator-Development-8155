@@ -56,4 +56,31 @@ describe('FormSection', () => {
     assert.ok(classNameVal.includes('w-4'));
     assert.ok(classNameVal.includes('h-4'));
   });
+
+  it('should render description when provided', () => {
+    const { container } = render(
+      <FormSection title="Desc Title" description="Test Description">
+        <div>Content</div>
+      </FormSection>
+    );
+
+    const descriptionElement = screen.getByText('Test Description');
+    assert.ok(descriptionElement);
+    assert.ok(descriptionElement.className.includes('font-inter'));
+    assert.ok(descriptionElement.className.includes('text-xs'));
+    assert.ok(descriptionElement.className.includes('text-zinc-400'));
+
+    assert.strictEqual(descriptionElement.tagName.toLowerCase(), 'p');
+  });
+
+  it('should not render description when not provided', () => {
+    const { container } = render(
+      <FormSection title="Desc Title">
+        <div>Content</div>
+      </FormSection>
+    );
+
+    const pElement = container.querySelector('p');
+    assert.strictEqual(pElement, null, 'Should not render a p tag for description');
+  });
 });
