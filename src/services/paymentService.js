@@ -65,7 +65,7 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
  * @returns {Promise<{success: boolean, transactionId?: string} | never>}
  */
 export const processPayment = async (productId) => {
-  const paymentApiUrl = typeof import.meta.env !== 'undefined'
+  const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
     ? import.meta.env.VITE_PAYMENT_API_URL
     : process.env.VITE_PAYMENT_API_URL;
 
@@ -73,7 +73,7 @@ export const processPayment = async (productId) => {
     return initiateBackendTransaction(paymentApiUrl, productId);
   }
 
-  const isProd = typeof import.meta.env !== 'undefined' && typeof import.meta.env.PROD !== 'undefined'
+  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
     ? import.meta.env.PROD
     : process.env.NODE_ENV === 'production';
 
@@ -115,7 +115,7 @@ const TOKEN_EXPIRY_KEY = 'axim_token_expiry';
 let simulationTokenStore = null;
 
 export const verifyPaymentSession = async (sessionId) => {
-  const paymentApiUrl = typeof import.meta.env !== 'undefined'
+  const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
     ? import.meta.env.VITE_PAYMENT_API_URL
     : process.env.VITE_PAYMENT_API_URL;
 
@@ -139,7 +139,7 @@ export const verifyPaymentSession = async (sessionId) => {
     }
   }
 
-  const isProd = typeof import.meta.env !== 'undefined' && typeof import.meta.env.PROD !== 'undefined'
+  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
     ? import.meta.env.PROD
     : process.env.NODE_ENV === 'production';
 
@@ -177,9 +177,18 @@ export const verifyPaymentSession = async (sessionId) => {
 };
 
 export const getValidAccessToken = () => {
+  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
+    ? import.meta.env.PROD
+    : process.env.NODE_ENV === 'production';
+
   // Prioritize in-memory simulation token
-  let token = simulationTokenStore?.token;
-  let expiry = simulationTokenStore?.expiry;
+  let token = null;
+  let expiry = null;
+
+  if (!isProd) {
+    token = simulationTokenStore?.token;
+    expiry = simulationTokenStore?.expiry;
+  }
 
   // Fallback to sessionStorage for real production tokens
   if (!token || !expiry) {

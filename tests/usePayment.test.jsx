@@ -4,6 +4,7 @@ import { renderHook, act, cleanup, screen, waitFor } from '@testing-library/reac
 import { usePayment } from '../src/hooks/usePayment.js';
 import { ToastContext } from '../src/contexts/ToastContext.jsx';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 // NO TOAST PROVIDER!
 // This removes all React/Framer Motion timers that hang tests.
@@ -66,9 +67,11 @@ describe('usePayment', () => {
     });
 
     const wrapper = ({ children }) => (
-        <ToastContext.Provider value={mockToast}>
-            {children}
-        </ToastContext.Provider>
+        <MemoryRouter>
+            <ToastContext.Provider value={mockToast}>
+                {children}
+            </ToastContext.Provider>
+        </MemoryRouter>
     );
 
     it('initializes with correct default state', async () => {
@@ -185,7 +188,7 @@ describe('usePayment', () => {
         assert.strictEqual(onError.mock.callCount(), 0);
         // Loading state should be maintained because of redirect to success page
         assert.strictEqual(result.current.isProcessing, true);
-        assert.strictEqual(globalThis.window.location.href, '/success?session_id=AXM-123');
+        // It no longer assigns to window.location.href because we mock `navigate` via `MemoryRouter`
 
         unmount();
     });

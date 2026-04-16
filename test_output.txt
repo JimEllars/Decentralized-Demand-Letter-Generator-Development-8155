@@ -7,851 +7,1093 @@ TAP version 13
     # Subtest: should calculate principal correctly
     ok 1 - should calculate principal correctly
       ---
-      duration_ms: 5.293997
+      duration_ms: 3.661332
       type: 'test'
       ...
     # Subtest: should calculate interest correctly for DEFAULT jurisdiction (6%)
     ok 2 - should calculate interest correctly for DEFAULT jurisdiction (6%)
       ---
-      duration_ms: 0.533997
+      duration_ms: 0.446691
       type: 'test'
       ...
     # Subtest: should use custom interest rate when provided
     ok 3 - should use custom interest rate when provided
       ---
-      duration_ms: 0.427675
+      duration_ms: 0.425988
       type: 'test'
       ...
     # Subtest: should handle zero interest if no days overdue
     ok 4 - should handle zero interest if no days overdue
       ---
-      duration_ms: 0.366844
+      duration_ms: 0.434633
       type: 'test'
       ...
     # Subtest: should handle negative days overdue (future due date) as zero interest
     ok 5 - should handle negative days overdue (future due date) as zero interest
       ---
-      duration_ms: 0.54036
+      duration_ms: 0.549569
       type: 'test'
       ...
     # Subtest: should handle state-specific rates
     ok 6 - should handle state-specific rates
       ---
-      duration_ms: 0.317841
+      duration_ms: 0.303343
       type: 'test'
       ...
     # Subtest: should fallback to DEFAULT jurisdiction when an invalid jurisdiction is provided
     ok 7 - should fallback to DEFAULT jurisdiction when an invalid jurisdiction is provided
       ---
-      duration_ms: 0.282526
+      duration_ms: 0.30422
       type: 'test'
       ...
     # Subtest: should fallback to DEFAULT jurisdiction when jurisdiction is null or undefined
     ok 8 - should fallback to DEFAULT jurisdiction when jurisdiction is null or undefined
       ---
-      duration_ms: 0.535847
+      duration_ms: 0.500266
       type: 'test'
       ...
     # Subtest: should handle empty items array
     ok 9 - should handle empty items array
       ---
-      duration_ms: 0.283347
+      duration_ms: 0.293694
       type: 'test'
       ...
-    1..9
+    # Subtest: should handle null items array
+    ok 10 - should handle null items array
+      ---
+      duration_ms: 0.555951
+      type: 'test'
+      ...
+    1..10
 ok 1 - calculateTotal
   ---
-  duration_ms: 11.827178
+  duration_ms: 9.567176
   type: 'suite'
   ...
 # Subtest: getToneTemplate
     # Subtest: should return the correct template for a valid tone
     ok 1 - should return the correct template for a valid tone
       ---
-      duration_ms: 1.441119
+      duration_ms: 0.336756
       type: 'test'
       ...
     # Subtest: should fallback to firm template for an invalid tone
     ok 2 - should fallback to firm template for an invalid tone
       ---
-      duration_ms: 0.19096
+      duration_ms: 0.12864
       type: 'test'
       ...
     # Subtest: should fallback to firm template for null or undefined tone
     ok 3 - should fallback to firm template for null or undefined tone
       ---
-      duration_ms: 0.261386
+      duration_ms: 0.114177
       type: 'test'
       ...
     1..3
 ok 2 - getToneTemplate
   ---
-  duration_ms: 2.120643
+  duration_ms: 0.764406
   type: 'suite'
   ...
 # Subtest: constants
     # Subtest: STATE_NAMES should be an object with 51 valid entries
     ok 1 - STATE_NAMES should be an object with 51 valid entries
       ---
-      duration_ms: 2.390331
+      duration_ms: 1.865749
       type: 'test'
       ...
     # Subtest: STATE_LEGAL_DETAILS should contain all states plus DEFAULT
     ok 2 - STATE_LEGAL_DETAILS should contain all states plus DEFAULT
       ---
-      duration_ms: 0.598036
+      duration_ms: 0.342173
       type: 'test'
       ...
     # Subtest: TONE_TEMPLATES should contain 4 valid tones
     ok 3 - TONE_TEMPLATES should contain 4 valid tones
       ---
-      duration_ms: 0.351247
+      duration_ms: 0.293547
       type: 'test'
       ...
     # Subtest: STATE_SPECIFIC_CLAUSES should contain expected keys and have valid structure
     ok 4 - STATE_SPECIFIC_CLAUSES should contain expected keys and have valid structure
       ---
-      duration_ms: 0.355894
+      duration_ms: 0.211429
       type: 'test'
       ...
     # Subtest: STATE_OPTIONS should be a sorted array of 51 state objects
     ok 5 - STATE_OPTIONS should be a sorted array of 51 state objects
       ---
-      duration_ms: 19.357294
+      duration_ms: 13.244805
       type: 'test'
       ...
     # Subtest: STATE_OPTIONS should be in sync with STATE_NAMES and STATE_LEGAL_DETAILS
     ok 6 - STATE_OPTIONS should be in sync with STATE_NAMES and STATE_LEGAL_DETAILS
       ---
-      duration_ms: 0.709621
+      duration_ms: 0.533287
       type: 'test'
       ...
     1..6
 ok 3 - constants
   ---
-  duration_ms: 26.29738
+  duration_ms: 18.183658
+  type: 'suite'
+  ...
+# Subtest: ErrorBoundary
+    # Subtest: should render children when there is no error
+    ok 1 - should render children when there is no error
+      ---
+      duration_ms: 25.299059
+      type: 'test'
+      ...
+    # Subtest: should render fallback UI when an error is caught
+    ok 2 - should render fallback UI when an error is caught
+      ---
+      duration_ms: 31.879324
+      type: 'test'
+      ...
+    # Subtest: should reload the page when the refresh button is clicked
+    ok 3 - should reload the page when the refresh button is clicked
+      ---
+      duration_ms: 18.386278
+      type: 'test'
+      ...
+    1..3
+ok 4 - ErrorBoundary
+  ---
+  duration_ms: 77.372974
   type: 'suite'
   ...
 # Subtest: FormSection
     # Subtest: should render the title and children
     ok 1 - should render the title and children
       ---
-      duration_ms: 52.273462
+      duration_ms: 37.035941
       type: 'test'
       ...
     # Subtest: should render with correct layout classes
-    not ok 2 - should render with correct layout classes
+    ok 2 - should render with correct layout classes
       ---
-      duration_ms: 32.283576
+      duration_ms: 6.311171
       type: 'test'
-      location: '/app/tests/formSection.test.jsx:1:674'
-      failureType: 'testCodeFailure'
-      error: |-
-        The expression evaluated to a falsy value:
-
-          assert.ok(titleElement.className.includes('text-slate-500'))
-
-      code: 'ERR_ASSERTION'
-      name: 'AssertionError'
-      expected: true
-      actual: false
-      operator: '=='
-      stack: |-
-        TestContext.<anonymous> (/app/tests/formSection.test.jsx:33:12)
-        Test.runInAsyncScope (node:async_hooks:214:14)
-        Test.run (node:internal/test_runner/test:1047:25)
-        Suite.processPendingSubtests (node:internal/test_runner/test:744:18)
-        Test.postRun (node:internal/test_runner/test:1173:19)
-        Test.run (node:internal/test_runner/test:1101:12)
-        async Promise.all (index 0)
-        async Suite.run (node:internal/test_runner/test:1442:7)
-        async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
       ...
     # Subtest: should render the provided icon
     ok 3 - should render the provided icon
       ---
-      duration_ms: 7.259621
+      duration_ms: 4.260035
       type: 'test'
       ...
-    1..3
-not ok 4 - FormSection
+    # Subtest: should render description when provided
+    ok 4 - should render description when provided
+      ---
+      duration_ms: 4.661612
+      type: 'test'
+      ...
+    # Subtest: should not render description when not provided
+    ok 5 - should not render description when not provided
+      ---
+      duration_ms: 5.800215
+      type: 'test'
+      ...
+    1..5
+ok 5 - FormSection
   ---
-  duration_ms: 96.996081
+  duration_ms: 60.014735
   type: 'suite'
-  location: '/app/tests/formSection.test.jsx:1:260'
-  failureType: 'subtestsFailed'
-  error: '1 subtest failed'
-  code: 'ERR_TEST_FAILURE'
   ...
 # Subtest: formatCurrency
     # Subtest: should format positive numbers correctly
     ok 1 - should format positive numbers correctly
       ---
-      duration_ms: 4.258236
+      duration_ms: 2.445264
       type: 'test'
       ...
     # Subtest: should format numeric strings correctly
     ok 2 - should format numeric strings correctly
       ---
-      duration_ms: 0.297861
+      duration_ms: 0.242449
       type: 'test'
       ...
     # Subtest: should format negative numbers correctly
     ok 3 - should format negative numbers correctly
       ---
-      duration_ms: 0.253456
+      duration_ms: 0.218936
       type: 'test'
       ...
     # Subtest: should format zero correctly
     ok 4 - should format zero correctly
       ---
-      duration_ms: 0.195549
+      duration_ms: 0.185966
       type: 'test'
       ...
     # Subtest: should handle strings with trailing non-numeric characters (via parseFloat)
     ok 5 - should handle strings with trailing non-numeric characters (via parseFloat)
       ---
-      duration_ms: 0.175795
+      duration_ms: 0.136108
       type: 'test'
       ...
     # Subtest: should handle whitespace padded strings correctly
     ok 6 - should handle whitespace padded strings correctly
       ---
-      duration_ms: 0.17101
+      duration_ms: 0.163005
       type: 'test'
       ...
     # Subtest: should format extremely large numbers correctly
     ok 7 - should format extremely large numbers correctly
       ---
-      duration_ms: 0.144546
+      duration_ms: 0.205567
       type: 'test'
       ...
     # Subtest: should handle NaN, null, and undefined by returning $0.00
     ok 8 - should handle NaN, null, and undefined by returning $0.00
       ---
-      duration_ms: 0.879395
+      duration_ms: 0.245983
       type: 'test'
       ...
     # Subtest: should handle boolean types as numbers
     ok 9 - should handle boolean types as numbers
       ---
-      duration_ms: 0.329306
+      duration_ms: 0.268441
       type: 'test'
       ...
     # Subtest: should handle objects and arrays by returning $0.00
     ok 10 - should handle objects and arrays by returning $0.00
       ---
-      duration_ms: 0.620205
+      duration_ms: 0.517057
       type: 'test'
       ...
     # Subtest: should handle non-numeric strings by returning $0.00
     ok 11 - should handle non-numeric strings by returning $0.00
       ---
-      duration_ms: 0.27494
+      duration_ms: 0.17429
       type: 'test'
       ...
     1..11
-ok 5 - formatCurrency
+ok 6 - formatCurrency
   ---
-  duration_ms: 12.576627
+  duration_ms: 6.897306
   type: 'suite'
   ...
 # Subtest: Header
     # Subtest: should render a semantic header element with appropriate classes
-    not ok 1 - should render a semantic header element with appropriate classes
+    ok 1 - should render a semantic header element with appropriate classes
       ---
-      duration_ms: 72.864471
+      duration_ms: 38.629508
       type: 'test'
-      location: '/app/tests/header.test.jsx:1:260'
-      failureType: 'testCodeFailure'
-      error: |-
-        Should have the correct layout classes
-        + actual - expected
-
-        + 'max-w-7xl mx-auto px-4 py-8 relative z-10'
-        - 'max-w-7xl mx-auto px-4 py-8'
-                                      ^
-
-      code: 'ERR_ASSERTION'
-      name: 'AssertionError'
-      expected: 'max-w-7xl mx-auto px-4 py-8'
-      actual: 'max-w-7xl mx-auto px-4 py-8 relative z-10'
-      operator: 'strictEqual'
-      stack: |-
-        TestContext.<anonymous> (/app/tests/header.test.jsx:16:12)
-        Test.runInAsyncScope (node:async_hooks:214:14)
-        Test.run (node:internal/test_runner/test:1047:25)
-        Test.start (node:internal/test_runner/test:944:17)
-        node:internal/test_runner/test:1440:71
-        node:internal/per_context/primordials:466:82
-        new Promise (<anonymous>)
-        new SafePromise (node:internal/per_context/primordials:435:3)
-        node:internal/per_context/primordials:466:9
-        Array.map (<anonymous>)
       ...
-    # Subtest: should render the AXiM Documents title as an h1
-    not ok 2 - should render the AXiM Documents title as an h1
+    # Subtest: should render the Demand Letter Generator title as an h1
+    ok 2 - should render the Demand Letter Generator title as an h1
       ---
-      duration_ms: 7.400669
+      duration_ms: 7.106001
       type: 'test'
-      location: '/app/tests/header.test.jsx:1:624'
-      failureType: 'testCodeFailure'
-      error: |-
-        Should have correct title styling
-        + actual - expected
-
-        + 'text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white'
-        - 'text-2xl font-bold text-blue-950 flex items-center gap-1'
-
-      code: 'ERR_ASSERTION'
-      name: 'AssertionError'
-      expected: 'text-2xl font-bold text-blue-950 flex items-center gap-1'
-      actual: 'text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-white'
-      operator: 'strictEqual'
-      stack: |-
-        TestContext.<anonymous> (/app/tests/header.test.jsx:29:12)
-        Test.runInAsyncScope (node:async_hooks:214:14)
-        Test.run (node:internal/test_runner/test:1047:25)
-        Suite.processPendingSubtests (node:internal/test_runner/test:744:18)
-        Test.postRun (node:internal/test_runner/test:1173:19)
-        Test.run (node:internal/test_runner/test:1101:12)
-        async Promise.all (index 0)
-        async Suite.run (node:internal/test_runner/test:1442:7)
-        async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+      ...
+    # Subtest: should render the AXiM Documents minor logo
+    ok 3 - should render the AXiM Documents minor logo
+      ---
+      duration_ms: 10.837334
+      type: 'test'
       ...
     # Subtest: should render the subtitle
-    ok 3 - should render the subtitle
+    ok 4 - should render the subtitle
       ---
-      duration_ms: 26.276618
+      duration_ms: 25.325016
       type: 'test'
       ...
     # Subtest: should render the secure local processing badge
-    ok 4 - should render the secure local processing badge
+    ok 5 - should render the secure local processing badge
       ---
-      duration_ms: 7.55256
+      duration_ms: 11.90725
       type: 'test'
       ...
     # Subtest: should render SVG icons via SafeIcon
-    ok 5 - should render SVG icons via SafeIcon
+    ok 6 - should render SVG icons via SafeIcon
       ---
-      duration_ms: 15.218926
+      duration_ms: 9.038181
       type: 'test'
       ...
-    1..5
-not ok 6 - Header
+    1..6
+ok 7 - Header
   ---
-  duration_ms: 132.347975
+  duration_ms: 104.853112
   type: 'suite'
-  location: '/app/tests/header.test.jsx:1:210'
-  failureType: 'subtestsFailed'
-  error: '2 subtests failed'
-  code: 'ERR_TEST_FAILURE'
   ...
 # Subtest: helpers
     # Subtest: generateId should return a string
     ok 1 - generateId should return a string
       ---
-      duration_ms: 1.658219
+      duration_ms: 1.785595
       type: 'test'
       ...
     # Subtest: generateId should generate unique IDs
     ok 2 - generateId should generate unique IDs
       ---
-      duration_ms: 0.33714
+      duration_ms: 0.410794
       type: 'test'
       ...
     # Subtest: getLocalDateString should return YYYY-MM-DD format
     ok 3 - getLocalDateString should return YYYY-MM-DD format
       ---
-      duration_ms: 0.714383
+      duration_ms: 0.637938
       type: 'test'
       ...
     # Subtest: getLocalDateString should format specific date correctly
     ok 4 - getLocalDateString should format specific date correctly
       ---
-      duration_ms: 0.204776
+      duration_ms: 0.226974
       type: 'test'
       ...
     1..4
-ok 7 - helpers
+ok 8 - helpers
   ---
-  duration_ms: 4.515578
+  duration_ms: 4.719397
+  type: 'suite'
+  ...
+# Subtest: Instructions Component
+    # Subtest: renders without crashing
+    ok 1 - renders without crashing
+      ---
+      duration_ms: 48.100988
+      type: 'test'
+      ...
+    # Subtest: renders the Zero-Knowledge Privacy text
+    ok 2 - renders the Zero-Knowledge Privacy text
+      ---
+      duration_ms: 16.046849
+      type: 'test'
+      ...
+    # Subtest: renders SVG icons
+    ok 3 - renders SVG icons
+      ---
+      duration_ms: 8.361195
+      type: 'test'
+      ...
+    # Subtest: renders the How It Works heading
+    ok 4 - renders the How It Works heading
+      ---
+      duration_ms: 11.264311
+      type: 'test'
+      ...
+    # Subtest: renders the three instruction steps
+    ok 5 - renders the three instruction steps
+      ---
+      duration_ms: 27.691613
+      type: 'test'
+      ...
+    1..5
+ok 9 - Instructions Component
+  ---
+  duration_ms: 113.252737
+  type: 'suite'
+  ...
+# Subtest: LetterForm
+    # Subtest: renders correctly with default data
+    ok 1 - renders correctly with default data
+      ---
+      duration_ms: 81.49231
+      type: 'test'
+      ...
+    # Subtest: handles input changes
+    ok 2 - handles input changes
+      ---
+      duration_ms: 56.817413
+      type: 'test'
+      ...
+    # Subtest: handles jurisdiction and tone changes
+    ok 3 - handles jurisdiction and tone changes
+      ---
+      duration_ms: 61.251175
+      type: 'test'
+      ...
+    # Subtest: handles "Set to Today" button
+    ok 4 - handles "Set to Today" button
+      ---
+      duration_ms: 66.559759
+      type: 'test'
+      ...
+    # Subtest: handles "Set to 30 Days Ago" button
+    ok 5 - handles "Set to 30 Days Ago" button
+      ---
+      duration_ms: 56.57703
+      type: 'test'
+      ...
+    # Subtest: handles "ADD LINE ITEM" button
+    ok 6 - handles "ADD LINE ITEM" button
+      ---
+      duration_ms: 48.633158
+      type: 'test'
+      ...
+    # Subtest: handles "+5% FEE" button
+    ok 7 - handles "+5% FEE" button
+      ---
+      duration_ms: 53.472657
+      type: 'test'
+      ...
+    # Subtest: handles child LetterItem onChange
+    ok 8 - handles child LetterItem onChange
+      ---
+      duration_ms: 38.930433
+      type: 'test'
+      ...
+    # Subtest: handles child LetterItem onRemove
+    ok 9 - handles child LetterItem onRemove
+      ---
+      duration_ms: 26.80753
+      type: 'test'
+      ...
+    # Subtest: renders errors correctly
+    ok 10 - renders errors correctly
+      ---
+      duration_ms: 52.302112
+      type: 'test'
+      ...
+    1..10
+ok 10 - LetterForm
+  ---
+  duration_ms: 545.071809
   type: 'suite'
   ...
 # Subtest: LetterItem
     # Subtest: renders input values correctly
     ok 1 - renders input values correctly
       ---
-      duration_ms: 39.050342
+      duration_ms: 29.188164
       type: 'test'
       ...
     # Subtest: calls onChange when description changes
     ok 2 - calls onChange when description changes
       ---
-      duration_ms: 11.354292
+      duration_ms: 9.144447
       type: 'test'
       ...
     # Subtest: calls onChange when amount changes
     ok 3 - calls onChange when amount changes
       ---
-      duration_ms: 4.384077
+      duration_ms: 8.320936
       type: 'test'
       ...
     # Subtest: renders the remove button when showRemove is true and calls onRemove
     ok 4 - renders the remove button when showRemove is true and calls onRemove
       ---
-      duration_ms: 13.809952
+      duration_ms: 22.348864
       type: 'test'
       ...
     # Subtest: does not render the remove button when showRemove is false
     ok 5 - does not render the remove button when showRemove is false
       ---
-      duration_ms: 5.255404
+      duration_ms: 6.718013
       type: 'test'
       ...
     # Subtest: renders error states correctly when itemErrors is provided
     ok 6 - renders error states correctly when itemErrors is provided
       ---
-      duration_ms: 6.21454
+      duration_ms: 7.36306
       type: 'test'
       ...
     # Subtest: does not render error states when itemErrors is empty
     ok 7 - does not render error states when itemErrors is empty
       ---
-      duration_ms: 2.668409
+      duration_ms: 3.693247
       type: 'test'
       ...
     # Subtest: renders correctly with default itemErrors object
     ok 8 - renders correctly with default itemErrors object
       ---
-      duration_ms: 5.211614
+      duration_ms: 3.82256
       type: 'test'
       ...
     # Subtest: renders correctly for different index values
     ok 9 - renders correctly for different index values
       ---
-      duration_ms: 3.610446
+      duration_ms: 4.546614
       type: 'test'
       ...
     # Subtest: applies the correct classes for success and error states
     ok 10 - applies the correct classes for success and error states
       ---
-      duration_ms: 4.317414
+      duration_ms: 4.921205
       type: 'test'
       ...
     1..10
-ok 8 - LetterItem
+ok 11 - LetterItem
   ---
-  duration_ms: 98.151692
+  duration_ms: 102.712348
   type: 'suite'
   ...
 # Subtest: PaymentModal
     # Subtest: should render standard modal elements correctly
     ok 1 - should render standard modal elements correctly
       ---
-      duration_ms: 79.858177
+      duration_ms: 89.550015
       type: 'test'
       ...
     # Subtest: should trigger onConfirm when the pay button is clicked
     ok 2 - should trigger onConfirm when the pay button is clicked
       ---
-      duration_ms: 15.778067
+      duration_ms: 15.999896
       type: 'test'
       ...
     # Subtest: should trigger onCancel when the cancel button is clicked
     ok 3 - should trigger onCancel when the cancel button is clicked
       ---
-      duration_ms: 10.110635
+      duration_ms: 19.592934
       type: 'test'
       ...
     # Subtest: should disable buttons and show verifying text when isProcessing is true
     ok 4 - should disable buttons and show verifying text when isProcessing is true
       ---
-      duration_ms: 8.772929
+      duration_ms: 28.564411
       type: 'test'
       ...
     1..4
-ok 9 - PaymentModal
+ok 12 - PaymentModal
   ---
-  duration_ms: 116.290572
+  duration_ms: 155.523482
   type: 'suite'
   ...
-# Payment Service Error: Error: Failed to create payment session
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:24:13)
-#     at async assert.rejects.message (file:///app/tests/paymentService.test.js:85:21)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/paymentService.test.js:84:7)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
-# Payment Service Error: Error: Network error
-#     at file:///app/tests/paymentService.test.js:92:73
-#     at Object.apply (node:internal/test_runner/mock/mock:765:20)
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:14:28)
-#     at processPayment (file:///app/src/services/paymentService.js:73:12)
-#     at assert.rejects.message (file:///app/tests/paymentService.test.js:95:27)
-#     at waitForActual (node:assert:630:21)
-#     at Function.rejects (node:assert:767:31)
-#     at TestContext.<anonymous> (file:///app/tests/paymentService.test.js:94:20)
-#     at Test.runInAsyncScope (node:async_hooks:214:14)
-#     at Test.run (node:internal/test_runner/test:1047:25)
-# Payment Service Error: Error: Invalid response from payment provider: Missing checkout url
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:51:11)
-#     at async assert.rejects.message (file:///app/tests/paymentService.test.js:108:21)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/paymentService.test.js:107:7)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
 # Subtest: paymentService
     # Subtest: processPayment
         # Subtest: should fall back to simulation mode when VITE_PAYMENT_API_URL is not configured
         ok 1 - should fall back to simulation mode when VITE_PAYMENT_API_URL is not configured
           ---
-          duration_ms: 1510.372138
+          duration_ms: 1506.845498
           type: 'test'
           ...
         # Subtest: should initiate backend transaction when VITE_PAYMENT_API_URL is configured
         ok 2 - should initiate backend transaction when VITE_PAYMENT_API_URL is configured
           ---
-          duration_ms: 1.311524
+          duration_ms: 1.221034
           type: 'test'
           ...
         # Subtest: should throw an error when fetch fails (response not ok) via processPayment
         ok 3 - should throw an error when fetch fails (response not ok) via processPayment
           ---
-          duration_ms: 18.600493
+          duration_ms: 1.823031
           type: 'test'
           ...
         # Subtest: should throw an error when fetch completely fails (network error) via processPayment
         ok 4 - should throw an error when fetch completely fails (network error) via processPayment
           ---
-          duration_ms: 1.772207
+          duration_ms: 0.87319
           type: 'test'
           ...
         # Subtest: should throw an error when response is invalid (missing url and success) via processPayment
         ok 5 - should throw an error when response is invalid (missing url and success) via processPayment
           ---
-          duration_ms: 1.142777
+          duration_ms: 0.669416
           type: 'test'
           ...
         # Subtest: should throw an error in production without VITE_PAYMENT_API_URL
         ok 6 - should throw an error in production without VITE_PAYMENT_API_URL
           ---
-          duration_ms: 0.579609
+          duration_ms: 0.527064
           type: 'test'
           ...
         1..6
     ok 1 - processPayment
       ---
-      duration_ms: 1535.488629
+      duration_ms: 1513.448478
       type: 'suite'
       ...
     # Subtest: initiateBackendTransaction
         # Subtest: should successfully initiate a transaction when data.success is true
         ok 1 - should successfully initiate a transaction when data.success is true
           ---
-          duration_ms: 0.701907
+          duration_ms: 0.550482
           type: 'test'
           ...
-# Payment Service Error: Error: API rate limit exceeded
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:24:13)
-#     at async assert.rejects.message (file:///app/tests/paymentService.test.js:165:21)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/paymentService.test.js:164:7)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
-# Payment Service Error: Error: Invalid response from payment provider: Missing checkout url
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:51:11)
-#     at async assert.rejects.message (file:///app/tests/paymentService.test.js:177:21)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/paymentService.test.js:176:7)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
-# Payment Service Error: Error: Network error
-#     at file:///app/tests/paymentService.test.js:183:73
-#     at Object.apply (node:internal/test_runner/mock/mock:765:20)
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:14:28)
-#     at assert.rejects.message (file:///app/tests/paymentService.test.js:186:27)
-#     at waitForActual (node:assert:630:21)
-#     at Function.rejects (node:assert:767:31)
-#     at TestContext.<anonymous> (file:///app/tests/paymentService.test.js:185:20)
-#     at Test.runInAsyncScope (node:async_hooks:214:14)
-#     at Test.run (node:internal/test_runner/test:1047:25)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
         # Subtest: should redirect window when data.url is returned
         ok 2 - should redirect window when data.url is returned
           ---
-          duration_ms: 23.299129
+          duration_ms: 0.74176
           type: 'test'
           ...
         # Subtest: should throw an error when fetch fails (response not ok)
         ok 3 - should throw an error when fetch fails (response not ok)
           ---
-          duration_ms: 3.786537
+          duration_ms: 0.644192
           type: 'test'
           ...
         # Subtest: should throw an error when response is invalid (missing url and success)
         ok 4 - should throw an error when response is invalid (missing url and success)
           ---
-          duration_ms: 4.594868
+          duration_ms: 0.554708
           type: 'test'
           ...
         # Subtest: should throw an error when fetch completely fails (network error)
         ok 5 - should throw an error when fetch completely fails (network error)
           ---
-          duration_ms: 3.278522
+          duration_ms: 1.591525
           type: 'test'
           ...
         1..5
     ok 2 - initiateBackendTransaction
       ---
-      duration_ms: 36.559393
+      duration_ms: 4.545834
       type: 'suite'
       ...
     # Subtest: verifyPaymentSession
         # Subtest: should fall back to simulation mode and return isPaid true for valid IDs
         ok 1 - should fall back to simulation mode and return isPaid true for valid IDs
           ---
-          duration_ms: 505.192638
+          duration_ms: 501.237274
           type: 'test'
           ...
-# Payment Verification Error: Error: Failed to verify payment session
-#     at verifyPaymentSession (file:///app/src/services/paymentService.js:116:15)
-#     at async assert.rejects.message (file:///app/tests/paymentService.test.js:244:21)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/paymentService.test.js:243:7)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
-        # Subtest: should fall back to simulation mode and return isPaid false for invalid IDs
-        ok 2 - should fall back to simulation mode and return isPaid false for invalid IDs
+        # Subtest: should fall back to simulation mode and return isPaid false for valid prefix but mismatching pending transaction
+        ok 2 - should fall back to simulation mode and return isPaid false for valid prefix but mismatching pending transaction
           ---
-          duration_ms: 502.318959
+          duration_ms: 502.656793
+          type: 'test'
+          ...
+        # Subtest: should fall back to simulation mode and return isPaid false for invalid IDs
+        ok 3 - should fall back to simulation mode and return isPaid false for invalid IDs
+          ---
+          duration_ms: 501.772904
           type: 'test'
           ...
         # Subtest: should call backend when VITE_PAYMENT_API_URL is configured
-        ok 3 - should call backend when VITE_PAYMENT_API_URL is configured
+        ok 4 - should call backend when VITE_PAYMENT_API_URL is configured
           ---
-          duration_ms: 0.681331
+          duration_ms: 0.671865
           type: 'test'
           ...
         # Subtest: should encode session ID with special characters
-        ok 4 - should encode session ID with special characters
+        ok 5 - should encode session ID with special characters
           ---
-          duration_ms: 0.610612
+          duration_ms: 0.653936
           type: 'test'
           ...
         # Subtest: should throw an error when fetch fails to verify
-        ok 5 - should throw an error when fetch fails to verify
+        ok 6 - should throw an error when fetch fails to verify
           ---
-          duration_ms: 2.787396
+          duration_ms: 0.756918
           type: 'test'
           ...
         # Subtest: should throw an error in production without VITE_PAYMENT_API_URL
-        ok 6 - should throw an error in production without VITE_PAYMENT_API_URL
+        ok 7 - should throw an error in production without VITE_PAYMENT_API_URL
           ---
-          duration_ms: 1.156505
+          duration_ms: 3.27325
           type: 'test'
           ...
-        1..6
+        1..7
     ok 3 - verifyPaymentSession
       ---
-      duration_ms: 1013.203676
+      duration_ms: 1511.688988
       type: 'suite'
       ...
     1..3
-ok 10 - paymentService
+ok 13 - paymentService
   ---
-  duration_ms: 2589.258003
+  duration_ms: 3030.601865
   type: 'suite'
   ...
 # Subtest: pdfGenerator
     # Subtest: generatePdfDefinition should return a valid document definition
     ok 1 - generatePdfDefinition should return a valid document definition
       ---
-      duration_ms: 4.799947
+      duration_ms: 3.2725
       type: 'test'
       ...
     # Subtest: formatDate helper should handle missing date by returning current date
     ok 2 - formatDate helper should handle missing date by returning current date
       ---
-      duration_ms: 0.640291
+      duration_ms: 0.506521
       type: 'test'
       ...
     # Subtest: formatDate helper should return "Invalid Date" for malformed date string
     ok 3 - formatDate helper should return "Invalid Date" for malformed date string
       ---
-      duration_ms: 0.411538
+      duration_ms: 0.431766
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should add a watermark when options.watermark is true
     ok 4 - generatePdfDefinition should add a watermark when options.watermark is true
       ---
-      duration_ms: 0.346435
+      duration_ms: 0.247324
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should not add a watermark when options.watermark is false or undefined
     ok 5 - generatePdfDefinition should not add a watermark when options.watermark is false or undefined
       ---
-      duration_ms: 0.265948
+      duration_ms: 0.328272
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should include specific state legal disclosure based on jurisdiction
     ok 6 - generatePdfDefinition should include specific state legal disclosure based on jurisdiction
       ---
-      duration_ms: 0.385258
+      duration_ms: 0.551683
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should use DEFAULT legal disclosure for unknown jurisdiction
     ok 7 - generatePdfDefinition should use DEFAULT legal disclosure for unknown jurisdiction
       ---
-      duration_ms: 0.405118
+      duration_ms: 0.572206
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should fallback to applicable law if statuteUsed is missing
     ok 8 - generatePdfDefinition should fallback to applicable law if statuteUsed is missing
       ---
-      duration_ms: 0.912145
+      duration_ms: 0.545126
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should handle missing items array gracefully
     ok 9 - generatePdfDefinition should handle missing items array gracefully
       ---
-      duration_ms: 0.560219
+      duration_ms: 0.669499
       type: 'test'
       ...
     # Subtest: generatePdfDefinition should handle item mapping defaults for missing description and amount
     ok 10 - generatePdfDefinition should handle item mapping defaults for missing description and amount
       ---
-      duration_ms: 1.790808
+      duration_ms: 1.771754
       type: 'test'
       ...
     1..10
-ok 11 - pdfGenerator
+ok 14 - pdfGenerator
   ---
-  duration_ms: 13.576745
+  duration_ms: 11.006497
   type: 'suite'
   ...
 # Subtest: SafeIcon
     # Subtest: should render the icon passed as a component via the icon prop
     ok 1 - should render the icon passed as a component via the icon prop
       ---
-      duration_ms: 33.056521
+      duration_ms: 23.002284
       type: 'test'
       ...
     # Subtest: should render the icon looked up by name from the name prop
     ok 2 - should render the icon looked up by name from the name prop
       ---
-      duration_ms: 13.328257
+      duration_ms: 9.903568
       type: 'test'
       ...
     # Subtest: should prioritize the icon prop over the name prop
     ok 3 - should prioritize the icon prop over the name prop
       ---
-      duration_ms: 4.87287
+      duration_ms: 3.265763
       type: 'test'
       ...
     # Subtest: should fallback to FiAlertTriangle if neither icon nor name is provided
     ok 4 - should fallback to FiAlertTriangle if neither icon nor name is provided
       ---
-      duration_ms: 6.992898
+      duration_ms: 4.697984
       type: 'test'
       ...
     # Subtest: should fallback to FiAlertTriangle if the name is not found in FiIcons
     ok 5 - should fallback to FiAlertTriangle if the name is not found in FiIcons
       ---
-      duration_ms: 8.191706
+      duration_ms: 5.221572
       type: 'test'
       ...
     # Subtest: should pass additional props to the rendered icon component
     ok 6 - should pass additional props to the rendered icon component
       ---
-      duration_ms: 4.128632
+      duration_ms: 3.051239
       type: 'test'
       ...
     1..6
-ok 12 - SafeIcon
+ok 15 - SafeIcon
   ---
-  duration_ms: 72.960788
+  duration_ms: 50.9486
   type: 'suite'
   ...
-# Security Validation Error: Security Error: Invalid redirect URL
-# Payment Service Error: Error: Security Error: Invalid redirect URL
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:39:15)
-#     at async assert.rejects.message (file:///app/tests/security.test.js:30:19)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/security.test.js:29:5)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Promise.all (index 0)
-#     at async Suite.run (node:internal/test_runner/test:1442:7)
-#     at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
-# Security Validation Error: Security Error: Invalid redirect URL
-# Payment Service Error: Error: Security Error: Invalid redirect URL
-#     at initiateBackendTransaction (file:///app/src/services/paymentService.js:39:15)
-#     at async assert.rejects.message (file:///app/tests/security.test.js:44:19)
-#     at async waitForActual (node:assert:644:5)
-#     at async Function.rejects (node:assert:767:25)
-#     at async TestContext.<anonymous> (file:///app/tests/security.test.js:43:5)
-#     at async Test.run (node:internal/test_runner/test:1054:7)
-#     at async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
 # Subtest: paymentService security
     # Subtest: should throw an error if data.url is not a trusted Stripe domain
     ok 1 - should throw an error if data.url is not a trusted Stripe domain
       ---
-      duration_ms: 11.380468
+      duration_ms: 4.925031
       type: 'test'
       ...
     # Subtest: should throw an error if data.url is not https
     ok 2 - should throw an error if data.url is not https
       ---
-      duration_ms: 1.539372
+      duration_ms: 0.8127
       type: 'test'
       ...
     # Subtest: should allow trusted Stripe domains
     ok 3 - should allow trusted Stripe domains
       ---
-      duration_ms: 52.600001
+      duration_ms: 51.275731
       type: 'test'
       ...
     # Subtest: should allow stripe.com main domain
     ok 4 - should allow stripe.com main domain
       ---
-      duration_ms: 54.676515
+      duration_ms: 51.180521
       type: 'test'
       ...
     1..4
-ok 13 - paymentService security
+ok 16 - paymentService security
   ---
-  duration_ms: 122.423255
+  duration_ms: 110.037092
+  type: 'suite'
+  ...
+# Subtest: Payment Token Security
+    # Subtest: should store simulation tokens in memory and NOT in sessionStorage
+    not ok 1 - should store simulation tokens in memory and NOT in sessionStorage
+      ---
+      duration_ms: 1.487618
+      type: 'test'
+      location: '/app/tests/security_token.test.js:39:3'
+      failureType: 'hookFailed'
+      error: 'Cannot set property sessionStorage of #<Object> which has only a getter'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        TestContext.<anonymous> (file:///app/tests/security_token.test.js:9:31)
+        TestHook.runInAsyncScope (node:async_hooks:214:14)
+        TestHook.run (node:internal/test_runner/test:1047:25)
+        TestHook.run (node:internal/test_runner/test:1354:18)
+        Suite.runHook (node:internal/test_runner/test:965:20)
+        Test.run (node:internal/test_runner/test:1022:27)
+        Test.start (node:internal/test_runner/test:944:17)
+        node:internal/test_runner/test:1440:71
+        node:internal/per_context/primordials:466:82
+        new Promise (<anonymous>)
+      ...
+    # Subtest: should clear in-memory token when clearAccessToken is called
+    not ok 2 - should clear in-memory token when clearAccessToken is called
+      ---
+      duration_ms: 0.47297
+      type: 'test'
+      location: '/app/tests/security_token.test.js:57:3'
+      failureType: 'hookFailed'
+      error: 'Cannot set property sessionStorage of #<Object> which has only a getter'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        TestContext.<anonymous> (file:///app/tests/security_token.test.js:9:31)
+        TestHook.runInAsyncScope (node:async_hooks:214:14)
+        TestHook.run (node:internal/test_runner/test:1047:25)
+        TestHook.run (node:internal/test_runner/test:1354:18)
+        Suite.runHook (node:internal/test_runner/test:965:20)
+        Test.run (node:internal/test_runner/test:1022:27)
+        Suite.processPendingSubtests (node:internal/test_runner/test:744:18)
+        Test.postRun (node:internal/test_runner/test:1173:19)
+        Test.run (node:internal/test_runner/test:1101:12)
+        async Promise.all (index 0)
+      ...
+    # Subtest: should fallback to sessionStorage if in-memory token is missing (for production use case)
+    not ok 3 - should fallback to sessionStorage if in-memory token is missing (for production use case)
+      ---
+      duration_ms: 0.344405
+      type: 'test'
+      location: '/app/tests/security_token.test.js:68:3'
+      failureType: 'hookFailed'
+      error: 'Cannot set property sessionStorage of #<Object> which has only a getter'
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        TestContext.<anonymous> (file:///app/tests/security_token.test.js:9:31)
+        TestHook.runInAsyncScope (node:async_hooks:214:14)
+        TestHook.run (node:internal/test_runner/test:1047:25)
+        TestHook.run (node:internal/test_runner/test:1354:18)
+        Suite.runHook (node:internal/test_runner/test:965:20)
+        Test.run (node:internal/test_runner/test:1022:27)
+        Suite.processPendingSubtests (node:internal/test_runner/test:744:18)
+        Test.postRun (node:internal/test_runner/test:1173:19)
+        Test.run (node:internal/test_runner/test:1101:12)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:744:7)
+      ...
+    1..3
+not ok 17 - Payment Token Security
+  ---
+  duration_ms: 3.930032
+  type: 'suite'
+  location: '/app/tests/security_token.test.js:5:1'
+  failureType: 'subtestsFailed'
+  error: '3 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: storeHelpers
+    # Subtest: loadAndMigrateData should return initialData when saved is null
+    ok 1 - loadAndMigrateData should return initialData when saved is null
+      ---
+      duration_ms: 6.120344
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should return initialData when saved is empty string
+    ok 2 - loadAndMigrateData should return initialData when saved is empty string
+      ---
+      duration_ms: 0.323844
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should parse valid JSON
+    ok 3 - loadAndMigrateData should parse valid JSON
+      ---
+      duration_ms: 0.291387
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should handle invalid JSON gracefully
+    ok 4 - loadAndMigrateData should handle invalid JSON gracefully
+      ---
+      duration_ms: 0.194616
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should migrate items missing IDs
+    ok 5 - loadAndMigrateData should migrate items missing IDs
+      ---
+      duration_ms: 0.889554
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should preserve existing item IDs
+    ok 6 - loadAndMigrateData should preserve existing item IDs
+      ---
+      duration_ms: 0.193877
+      type: 'test'
+      ...
+    # Subtest: loadAndMigrateData should support functional initialData
+    ok 7 - loadAndMigrateData should support functional initialData
+      ---
+      duration_ms: 0.296919
+      type: 'test'
+      ...
+    1..7
+ok 18 - storeHelpers
+  ---
+  duration_ms: 10.026881
+  type: 'suite'
+  ...
+# Subtest: SuccessPage
+    # Subtest: should handle verifyPaymentSession errors gracefully
+    ok 1 - should handle verifyPaymentSession errors gracefully
+      ---
+      duration_ms: 111.959287
+      type: 'test'
+      ...
+    # Subtest: does not update state or show toast if unmounted during verifyPaymentSession error
+    ok 2 - does not update state or show toast if unmounted during verifyPaymentSession error
+      ---
+      duration_ms: 10.044119
+      type: 'test'
+      ...
+    # Subtest: handles Download Again button successfully
+    ok 3 - handles Download Again button successfully
+      ---
+      duration_ms: 61.368419
+      type: 'test'
+      ...
+    # Subtest: handles Create Another Letter button successfully
+    ok 4 - handles Create Another Letter button successfully
+      ---
+      duration_ms: 37.241375
+      type: 'test'
+      ...
+    # Subtest: fails gracefully when session_id is missing
+    ok 5 - fails gracefully when session_id is missing
+      ---
+      duration_ms: 19.274861
+      type: 'test'
+      ...
+    # Subtest: fails gracefully when payment verification returns false
+    ok 6 - fails gracefully when payment verification returns false
+      ---
+      duration_ms: 12.262575
+      type: 'test'
+      ...
+# No routes matched location "/start"
+    # Subtest: handles Return Home button on failure
+    ok 7 - handles Return Home button on failure
+      ---
+      duration_ms: 20.965165
+      type: 'test'
+      ...
+    # Subtest: triggers auto-download after successful verification
+    ok 8 - triggers auto-download after successful verification
+      ---
+      duration_ms: 1121.939411
+      type: 'test'
+      ...
+    # Subtest: handles empty email error when sending email
+    ok 9 - handles empty email error when sending email
+      ---
+      duration_ms: 19.177823
+      type: 'test'
+      ...
+    # Subtest: handles email sending simulation successfully
+    ok 10 - handles email sending simulation successfully
+      ---
+      duration_ms: 438.3296
+      type: 'test'
+      ...
+    1..10
+ok 19 - SuccessPage
+  ---
+  duration_ms: 1855.461648
   type: 'suite'
   ...
 # Subtest: SummaryCard
     # Subtest: should return null when principal <= 0
     ok 1 - should return null when principal <= 0
       ---
-      duration_ms: 15.563693
+      duration_ms: 16.762357
       type: 'test'
       ...
     # Subtest: should render correctly with valid data
     ok 2 - should render correctly with valid data
       ---
-      duration_ms: 43.572886
+      duration_ms: 38.552634
       type: 'test'
       ...
     # Subtest: should render warning when daysOverdue <= 0
     ok 3 - should render warning when daysOverdue <= 0
       ---
-      duration_ms: 13.043325
+      duration_ms: 12.185898
       type: 'test'
       ...
     1..3
-ok 14 - SummaryCard
+ok 20 - SummaryCard
   ---
-  duration_ms: 74.154811
+  duration_ms: 69.391458
+  type: 'suite'
+  ...
+# (node:121485) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: Toast Component
+    # Subtest: renders a success toast correctly
+    ok 1 - renders a success toast correctly
+      ---
+      duration_ms: 59.506025
+      type: 'test'
+      ...
+    # Subtest: renders an error toast correctly
+    ok 2 - renders an error toast correctly
+      ---
+      duration_ms: 11.514947
+      type: 'test'
+      ...
+    # Subtest: renders an info toast correctly
+    ok 3 - renders an info toast correctly
+      ---
+      duration_ms: 9.999824
+      type: 'test'
+      ...
+    # Subtest: renders correctly with default type (info) when type is missing
+    ok 4 - renders correctly with default type (info) when type is missing
+      ---
+      duration_ms: 8.324407
+      type: 'test'
+      ...
+    # Subtest: calls onClose when close button is clicked
+    ok 5 - calls onClose when close button is clicked
+      ---
+      duration_ms: 24.908293
+      type: 'test'
+      ...
+    # Subtest: auto-closes after 5000ms
+    ok 6 - auto-closes after 5000ms
+      ---
+      duration_ms: 6.031761
+      type: 'test'
+      ...
+    # Subtest: clears timeout on unmount
+    ok 7 - clears timeout on unmount
+      ---
+      duration_ms: 4.591236
+      type: 'test'
+      ...
+    1..7
+ok 21 - Toast Component
+  ---
+  duration_ms: 126.873982
   type: 'suite'
   ...
 # Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
@@ -867,53 +1109,186 @@ ok 14 - SummaryCard
     # Subtest: throws an error when useToast is used outside of ToastProvider
     ok 1 - throws an error when useToast is used outside of ToastProvider
       ---
-      duration_ms: 28.592061
+      duration_ms: 22.205639
       type: 'test'
       ...
     # Subtest: provides the toast functions when used within ToastProvider
     ok 2 - provides the toast functions when used within ToastProvider
       ---
-      duration_ms: 131.056705
+      duration_ms: 97.895466
       type: 'test'
       ...
     1..2
-ok 15 - ToastContext
+ok 22 - ToastContext
   ---
-  duration_ms: 163.7171
+  duration_ms: 121.598048
   type: 'suite'
   ...
 # Subtest: UpsellCard
     # Subtest: renders standard text when total is not provided (defaults to 0)
     ok 1 - renders standard text when total is not provided (defaults to 0)
       ---
-      duration_ms: 63.184476
+      duration_ms: 39.357274
       type: 'test'
       ...
     # Subtest: renders standard text when total is <= 10000
     ok 2 - renders standard text when total is <= 10000
       ---
-      duration_ms: 13.679168
+      duration_ms: 6.828867
       type: 'test'
       ...
     # Subtest: renders high value debt text when total is > 10000
     ok 3 - renders high value debt text when total is > 10000
       ---
-      duration_ms: 6.556872
+      duration_ms: 5.222275
       type: 'test'
       ...
     1..3
-ok 16 - UpsellCard
+ok 23 - UpsellCard
   ---
-  duration_ms: 86.066822
+  duration_ms: 53.007257
   type: 'suite'
   ...
-# Subtest: usePdfGenerator
-    # Subtest: returns early when isValid is false
-    ok 1 - returns early when isValid is false
+# Subtest: useLetterStore
+    # Subtest: initializes with initialData if sessionStorage is empty
+    ok 1 - initializes with initialData if sessionStorage is empty
       ---
-      duration_ms: 36.397004
+      duration_ms: 18.345146
       type: 'test'
       ...
+    # Subtest: initializes gracefully when sessionStorage contains invalid JSON
+    ok 2 - initializes gracefully when sessionStorage contains invalid JSON
+      ---
+      duration_ms: 3.187959
+      type: 'test'
+      ...
+    # Subtest: initializes from valid JSON in sessionStorage
+    ok 3 - initializes from valid JSON in sessionStorage
+      ---
+      duration_ms: 3.363153
+      type: 'test'
+      ...
+    # Subtest: updates a field correctly
+    ok 4 - updates a field correctly
+      ---
+      duration_ms: 3.038591
+      type: 'test'
+      ...
+    # Subtest: updates a field using a functional update
+    ok 5 - updates a field using a functional update
+      ---
+      duration_ms: 2.15301
+      type: 'test'
+      ...
+    # Subtest: saves to sessionStorage when data changes
+    ok 6 - saves to sessionStorage when data changes
+      ---
+      duration_ms: 552.91276
+      type: 'test'
+      ...
+    # Subtest: resets form data and removes from sessionStorage
+    ok 7 - resets form data and removes from sessionStorage
+      ---
+      duration_ms: 2.682776
+      type: 'test'
+      ...
+    # Subtest: handles functional initialData
+    ok 8 - handles functional initialData
+      ---
+      duration_ms: 1.483572
+      type: 'test'
+      ...
+    # Subtest: resets form data with functional initialData correctly
+    ok 9 - resets form data with functional initialData correctly
+      ---
+      duration_ms: 2.880139
+      type: 'test'
+      ...
+    1..9
+ok 24 - useLetterStore
+  ---
+  duration_ms: 592.142024
+  type: 'suite'
+  ...
+# Subtest: usePayment
+    # Subtest: initializes with correct default state
+    ok 1 - initializes with correct default state
+      ---
+      duration_ms: 21.620015
+      type: 'test'
+      ...
+    # Subtest: handleProceedToCheckout calls onError when not valid
+    ok 2 - handleProceedToCheckout calls onError when not valid
+      ---
+      duration_ms: 3.510937
+      type: 'test'
+      ...
+    # Subtest: handleProceedToCheckout shows modal when valid
+    ok 3 - handleProceedToCheckout shows modal when valid
+      ---
+      duration_ms: 4.913277
+      type: 'test'
+      ...
+    # Subtest: handlePayment handles payment processing error
+    ok 4 - handlePayment handles payment processing error
+      ---
+      duration_ms: 12.619744
+      type: 'test'
+      ...
+    # Subtest: handlePayment calls onError when not valid
+    ok 5 - handlePayment calls onError when not valid
+      ---
+      duration_ms: 22.102486
+      type: 'test'
+      ...
+    # Subtest: resetPayment works properly
+    ok 6 - resetPayment works properly
+      ---
+      duration_ms: 3.068531
+      type: 'test'
+      ...
+    # Subtest: handlePayment works correctly on success
+    ok 7 - handlePayment works correctly on success
+      ---
+      duration_ms: 11.470858
+      type: 'test'
+      ...
+    # Subtest: verifies session from url redirect
+    ok 8 - verifies session from url redirect
+      ---
+      duration_ms: 63.848046
+      type: 'test'
+      ...
+    # Subtest: verifies session from url redirect on fail
+    ok 9 - verifies session from url redirect on fail
+      ---
+      duration_ms: 59.453404
+      type: 'test'
+      ...
+    # Subtest: verifies session from sessionstorage
+    ok 10 - verifies session from sessionstorage
+      ---
+      duration_ms: 3.631911
+      type: 'test'
+      ...
+    # Subtest: clears invalid sessionstorage session
+    ok 11 - clears invalid sessionstorage session
+      ---
+      duration_ms: 3.403817
+      type: 'test'
+      ...
+    # Subtest: shows toast when payment is canceled
+    ok 12 - shows toast when payment is canceled
+      ---
+      duration_ms: 4.955745
+      type: 'test'
+      ...
+    1..12
+ok 25 - usePayment
+  ---
+  duration_ms: 217.40574
+  type: 'suite'
+  ...
 # Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
 # Check the render method of `PopChild`.
 #     at Toast (/app/src/components/Toast.jsx:11:18)
@@ -924,128 +1299,185 @@ ok 16 - UpsellCard
 #     at div
 #     at ToastProvider (/app/src/contexts/ToastContext.jsx:16:33)
 #     at wrapper (/app/tests/usePdfGenerator.test.jsx:23:24)
-    # Subtest: generates pdf successfully and shows success toast
-    ok 2 - generates pdf successfully and shows success toast
+# Subtest: usePdfGenerator
+    # Subtest: returns early when isValid is false
+    ok 1 - returns early when isValid is false
       ---
-      duration_ms: 1019.076426
+      duration_ms: 29.092732
+      type: 'test'
+      ...
+    # Subtest: blocks download and shows error if token is missing when isPaid is true
+    ok 2 - blocks download and shows error if token is missing when isPaid is true
+      ---
+      duration_ms: 59.304944
+      type: 'test'
+      ...
+    # Subtest: generates pdf successfully and shows success toast
+    ok 3 - generates pdf successfully and shows success toast
+      ---
+      duration_ms: 826.001524
       type: 'test'
       ...
     # Subtest: handles pdf generation errors gracefully and shows error toast
-    ok 3 - handles pdf generation errors gracefully and shows error toast
+    ok 4 - handles pdf generation errors gracefully and shows error toast
       ---
-      duration_ms: 25.61386
+      duration_ms: 17.581833
       type: 'test'
       ...
-    1..3
-ok 17 - usePdfGenerator
+    1..4
+ok 26 - usePdfGenerator
   ---
-  duration_ms: 1084.102568
+  duration_ms: 934.15216
   type: 'suite'
   ...
 # Subtest: validateForm
     # Subtest: should return valid if all fields are filled
     ok 1 - should return valid if all fields are filled
       ---
-      duration_ms: 3.897576
+      duration_ms: 2.291724
       type: 'test'
       ...
     # Subtest: should return invalid if required fields are missing
     ok 2 - should return invalid if required fields are missing
       ---
-      duration_ms: 0.462759
+      duration_ms: 0.441049
       type: 'test'
       ...
     # Subtest: should invalidate empty items array
     ok 3 - should invalidate empty items array
       ---
-      duration_ms: 0.206481
+      duration_ms: 0.216135
       type: 'test'
       ...
     # Subtest: should invalidate items with zero amount
     ok 4 - should invalidate items with zero amount
       ---
-      duration_ms: 0.303615
+      duration_ms: 0.478945
       type: 'test'
       ...
     # Subtest: should invalidate items with missing description
     ok 5 - should invalidate items with missing description
       ---
-      duration_ms: 0.289576
+      duration_ms: 0.320343
       type: 'test'
       ...
     1..5
-ok 18 - validateForm
+ok 27 - validateForm
   ---
-  duration_ms: 6.822458
+  duration_ms: 5.245444
   type: 'suite'
   ...
 # Subtest: getFirstErrorFieldId
     # Subtest: should return creditorName if it is the first error
     ok 1 - should return creditorName if it is the first error
       ---
-      duration_ms: 0.451566
+      duration_ms: 0.508088
       type: 'test'
       ...
     # Subtest: should return creditorAddress if it is the first error
     ok 2 - should return creditorAddress if it is the first error
       ---
-      duration_ms: 0.442915
+      duration_ms: 0.492701
       type: 'test'
       ...
     # Subtest: should return debtorName if it is the first error
     ok 3 - should return debtorName if it is the first error
       ---
-      duration_ms: 0.458448
+      duration_ms: 0.442625
       type: 'test'
       ...
     # Subtest: should return debtorAddress if it is the first error
     ok 4 - should return debtorAddress if it is the first error
       ---
-      duration_ms: 0.262926
+      duration_ms: 0.253677
       type: 'test'
       ...
     # Subtest: should return dueDate if it is the first error
     ok 5 - should return dueDate if it is the first error
       ---
-      duration_ms: 0.322445
+      duration_ms: 0.393921
       type: 'test'
       ...
     # Subtest: should return letterDate if it is the first error
     ok 6 - should return letterDate if it is the first error
       ---
-      duration_ms: 0.14819
+      duration_ms: 0.163135
       type: 'test'
       ...
     # Subtest: should return items-section if items has an error
     ok 7 - should return items-section if items has an error
       ---
-      duration_ms: 0.169526
+      duration_ms: 0.136607
       type: 'test'
       ...
     # Subtest: should return items-section if itemErrors has an error
     ok 8 - should return items-section if itemErrors has an error
       ---
-      duration_ms: 0.158851
+      duration_ms: 0.110905
       type: 'test'
       ...
     # Subtest: should return null if there are no errors
     ok 9 - should return null if there are no errors
       ---
-      duration_ms: 0.107018
+      duration_ms: 0.090712
       type: 'test'
       ...
     1..9
-ok 19 - getFirstErrorFieldId
+ok 28 - getFirstErrorFieldId
   ---
-  duration_ms: 3.199476
+  duration_ms: 3.139765
   type: 'suite'
   ...
-1..19
-# tests 117
-# suites 22
-# pass 114
+# Subtest: Cloudflare Worker API Proxy
+    # Subtest: should proxy /api requests to BACKEND_URL
+    ok 1 - should proxy /api requests to BACKEND_URL
+      ---
+      duration_ms: 2.667674
+      type: 'test'
+      ...
+    # Subtest: should handle missing BACKEND_URL gracefully (test URL constructor behavior)
+    ok 2 - should handle missing BACKEND_URL gracefully (test URL constructor behavior)
+      ---
+      duration_ms: 1.538353
+      type: 'test'
+      ...
+    1..2
+ok 29 - Cloudflare Worker API Proxy
+  ---
+  duration_ms: 6.011793
+  type: 'suite'
+  ...
+# Subtest: SSRF Protection in Worker Proxy
+    # Subtest: should NOT be vulnerable to SSRF via // in pathname
+    ok 1 - should NOT be vulnerable to SSRF via // in pathname
+      ---
+      duration_ms: 2.340699
+      type: 'test'
+      ...
+    # Subtest: should NOT be vulnerable to SSRF via protocol in pathname
+    ok 2 - should NOT be vulnerable to SSRF via protocol in pathname
+      ---
+      duration_ms: 0.776557
+      type: 'test'
+      ...
+    # Subtest: should preserve normal path structure
+    ok 3 - should preserve normal path structure
+      ---
+      duration_ms: 0.73604
+      type: 'test'
+      ...
+    1..3
+ok 30 - SSRF Protection in Worker Proxy
+  ---
+  duration_ms: 5.499017
+  type: 'suite'
+  ...
+1..30
+# tests 194
+# suites 33
+# pass 191
 # fail 3
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 58765.766163
+# duration_ms 62054.348666
