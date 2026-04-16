@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import { processPayment, verifyPaymentSession, getValidAccessToken, clearAccessToken } from '../services/paymentService';
 
@@ -7,6 +8,7 @@ export const usePayment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const verifySession = async (sessionId, isFromRedirect = false) => {
@@ -95,7 +97,8 @@ export const usePayment = () => {
         if (result.transactionId) {
           // If simulating or not returning a direct redirect URL, simulate redirect
           isRedirecting = true;
-          window.location.href = `/success?session_id=${result.transactionId}`;
+          // Use client-side navigation for simulation mode to preserve in-memory module state
+          navigate(`/success?session_id=${result.transactionId}`);
         } else {
           // Fallback if no transactionId is provided
           setIsPaid(true);

@@ -68,7 +68,7 @@ const SuccessPage = () => {
           // Delay download slightly to ensure UI updates and is perceived as a smooth transition
           setTimeout(() => {
             if (isMounted) {
-              handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, false);
+              handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
             }
           }, 1000);
 
@@ -100,7 +100,7 @@ const SuccessPage = () => {
       formData.letterDate
     );
     const toneTemplate = TONE_TEMPLATES[formData.tone];
-    handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, false);
+    handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
   };
 
   const handleCreateAnother = () => {

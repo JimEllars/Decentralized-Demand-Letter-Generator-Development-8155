@@ -111,6 +111,9 @@ export const processPayment = async (productId) => {
 const PAYMENT_TOKEN_KEY = 'axim_access_token';
 const TOKEN_EXPIRY_KEY = 'axim_token_expiry';
 
+// Simulation mode: Secure in-memory token storage to prevent PII/Token exposure in sessionStorage
+let simulationTokenStore = null;
+
 export const verifyPaymentSession = async (sessionId) => {
   const paymentApiUrl = typeof import.meta.env !== 'undefined'
     ? import.meta.env.VITE_PAYMENT_API_URL
@@ -158,8 +161,13 @@ export const verifyPaymentSession = async (sessionId) => {
 
         const mockToken = `dev-token-${crypto.randomUUID()}`;
         const mockExpiry = new Date(Date.now() + 3600000).toISOString();
-        sessionStorage.setItem(PAYMENT_TOKEN_KEY, mockToken);
-        sessionStorage.setItem(TOKEN_EXPIRY_KEY, mockExpiry);
+
+        // Use in-memory store for simulation mode instead of sessionStorage
+        simulationTokenStore = {
+          token: mockToken,
+          expiry: mockExpiry
+        };
+
         resolve({ isPaid: true, accessToken: mockToken, expiresAt: mockExpiry });
       } else {
         resolve({ isPaid: false });
@@ -169,8 +177,15 @@ export const verifyPaymentSession = async (sessionId) => {
 };
 
 export const getValidAccessToken = () => {
-  const token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
-  const expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
+  // Prioritize in-memory simulation token
+  let token = simulationTokenStore?.token;
+  let expiry = simulationTokenStore?.expiry;
+
+  // Fallback to sessionStorage for real production tokens
+  if (!token || !expiry) {
+    token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
+    expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
+  }
 
   if (!token || !expiry) return null;
 
@@ -183,6 +198,7 @@ export const getValidAccessToken = () => {
 };
 
 export const clearAccessToken = () => {
+  simulationTokenStore = null;
   sessionStorage.removeItem(PAYMENT_TOKEN_KEY);
   sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
 };
