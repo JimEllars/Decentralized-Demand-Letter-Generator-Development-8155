@@ -110,6 +110,12 @@ describe('calculateTotal', () => {
     assert.strictEqual(result.principal, 0);
     assert.strictEqual(result.total, 0);
   });
+
+  it('should handle null items array', () => {
+    const result = calculateTotal(null, 0, '2023-01-01');
+    assert.strictEqual(result.principal, 0);
+    assert.strictEqual(result.total, 0);
+  });
 });
 
 describe('getToneTemplate', () => {
