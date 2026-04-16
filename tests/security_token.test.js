@@ -3,15 +3,21 @@ import assert from 'node:assert';
 import { verifyPaymentSession, getValidAccessToken, clearAccessToken } from '../src/services/paymentService.js';
 
 describe('Payment Token Security', () => {
+  let originalSessionStorage;
+
   beforeEach(() => {
+    originalSessionStorage = globalThis.sessionStorage;
     // Mock sessionStorage
     const store = new Map();
-    globalThis.sessionStorage = {
+    const mockStorage = {
       setItem: mock.fn((key, value) => store.set(key, value)),
       getItem: mock.fn((key) => store.get(key) || null),
       removeItem: mock.fn((key) => store.delete(key)),
       clear: mock.fn(() => store.clear())
     };
+    Object.defineProperty(globalThis, 'sessionStorage', { value: mockStorage, writable: true, configurable: true });
+
+    // In our test, import.meta is read-only, but we can simulate the environment variables via process.env
 
     // Mock crypto.randomUUID safely
     if (!globalThis.crypto) {
@@ -28,9 +34,14 @@ describe('Payment Token Security', () => {
 
     // Ensure we are in simulation mode (no VITE_PAYMENT_API_URL)
     delete process.env.VITE_PAYMENT_API_URL;
+    process.env.NODE_ENV = 'development';
 
     // Clear any existing tokens
     clearAccessToken();
+  });
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, writable: true, configurable: true });
   });
 
   it('should store simulation tokens in memory and NOT in sessionStorage', async () => {
