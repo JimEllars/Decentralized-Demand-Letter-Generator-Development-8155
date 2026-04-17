@@ -321,17 +321,34 @@ describe('SuccessPage', () => {
     process.env.VITE_PAYMENT_API_URL = originalUrl;
   });
 
-  it('handles email sending simulation successfully', async () => {
-    // We want to test the manual send, so we start with no email in sessionStorage to bypass auto-send
+  it('handles email sending successfully', async () => {
     sessionStorage.removeItem('axim_delivery_email');
 
     const originalUrl = process.env.VITE_PAYMENT_API_URL;
     process.env.VITE_PAYMENT_API_URL = 'http://test.api';
 
-    globalThis.fetch = mock.fn(() => Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ isPaid: true })
-    }));
+    let fetchCallCount = 0;
+    globalThis.fetch = mock.fn(async (url, options) => {
+      fetchCallCount++;
+
+      // Respond to payment verification
+      if (url.includes('verify')) {
+        return {
+          ok: true,
+          json: () => Promise.resolve({ isPaid: true })
+        };
+      }
+
+      // Respond to email send
+      if (url === '/api/send-email') {
+        return {
+          ok: true,
+          json: () => Promise.resolve({ success: true })
+        };
+      }
+
+      return { ok: false };
+    });
 
     render(
       <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
@@ -343,44 +360,36 @@ describe('SuccessPage', () => {
       </ToastContext.Provider>
     );
 
-    // Wait for successful verification state
+    // Wait for successful verification
     await waitFor(() => {
       assert.ok(screen.queryByText('Payment Successful'));
     });
 
+    // Type email and submit form
     const emailInput = screen.getByPlaceholderText('Enter email address');
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    });
 
     const emailForm = emailInput.closest('form');
     const sendButton = emailForm.querySelector('button[type="submit"]');
 
-    fireEvent.click(sendButton);
-
-    // Wait for the simulated delay in handleSendEmail
     await act(async () => {
-      await new Promise(r => setTimeout(r, 400));
+      fireEvent.click(sendButton);
+      // Wait for fetch promise to settle
+      await new Promise(r => setTimeout(r, 0));
     });
 
-    // We can check if Send is back
-    assert.ok(screen.getByRole('button', { name: /Send/i }));
-
-    // There might be 2 calls to mockToastSuccess if the auto-send ran
-    assert.ok(mockToastSuccess.mock.calls.length >= 1);
-    const hasSendSuccessMessage = mockToastSuccess.mock.calls.some(call =>
-      call.arguments[0] === 'Document sent to test@example.com' ||
-      call.arguments[0] === 'Document automatically sent to test@example.com'
-    );
-    assert.ok(hasSendSuccessMessage);
-
-    // Ensure input is cleared
+    // The key assertion: mockToastSuccess should have been called with the email message
     await waitFor(() => {
-        const input = screen.getByPlaceholderText('Enter email address');
-        // Setting state takes a tick, sometimes React test library needs this check
-        if (input.value !== '') {
-          fireEvent.change(input, { target: { value: '' } });
-        }
-        assert.strictEqual(input.value, ''); // Email input should be cleared
-    }, { timeout: 3000 });
+      const emailToastCall = mockToastSuccess.mock.calls.find(call =>
+        call.arguments[0] === 'Document sent to test@example.com'
+      );
+      assert.ok(emailToastCall, `mockToastSuccess should be called with email message. Calls: ${JSON.stringify(mockToastSuccess.mock.calls)}`);
+    }, { timeout: 2000 });
+
+    // Verify email input was cleared
+    assert.strictEqual(emailInput.value, '');
 
     process.env.VITE_PAYMENT_API_URL = originalUrl;
   });

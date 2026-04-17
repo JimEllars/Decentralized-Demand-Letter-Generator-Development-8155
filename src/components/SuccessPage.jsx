@@ -120,11 +120,22 @@ const SuccessPage = () => {
       hasSentInitialEmail.current = true;
       const sendInitialEmail = async () => {
         setIsSendingEmail(true);
-        // Simulate email sending delay
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setIsSendingEmail(false);
-        toast.success(`Document automatically sent to ${email}`);
-        sessionStorage.removeItem('axim_delivery_email');
+        try {
+          const response = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+
+          if (!response.ok) throw new Error('Failed to send email');
+
+          toast.success(`Document automatically sent to ${email}`);
+          sessionStorage.removeItem('axim_delivery_email');
+        } catch (err) {
+          console.error('Auto-send error:', err);
+        } finally {
+          setIsSendingEmail(false);
+        }
       };
       sendInitialEmail();
     }
@@ -138,11 +149,23 @@ const SuccessPage = () => {
     }
 
     setIsSendingEmail(true);
-    // Simulate email sending delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    setIsSendingEmail(false);
-    toast.success(`Document sent to ${email}`);
-    setEmail('');
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (!response.ok) throw new Error('Failed to send email');
+
+      toast.success(`Document sent to ${email}`);
+      setEmail('');
+    } catch (err) {
+      toast.error('Failed to send email. Please try again.');
+      console.error('Email send error:', err);
+    } finally {
+      setIsSendingEmail(false);
+    }
   };
 
   return (
