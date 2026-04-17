@@ -282,6 +282,59 @@ describe('SuccessPage', () => {
     process.env.VITE_PAYMENT_API_URL = originalUrl;
   });
 
+  it('handles 401/403 token expirations gracefully when sending email', async () => {
+    sessionStorage.removeItem('axim_delivery_email');
+    const originalUrl = process.env.VITE_PAYMENT_API_URL;
+    process.env.VITE_PAYMENT_API_URL = 'http://test.api';
+
+    globalThis.fetch = mock.fn(async (url) => {
+      if (url.includes('verify')) {
+        return { ok: true, json: () => Promise.resolve({ isPaid: true }) };
+      }
+      if (url === '/api/send-email') {
+        return { ok: false, status: 401 };
+      }
+      return { ok: false };
+    });
+
+    render(
+      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+          <Routes>
+            <Route path="/" element={<SuccessPage />} />
+          </Routes>
+        </MemoryRouter>
+      </ToastContext.Provider>
+    );
+
+    // Wait for successful verification
+    await waitFor(() => {
+      assert.ok(screen.queryByText('Payment Successful'));
+    });
+
+    // Type email and submit
+    const emailInput = screen.getByPlaceholderText('Enter email address');
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    });
+
+    const emailForm = emailInput.closest('form');
+    const sendButton = emailForm.querySelector('button[type="submit"]');
+
+    await act(async () => {
+      fireEvent.click(sendButton);
+      await new Promise(r => setTimeout(r, 0));
+    });
+
+    await waitFor(() => {
+      assert.ok(mockToastError.mock.calls.some(call =>
+        call.arguments[0] === 'Your secure session has expired. Please download your document directly using the button above.'
+      ), 'Should show specific error message for 401/403');
+    });
+
+    process.env.VITE_PAYMENT_API_URL = originalUrl;
+  });
+
   it('handles empty email error when sending email', async () => {
     const originalUrl = process.env.VITE_PAYMENT_API_URL;
     process.env.VITE_PAYMENT_API_URL = 'http://test.api';

@@ -1,10 +1,58 @@
 
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert';
-import { validateForm, getFirstErrorFieldId } from '../src/utils/validation.js';
+import { validateForm, getFirstErrorFieldId, sanitizeInput, sanitizeFormData } from '../src/utils/validation.js';
+
+describe('sanitizeInput', () => {
+  it('should strip HTML tags', () => {
+    assert.strictEqual(sanitizeInput('<b>bold</b>'), 'bold');
+    assert.strictEqual(sanitizeInput('<script>alert("x")</script>hello'), 'alert("x")hello');
+  });
+
+  it('should strip non-standard special characters', () => {
+    assert.strictEqual(sanitizeInput('hello {world} | test < > ='), 'hello world  test');
+  });
+
+  it('should trim whitespace', () => {
+    assert.strictEqual(sanitizeInput('  hello  '), 'hello');
+  });
+
+  it('should handle non-strings gracefully', () => {
+    assert.strictEqual(sanitizeInput(null), null);
+    assert.strictEqual(sanitizeInput(123), 123);
+  });
+});
+
+describe('sanitizeFormData', () => {
+  it('should sanitize all string fields in form data', () => {
+    const rawData = {
+      creditorName: '<b>John</b>',
+      creditorAddress: '123 Main St {Apt 1}',
+      debtorName: '<script>Doe</script>',
+      debtorAddress: '456 Oak St | Suite 2',
+      items: [
+        { description: 'Service <i>1</i>', amount: '100' }
+      ]
+    };
+
+    const sanitized = sanitizeFormData(rawData);
+
+    assert.strictEqual(sanitized.creditorName, 'John');
+    assert.strictEqual(sanitized.creditorAddress, '123 Main St Apt 1');
+    assert.strictEqual(sanitized.debtorName, 'Doe');
+    assert.strictEqual(sanitized.debtorAddress, '456 Oak St  Suite 2');
+    assert.strictEqual(sanitized.items[0].description, 'Service 1');
+    assert.strictEqual(sanitized.items[0].amount, '100'); // amount untouched
+  });
+
+  it('should handle empty or null form data', () => {
+    assert.strictEqual(sanitizeFormData(null), null);
+    assert.strictEqual(sanitizeFormData(undefined), undefined);
+  });
+});
 
 describe('validateForm', () => {
-  it('should return valid if all fields are filled', () => {
+  it('should return valid if all fields are filled properly', () => {
     const validForm = {
       creditorName: 'Creditor',
       creditorAddress: 'Address 1',
@@ -37,6 +85,29 @@ describe('validateForm', () => {
     assert.ok(result.errors.dueDate);
     assert.ok(result.errors.letterDate);
     assert.ok(result.errors.items);
+  });
+
+  it('should invalidate strings over length limits', () => {
+    const longString101 = 'a'.repeat(101);
+    const longString501 = 'a'.repeat(501);
+
+    const invalidForm = {
+      creditorName: longString101,
+      creditorAddress: longString501,
+      debtorName: longString101,
+      debtorAddress: longString501,
+      dueDate: '2023-01-01',
+      letterDate: '2023-01-01',
+      items: [{ description: longString501, amount: '100' }]
+    };
+
+    const result = validateForm(invalidForm);
+    assert.strictEqual(result.isValid, false);
+    assert.strictEqual(result.errors.creditorName, "Creditor Name must be 100 characters or less.");
+    assert.strictEqual(result.errors.creditorAddress, "Creditor Address must be 500 characters or less.");
+    assert.strictEqual(result.errors.debtorName, "Debtor Name must be 100 characters or less.");
+    assert.strictEqual(result.errors.debtorAddress, "Debtor Address must be 500 characters or less.");
+    assert.strictEqual(result.errors.itemErrors[0].errors.description, "Description must be 500 characters or less.");
   });
 
   it('should invalidate empty items array', () => {

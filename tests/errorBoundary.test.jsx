@@ -45,6 +45,36 @@ describe('ErrorBoundary', () => {
     assert.strictEqual(consoleMock.mock.callCount() >= 1, true);
   });
 
+  it('should send telemetry data to axim endpoint on error', async () => {
+    // Suppress console.error
+    const consoleMock = mock.method(console, 'error', () => {});
+
+    // Mock fetch
+    const fetchMock = mock.fn(() => Promise.resolve({ ok: true }));
+    globalThis.fetch = fetchMock;
+
+    render(
+      <ErrorBoundary>
+        <BuggyComponent shouldThrow={true} />
+      </ErrorBoundary>
+    );
+
+    assert.strictEqual(fetchMock.mock.callCount(), 1);
+
+    const fetchCall = fetchMock.mock.calls[0];
+    assert.strictEqual(fetchCall.arguments[0], 'https://api.axim.us.com/v1/telemetry/errors');
+    assert.strictEqual(fetchCall.arguments[1].method, 'POST');
+    assert.strictEqual(fetchCall.arguments[1].headers['Content-Type'], 'application/json');
+
+    const body = JSON.parse(fetchCall.arguments[1].body);
+    assert.strictEqual(body.app, 'demand_letter_generator');
+    assert.strictEqual(body.error, 'Test Error');
+    assert.ok(body.stack);
+    assert.ok(body.timestamp);
+
+    delete globalThis.fetch;
+  });
+
   it('should reload the page when the refresh button is clicked', () => {
     // Suppress console.error
     mock.method(console, 'error', () => {});

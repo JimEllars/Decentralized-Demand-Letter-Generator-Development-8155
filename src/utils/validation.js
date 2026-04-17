@@ -3,20 +3,59 @@
  * Validation logic for the Demand Letter Generator
  */
 
+export const sanitizeInput = (input) => {
+  if (typeof input !== 'string') return input;
+  // Strip HTML tags
+  let sanitized = input.replace(/<[^>]*>?/gm, '');
+  // Optionally strip non-standard special characters to prevent script injection
+  // Here we allow alphanumeric, spaces, common punctuation used in addresses and names
+  // but strip < > { }
+  sanitized = sanitized.replace(/[<>{}|=]/g, '');
+  return sanitized.trim();
+};
+
+export const sanitizeFormData = (formData) => {
+  if (!formData) return formData;
+  const sanitized = { ...formData };
+
+  if (sanitized.creditorName) sanitized.creditorName = sanitizeInput(sanitized.creditorName);
+  if (sanitized.creditorAddress) sanitized.creditorAddress = sanitizeInput(sanitized.creditorAddress);
+  if (sanitized.debtorName) sanitized.debtorName = sanitizeInput(sanitized.debtorName);
+  if (sanitized.debtorAddress) sanitized.debtorAddress = sanitizeInput(sanitized.debtorAddress);
+
+  if (Array.isArray(sanitized.items)) {
+    sanitized.items = sanitized.items.map(item => ({
+      ...item,
+      description: sanitizeInput(item.description),
+      amount: item.amount // assuming amount is validated numerically
+    }));
+  }
+
+  return sanitized;
+};
+
 export const validateForm = (formData) => {
   const errors = {};
 
   if (!formData.creditorName?.trim()) {
     errors.creditorName = "Creditor Name is required.";
+  } else if (formData.creditorName.length > 100) {
+    errors.creditorName = "Creditor Name must be 100 characters or less.";
   }
   if (!formData.creditorAddress?.trim()) {
     errors.creditorAddress = "Creditor Address is required.";
+  } else if (formData.creditorAddress.length > 500) {
+    errors.creditorAddress = "Creditor Address must be 500 characters or less.";
   }
   if (!formData.debtorName?.trim()) {
     errors.debtorName = "Debtor Name is required.";
+  } else if (formData.debtorName.length > 100) {
+    errors.debtorName = "Debtor Name must be 100 characters or less.";
   }
   if (!formData.debtorAddress?.trim()) {
     errors.debtorAddress = "Debtor Address is required.";
+  } else if (formData.debtorAddress.length > 500) {
+    errors.debtorAddress = "Debtor Address must be 500 characters or less.";
   }
   if (!formData.dueDate) {
     errors.dueDate = "Original Due Date is required.";
@@ -35,6 +74,9 @@ export const validateForm = (formData) => {
       let hasError = false;
       if (!item.description || !item.description.trim()) {
         itemError.description = "Description is required.";
+        hasError = true;
+      } else if (item.description.length > 500) {
+        itemError.description = "Description must be 500 characters or less.";
         hasError = true;
       }
       if (!item.amount || parseFloat(item.amount) <= 0) {
