@@ -35,13 +35,22 @@ describe('Cloudflare Worker API Proxy', () => {
     };
     globalThis.Headers = class {
         constructor(init) {
-            this.map = new Map(Object.entries(init || {}));
+            if (init instanceof Headers) {
+                this.map = new Map(init.map);
+            } else if (init && typeof init[Symbol.iterator] === 'function') {
+                this.map = new Map(init);
+            } else {
+                this.map = new Map(Object.entries(init || {}));
+            }
         }
         set(key, value) {
-            this.map.set(key, value);
+            this.map.set(key.toLowerCase(), value);
         }
         get(key) {
-            return this.map.get(key);
+            return this.map.get(key.toLowerCase());
+        }
+        *[Symbol.iterator]() {
+            yield* this.map.entries();
         }
     };
   });
@@ -78,5 +87,26 @@ describe('Cloudflare Worker API Proxy', () => {
       async () => await worker.fetch(request, {}),
       TypeError
     );
+  });
+
+  it('should pass Original Headers through and not spoof Origin/Referer', async () => {
+    const initialHeaders = new Headers();
+    initialHeaders.set('Origin', 'https://attacker.com');
+    initialHeaders.set('Referer', 'https://attacker.com/malicious');
+    initialHeaders.set('X-Custom-Header', 'custom-value');
+
+    const request = new Request('https://quickdemandletter.com/api/test', {
+      method: 'POST',
+      headers: initialHeaders
+    });
+
+    await worker.fetch(request, mockEnv);
+
+    const fetchCall = globalThis.fetch.mock.calls[0];
+    const proxiedRequest = fetchCall.arguments[0];
+
+    assert.strictEqual(proxiedRequest.headers.get('Origin'), 'https://attacker.com');
+    assert.strictEqual(proxiedRequest.headers.get('Referer'), 'https://attacker.com/malicious');
+    assert.strictEqual(proxiedRequest.headers.get('X-Custom-Header'), 'custom-value');
   });
 });

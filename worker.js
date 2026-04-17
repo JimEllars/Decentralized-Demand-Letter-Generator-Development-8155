@@ -18,10 +18,6 @@ export default {
         headers: new Headers(request.headers),
       };
 
-      // Override headers to ensure backend sees the correct origin
-      fetchOptions.headers.set('Origin', 'https://quickdemandletter.com');
-      fetchOptions.headers.set('Referer', 'https://quickdemandletter.com/');
-
       if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
         if (url.pathname === '/api/create-checkout-session') {
           try {
