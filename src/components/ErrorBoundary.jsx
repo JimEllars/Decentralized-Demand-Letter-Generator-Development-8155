@@ -14,6 +14,23 @@ class ErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
+
+    try {
+      fetch('https://api.axim.us.com/v1/telemetry/errors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          app: 'demand_letter_generator',
+          error: error.message,
+          stack: errorInfo.componentStack,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(err => console.error("Telemetry failed:", err));
+    } catch (e) {
+      console.error("Failed to send telemetry:", e);
+    }
   }
 
   handleReset = () => {

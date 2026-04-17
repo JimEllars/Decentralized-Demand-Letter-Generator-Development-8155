@@ -112,6 +112,7 @@ const SuccessPage = () => {
   const handleCreateAnother = () => {
     resetForm();
     localStorage.removeItem('axim_demand_letter_paid_status');
+    sessionStorage.removeItem('axim_delivery_email');
     clearAccessToken();
     navigate('/app/demand-generator');
   };

@@ -19,7 +19,7 @@ describe('PaymentModal', () => {
     assert.ok(screen.getByText('$4.00'));
 
     // Renders disclaimer
-    assert.ok(screen.getByText('All sales are final. No refunds.'));
+    assert.ok(screen.getByText('Quality and Satisfaction Guaranteed.'));
 
     // Renders buttons
     const payButton = screen.getByText('Pay $4.00 Now');

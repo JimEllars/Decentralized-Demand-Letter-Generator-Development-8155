@@ -234,7 +234,7 @@ const DemandGenerator = () => {
                 Secure 256-bit SSL Encrypted Payment via Stripe
               </div>
               <div className="text-center font-mono text-[0.65rem] text-zinc-400 font-bold mt-1 tracking-widest uppercase">
-                All sales are final. No refunds.
+                Quality and Satisfaction Guaranteed.
               </div>
             </div>
 
