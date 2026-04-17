@@ -129,13 +129,13 @@ const SuccessPage = () => {
         setIsSendingEmail(true);
         try {
           const token = getValidAccessToken();
-          const response = await fetch('/api/send-email', {
+          const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ email, formData })
+            body: JSON.stringify({ templateId: 'demand_letter_v1', formData, email })
           });
 
           if (!response.ok) {
@@ -168,13 +168,13 @@ const SuccessPage = () => {
     setIsSendingEmail(true);
     try {
       const token = getValidAccessToken();
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ email, formData })
+        body: JSON.stringify({ templateId: 'demand_letter_v1', formData, email })
       });
 
       if (!response.ok) {
