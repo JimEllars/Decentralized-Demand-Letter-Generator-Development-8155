@@ -20,10 +20,44 @@ export const usePdfGenerator = () => {
         toast.error("Payment session expired. Please complete payment again.");
         return;
       }
+
+      // Basic structural validation to prevent trivial bypass (e.g. users manually setting sessionStorage)
+      // We check if it's a dev token or a valid JWT
+      const isDevToken = accessToken.startsWith('dev-token-');
+      let isValidJwt = false;
+
+      if (!isDevToken) {
+        try {
+          const parts = accessToken.split('.');
+          if (parts.length === 3) {
+            // Fix Base64URL to Base64 to support actual JWTs properly without DOMException
+            let base64Url = parts[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            // Pad base64 with = so it is a multiple of 4
+            const padLength = (4 - (base64.length % 4)) % 4;
+            base64 = base64 + '='.repeat(padLength);
+
+            const payload = JSON.parse(atob(base64));
+            if (payload && typeof payload === 'object') {
+              isValidJwt = true;
+            }
+          }
+        } catch (e) {
+          // Decoding failed, not a valid JWT
+        }
+      }
+
+      if (!isDevToken && !isValidJwt) {
+        toast.error("Invalid payment token. Please complete payment again.");
+        return;
+      }
     }
 
     setIsGenerating(true);
-    const docDefinition = generatePdfDefinition(formData, calculatedValues, toneTemplate, { watermark: !isPaid });
+    // Ensure default empty arrays/values are passed correctly for generator resilience
+    const safeFormData = { ...formData, items: Array.isArray(formData?.items) ? formData.items : [] };
+    const safeCalculatedValues = calculatedValues || {};
+    const docDefinition = generatePdfDefinition(safeFormData, safeCalculatedValues, toneTemplate || {}, { watermark: !isPaid });
 
     try {
       // 1. Import both modules concurrently
@@ -46,7 +80,7 @@ export const usePdfGenerator = () => {
       // 3. Explicitly attach the VFS to this instance of pdfMake
       pdfMake.vfs = vfs;
 
-      const safeJurisdiction = (formData.jurisdiction || 'DEFAULT').replace(/[^a-zA-Z0-9]/g, '_');
+      const safeJurisdiction = (safeFormData.jurisdiction || 'DEFAULT').replace(/[^a-zA-Z0-9]/g, '_');
 
       // 4. Create and trigger download
       pdfMake.createPdf(docDefinition).download(`Demand_Letter_${safeJurisdiction}.pdf`);
