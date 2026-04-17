@@ -54,6 +54,7 @@ const DemandGenerator = () => {
     setShowPaymentModal,
     handleProceedToCheckout,
     handlePayment,
+    handleBypassPaywall,
     resetPayment
   } = usePayment();
 
@@ -243,7 +244,7 @@ const DemandGenerator = () => {
       </main>
 
       <AnimatePresence>
-        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} />}
+        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} onBypass={handleBypassPaywall} />}
       </AnimatePresence>
     </div>
   );

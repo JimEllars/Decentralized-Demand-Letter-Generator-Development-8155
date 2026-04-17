@@ -1,11 +1,20 @@
 import { Link } from 'react-router-dom';
-import { FiShield, FiCheckCircle } from 'react-icons/fi';
+import { FiShield, FiCheckCircle, FiArrowLeft } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const Header = () => (
   <header className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-    {/* Minor Logo Top Left */}
-    <Link to="/start" className="absolute top-8 left-4 md:left-8 flex items-center gap-2 hover:opacity-80 transition-opacity">
+    {/* Back to Ecosystem Link */}
+    <a
+      href="https://axim.us.com"
+      className="absolute top-6 left-4 md:left-8 flex items-center gap-2 text-xs font-mono tracking-widest uppercase text-zinc-400 hover:text-axim-teal transition-colors bg-black/40 border border-white/5 hover:border-axim-teal/30 px-3 py-1.5 rounded-sm backdrop-blur-sm"
+    >
+      <SafeIcon icon={FiArrowLeft} className="w-3 h-3" />
+      Back to AXiM Ecosystem
+    </a>
+
+    {/* Minor Logo */}
+    <Link to="/start" className="absolute top-16 left-4 md:left-8 flex items-center gap-2 hover:opacity-80 transition-opacity">
       <SafeIcon icon={FiShield} className="text-axim-gold w-5 h-5" />
       <span className="font-inter font-bold tracking-tight text-white text-lg">
         AXiM <span className="text-axim-teal font-medium">Documents</span>

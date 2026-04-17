@@ -2,14 +2,39 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
+import { ConnectButton, useReadContract, useActiveAccount } from 'thirdweb/react';
+import { createThirdwebClient, getContract } from 'thirdweb';
+import { defineChain } from 'thirdweb/chains';
 
-const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
+const client = createThirdwebClient({ clientId: "dummy-client-id" });
+
+const dummyContract = getContract({
+  client,
+  chain: defineChain(1),
+  address: "0x0000000000000000000000000000000000000000",
+});
+
+const PaymentModal = ({ isProcessing, onConfirm, onCancel, onBypass }) => {
   const [sendEmail, setSendEmail] = useState(false);
   const [email, setEmail] = useState('');
+
+  const account = useActiveAccount();
+  const { data: hasToken, isLoading: isTokenLoading } = useReadContract({
+    contract: dummyContract,
+    method: "function balanceOf(address owner) view returns (uint256)",
+    params: account ? [account.address] : [""],
+    queryOptions: {
+      enabled: !!account,
+    }
+  });
 
   const handleConfirm = () => {
     onConfirm(sendEmail ? email : null);
   };
+
+  // For dummy purposes, we assume any connected account has the token
+  // Replace this logic with actual `hasToken > 0n` in production
+  const canBypass = !!account;
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 bg-grid" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -87,7 +112,27 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
                 <><SafeIcon icon={FiCreditCard} /> Pay $4.00 Now</>
               )}
             </button>
-            <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-xs text-zinc-500 hover:text-white hover:bg-glass border border-transparent hover:border-subtle transition-all uppercase tracking-widest rounded-sm">
+
+            <div className="py-2 flex items-center justify-center gap-4">
+              <div className="h-px bg-white/10 flex-1"></div>
+              <span className="font-mono text-[0.65rem] text-zinc-500 uppercase tracking-widest">Or</span>
+              <div className="h-px bg-white/10 flex-1"></div>
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-3">
+              <ConnectButton client={client} />
+
+              {canBypass && (
+                 <button
+                  onClick={onBypass}
+                  className="w-full bg-black border border-axim-teal text-axim-teal px-8 py-3 font-bold uppercase tracking-[1px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_-10px_rgba(0,229,255,0.3)] hover:bg-axim-teal/10"
+                >
+                  <SafeIcon icon={FiShield} /> Bypass Paywall (Node Holder)
+                </button>
+              )}
+            </div>
+
+            <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-xs text-zinc-500 hover:text-white hover:bg-glass border border-transparent hover:border-subtle transition-all uppercase tracking-widest rounded-sm mt-2">
               Cancel
             </button>
           </div>

@@ -66,6 +66,18 @@ export const usePayment = () => {
       setShowPaymentModal(true);
   };
 
+  const handleBypassPaywall = () => {
+    const mockToken = `web3-token-${crypto.randomUUID()}`;
+    const mockExpiry = new Date(Date.now() + 3600000).toISOString();
+
+    sessionStorage.setItem('axim_access_token', mockToken);
+    sessionStorage.setItem('axim_token_expiry', mockExpiry);
+
+    setIsPaid(true);
+    setShowPaymentModal(false);
+    toast.success("Web3 Verification Successful. Paywall bypassed.");
+  };
+
   const handlePayment = async (isValid, onError) => {
     if (isProcessing) return; // Prevent double submission
 
@@ -125,6 +137,7 @@ export const usePayment = () => {
     setShowPaymentModal,
     handleProceedToCheckout,
     handlePayment,
+    handleBypassPaywall,
     resetPayment
   };
 };
