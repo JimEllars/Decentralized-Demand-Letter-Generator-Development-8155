@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { loadAndMigrateData } from '../utils/storeHelpers';
+import { sanitizeInput } from '../utils/validation';
 
 const STORAGE_KEY = 'axim_demand_letter_draft';
 
@@ -28,10 +29,17 @@ export const useLetterStore = (initialDataOrFn) => {
   }, [formData, isInitialized]);
 
   const updateField = useCallback((name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: typeof value === 'function' ? value(prev[name]) : value
-    }));
+    setFormData(prev => {
+      let resolvedValue = typeof value === 'function' ? value(prev[name]) : value;
+      // Sanitize standard text fields when updating individually
+      if (['creditorName', 'creditorAddress', 'debtorName', 'debtorAddress'].includes(name) && typeof resolvedValue === 'string') {
+        resolvedValue = sanitizeInput(resolvedValue);
+      }
+      return {
+        ...prev,
+        [name]: resolvedValue
+      };
+    });
   }, []);
 
   const resetForm = useCallback(() => {
