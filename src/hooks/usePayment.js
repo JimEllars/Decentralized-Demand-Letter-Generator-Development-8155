@@ -89,6 +89,7 @@ export const usePayment = () => {
 
       if (result && result.url) {
         // A direct redirect to a payment provider is happening.
+        window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'begin_checkout', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
         isRedirecting = true;
         return;
       }
@@ -96,6 +97,7 @@ export const usePayment = () => {
       if (result && result.success) {
         if (result.transactionId) {
           // If simulating or not returning a direct redirect URL, simulate redirect
+          window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'begin_checkout', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           isRedirecting = true;
           // Use client-side navigation for simulation mode to preserve in-memory module state
           navigate(`/success?session_id=${result.transactionId}`);
