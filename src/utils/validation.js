@@ -11,6 +11,8 @@ export const sanitizeInput = (input) => {
   // Here we allow alphanumeric, spaces, common punctuation used in addresses and names
   // but strip < > { }
   sanitized = sanitized.replace(/[<>{}|=]/g, '');
+  // Replace excessive newlines
+  sanitized = sanitized.replace(/\n{3,}/g, '\n\n');
   return sanitized.trim();
 };
 

@@ -68,7 +68,7 @@ describe('ErrorBoundary', () => {
 
     const body = JSON.parse(fetchCall.arguments[1].body);
     assert.strictEqual(body.app, 'demand_letter_generator');
-    assert.strictEqual(body.error, 'Test Error');
+    assert.strictEqual(body.message, 'Test Error');
     assert.ok(body.stack);
     assert.ok(body.timestamp);
 

@@ -23,7 +23,7 @@ class ErrorBoundary extends Component {
         },
         body: JSON.stringify({
           app: 'demand_letter_generator',
-          error: error.message,
+          message: error.message,
           stack: errorInfo.componentStack,
           timestamp: new Date().toISOString()
         })

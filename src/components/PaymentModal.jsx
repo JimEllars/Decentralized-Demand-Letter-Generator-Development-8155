@@ -84,7 +84,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
               {isProcessing ? (
                 <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Verifying...</>
               ) : (
-                <><SafeIcon icon={FiCreditCard} /> Pay $4.00 Now</>
+                <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
               )}
             </button>
             <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-xs text-zinc-500 hover:text-white hover:bg-glass border border-transparent hover:border-subtle transition-all uppercase tracking-widest rounded-sm">

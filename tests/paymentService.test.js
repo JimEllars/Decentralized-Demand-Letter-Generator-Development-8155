@@ -127,6 +127,19 @@ describe('paymentService', () => {
       );
     });
 
+    it('should throw an error when receiving 403 Forbidden token expiration', async () => {
+      process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+        ok: false,
+        status: 403
+      }));
+
+      await assert.rejects(
+        async () => await verifyPaymentSession('real-session-id'),
+        { message: 'Failed to verify payment session' }
+      );
+    });
+
     it('should throw an error in production without VITE_PAYMENT_API_URL', async () => {
       const originalNodeEnv = process.env.NODE_ENV;
       delete process.env.VITE_PAYMENT_API_URL;
@@ -199,6 +212,15 @@ describe('paymentService', () => {
       await assert.rejects(
         async () => await initiateBackendTransaction('http://test.api', 'test_product'),
         { message: 'Network error' }
+      );
+    });
+
+    it('should handle Stripe network timeout by gracefully throwing an error without crashing', async () => {
+      globalThis.fetch.mock.mockImplementationOnce(() => Promise.reject(new Error('Payment request timed out. Please try again.')));
+
+      await assert.rejects(
+        async () => await initiateBackendTransaction('http://test.api', 'test_product'),
+        { message: 'Payment request timed out. Please try again.' }
       );
     });
   });
