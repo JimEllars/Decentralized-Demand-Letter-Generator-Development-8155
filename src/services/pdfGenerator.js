@@ -7,7 +7,9 @@ import { parseISO, isValid } from 'date-fns';
  * Shared formatters to improve performance
  */
 const dateFormatter = new Intl.DateTimeFormat(undefined);
-const dateCache = new Map();
+let cache = new Map();
+let oldCache = new Map();
+const MAX_CACHE_SIZE = 1000;
 
 /**
  * Helper to format date YYYY-MM-DD to Locale Date String
@@ -15,12 +17,19 @@ const dateCache = new Map();
 export const formatDate = (dateString) => {
   if (!dateString) return dateFormatter.format(new Date());
 
-  const cached = dateCache.get(dateString);
+  const cached = cache.get(dateString);
   if (cached) {
-    // Maintain LRU order by deleting and re-inserting
-    dateCache.delete(dateString);
-    dateCache.set(dateString, cached);
     return cached;
+  }
+
+  const cachedOld = oldCache.get(dateString);
+  if (cachedOld) {
+    cache.set(dateString, cachedOld);
+    if (cache.size >= MAX_CACHE_SIZE) {
+      oldCache = cache;
+      cache = new Map();
+    }
+    return cachedOld;
   }
 
   const date = parseISO(dateString);
@@ -32,12 +41,11 @@ export const formatDate = (dateString) => {
 
   const formatted = dateFormatter.format(date);
 
-  if (dateCache.size >= 1000) {
-    const firstKey = dateCache.keys().next().value;
-    dateCache.delete(firstKey);
+  cache.set(dateString, formatted);
+  if (cache.size >= MAX_CACHE_SIZE) {
+    oldCache = cache;
+    cache = new Map();
   }
-
-  dateCache.set(dateString, formatted);
   return formatted;
 };
 
