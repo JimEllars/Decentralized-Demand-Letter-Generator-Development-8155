@@ -74,7 +74,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
 
           <div className="space-y-4 pt-2 border-t border-white/5">
             <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-2 uppercase tracking-widest">
-              All sales are final. No refunds.
+              Quality and Satisfaction Guaranteed.
             </div>
             <button
               onClick={handleConfirm}
