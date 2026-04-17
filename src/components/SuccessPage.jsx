@@ -53,6 +53,7 @@ const SuccessPage = () => {
 
         if (data.isPaid) {
           setVerificationStatus('success');
+          window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           // Trigger download automatically
@@ -68,7 +69,12 @@ const SuccessPage = () => {
           // Delay download slightly to ensure UI updates and is perceived as a smooth transition
           setTimeout(() => {
             if (isMounted) {
-              handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
+              try {
+                handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
+              } catch (err) {
+                console.error("PDF generation error:", err);
+                toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
+              }
             }
           }, 1000);
 
@@ -124,7 +130,7 @@ const SuccessPage = () => {
           const response = await fetch('/api/send-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, formData })
           });
 
           if (!response.ok) throw new Error('Failed to send email');
@@ -139,7 +145,7 @@ const SuccessPage = () => {
       };
       sendInitialEmail();
     }
-  }, [verificationStatus, email, toast]);
+  }, [verificationStatus, email, toast, formData]);
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -153,7 +159,7 @@ const SuccessPage = () => {
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, formData })
       });
 
       if (!response.ok) throw new Error('Failed to send email');
