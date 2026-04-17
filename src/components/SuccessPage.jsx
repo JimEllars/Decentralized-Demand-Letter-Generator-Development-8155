@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
-import { verifyPaymentSession, clearAccessToken } from '../services/paymentService';
+import { verifyPaymentSession, clearAccessToken, getValidAccessToken } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail } from 'react-icons/fi';
@@ -127,13 +127,23 @@ const SuccessPage = () => {
       const sendInitialEmail = async () => {
         setIsSendingEmail(true);
         try {
+          const token = getValidAccessToken();
           const response = await fetch('/api/send-email', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ email, formData })
           });
 
-          if (!response.ok) throw new Error('Failed to send email');
+          if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+              toast.error('Your secure session has expired. Please download your document directly using the button above.');
+              return;
+            }
+            throw new Error('Failed to send email');
+          }
 
           toast.success(`Document automatically sent to ${email}`);
           sessionStorage.removeItem('axim_delivery_email');
@@ -156,13 +166,23 @@ const SuccessPage = () => {
 
     setIsSendingEmail(true);
     try {
+      const token = getValidAccessToken();
       const response = await fetch('/api/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ email, formData })
       });
 
-      if (!response.ok) throw new Error('Failed to send email');
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          toast.error('Your secure session has expired. Please download your document directly using the button above.');
+          return;
+        }
+        throw new Error('Failed to send email');
+      }
 
       toast.success(`Document sent to ${email}`);
       setEmail('');

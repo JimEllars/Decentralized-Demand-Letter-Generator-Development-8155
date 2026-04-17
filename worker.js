@@ -48,7 +48,7 @@ export default {
         // Ensure CORS headers are correct for the client
         newResponse.headers.set('Access-Control-Allow-Origin', url.origin);
         newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-        newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+        newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
         return newResponse;
       } catch (err) {
