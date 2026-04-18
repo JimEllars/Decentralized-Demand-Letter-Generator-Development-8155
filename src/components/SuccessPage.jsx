@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
-import { verifyPaymentSession, clearAccessToken, getValidAccessToken } from '../services/paymentService';
+import { verifyPaymentSession, clearAccessToken, getValidAccessToken, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail } from 'react-icons/fi';
@@ -128,28 +128,14 @@ const SuccessPage = () => {
       const sendInitialEmail = async () => {
         setIsSendingEmail(true);
         try {
-          const token = getValidAccessToken();
-          const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ templateId: 'demand_letter_v1', formData, email })
-          });
-
-          if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-              toast.error('Your secure session has expired. Please download your document directly using the button above.');
-              return;
-            }
-            throw new Error('Failed to send email');
-          }
-
+          await deliverOrchestratedDocument('demand_letter_v1', formData, email);
           toast.success(`Document automatically sent to ${email}`);
           sessionStorage.removeItem('axim_delivery_email');
         } catch (err) {
           console.error('Auto-send error:', err);
+          if (err.message === 'Your secure session has expired.') {
+            toast.error('Your secure session has expired. Please download your document directly using the button above.');
+          }
         } finally {
           setIsSendingEmail(false);
         }
@@ -167,28 +153,15 @@ const SuccessPage = () => {
 
     setIsSendingEmail(true);
     try {
-      const token = getValidAccessToken();
-      const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ templateId: 'demand_letter_v1', formData, email })
-      });
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          toast.error('Your secure session has expired. Please download your document directly using the button above.');
-          return;
-        }
-        throw new Error('Failed to send email');
-      }
-
+      await deliverOrchestratedDocument('demand_letter_v1', formData, email);
       toast.success(`Document sent to ${email}`);
       setEmail('');
     } catch (err) {
-      toast.error('Failed to send email. Please try again.');
+      if (err.message === 'Your secure session has expired.') {
+        toast.error('Your secure session has expired. Please download your document directly using the button above.');
+      } else {
+        toast.error('Failed to send email. Please try again.');
+      }
       console.error('Email send error:', err);
     } finally {
       setIsSendingEmail(false);

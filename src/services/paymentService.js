@@ -211,3 +211,33 @@ export const clearAccessToken = () => {
   sessionStorage.removeItem(PAYMENT_TOKEN_KEY);
   sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
 };
+
+/**
+ * Delivers the document to the user via the AXiM Core Orchestrator.
+ * @param {string} templateId - The ID of the document template.
+ * @param {Object} formData - The data used to generate the document.
+ * @param {string} email - The email address to send the document to.
+ * @returns {Promise<Object>} The response from the orchestrator.
+ */
+export const deliverOrchestratedDocument = async (templateId, formData, email) => {
+  const token = getValidAccessToken();
+  const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ templateId, formData, email })
+  });
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      const error = new Error('Your secure session has expired.');
+      error.status = response.status;
+      throw error;
+    }
+    throw new Error('Failed to deliver orchestrated document');
+  }
+
+  return response.json();
+};

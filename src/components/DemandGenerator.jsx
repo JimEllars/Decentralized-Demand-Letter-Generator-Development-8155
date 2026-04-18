@@ -11,6 +11,7 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../hooks/useAuth';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
@@ -46,6 +47,7 @@ const STEPS = [
 const DemandGenerator = () => {
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
+  const { userSession } = useAuth();
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
@@ -170,6 +172,13 @@ const DemandGenerator = () => {
     <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
       <Header />
       <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8 relative z-10">
+        {userSession && userSession.health_index < 40 && (
+          <div className="bg-axim-teal/10 border border-axim-teal/30 text-axim-teal px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 font-medium">
+            <SafeIcon name="FiInfo" />
+            Need assistance? Our legal support team is available to help you complete this draft.
+          </div>
+        )}
+
         <Instructions />
 
         {/* Stepper Progress Indicator */}
@@ -242,10 +251,11 @@ const DemandGenerator = () => {
              {currentStep < 3 ? (
                 <button
                     onClick={handleNextStep}
+                    disabled={!isCurrentStepValid}
                     className={`px-8 py-3 font-bold uppercase tracking-wider text-xs rounded-sm flex items-center gap-2 transition-all ${
                         isCurrentStepValid
                         ? 'bg-axim-teal text-black hover:bg-white'
-                        : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                        : 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-50'
                     }`}
                 >
                     Next <SafeIcon icon={FiChevronRight} />
