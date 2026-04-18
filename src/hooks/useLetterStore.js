@@ -1,102 +1,110 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { sanitizeInput } from '../utils/validation';
 import { useToast } from '../contexts/ToastContext';
 
 const STORAGE_KEY = 'axim_demand_letter_draft';
 
-export const useLetterStore = (initialDataOrFn) => {
-  const toast = useToast();
-  const hasRestored = useRef(false);
-  const isMounted = useRef(false);
-
+// Factory function to create the Zustand store with initial data
+const createStore = (initialDataOrFn) => {
   const getInitialState = () => typeof initialDataOrFn === 'function' ? initialDataOrFn() : initialDataOrFn;
 
-  const loadFromStorage = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
-           // We might have saved just formData or an object with formData and currentStep
-           if (parsed.formData !== undefined) {
-               return parsed;
-           }
-           // Fallback to older format where root is formData
-           return { formData: parsed, currentStep: 1 };
+  return create(
+    persist(
+      (set) => ({
+        formData: getInitialState(),
+        currentStep: 1,
+        isInitialized: false,
+        _hasHydrated: false,
+
+        setHasHydrated: (state) => set({ _hasHydrated: state }),
+
+        updateField: (name, value) => set((state) => {
+          if (!state.formData) return state;
+          let resolvedValue = typeof value === 'function' ? value(state.formData[name]) : value;
+          if (['creditorName', 'creditorAddress', 'debtorName', 'debtorAddress'].includes(name) && typeof resolvedValue === 'string') {
+            resolvedValue = sanitizeInput(resolvedValue);
+          }
+          return {
+            formData: {
+              ...state.formData,
+              [name]: resolvedValue
+            }
+          };
+        }),
+
+        setStep: (step) => set({ currentStep: step }),
+
+        resetForm: () => {
+            set({ formData: getInitialState(), currentStep: 1 });
+            // Since we're re-assigning formData, force clear storage to avoid stale data during reload
+            localStorage.removeItem(STORAGE_KEY);
+        }
+      }),
+      {
+        name: STORAGE_KEY,
+        storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({
+          formData: state.formData,
+          currentStep: state.currentStep
+        }),
+        onRehydrateStorage: () => (state) => {
+          if (state) {
+            state.setHasHydrated(true);
+            state.isInitialized = true;
+          }
         }
       }
-    } catch {}
-    return null;
-  };
+    )
+  );
+};
 
-  const [state, setState] = useState(() => {
-    const loaded = loadFromStorage();
-    if (loaded) {
-       return { ...loaded, isInitialized: true };
-    }
-    return { formData: getInitialState(), currentStep: 1, isInitialized: false };
-  });
+// Map to cache stores based on initialData structure (usually only one store needed per app)
+const storeCache = new Map();
 
-  useEffect(() => {
-    if (!isMounted.current) {
-        isMounted.current = true;
-        const loaded = loadFromStorage();
-        if (loaded && !hasRestored.current) {
-            hasRestored.current = true;
-            toast.success("Welcome back! We've restored your progress.");
-        }
-        if (!state.isInitialized) {
-            setState(prev => ({ ...prev, isInitialized: true }));
-        }
-    }
-  }, [state.isInitialized, toast]);
+export const useLetterStore = (initialDataOrFn) => {
+  const toast = useToast();
+  const hasToastFired = useRef(false);
+
+  // We use a cached store to avoid creating a new store instance on every render
+  let useBoundStore = storeCache.get(STORAGE_KEY);
+  if (!useBoundStore) {
+    useBoundStore = createStore(initialDataOrFn);
+    storeCache.set(STORAGE_KEY, useBoundStore);
+  }
+
+  const store = useBoundStore();
 
   useEffect(() => {
-    if (state.isInitialized) {
-       const timer = setTimeout(() => {
-           localStorage.setItem(STORAGE_KEY, JSON.stringify({
-               formData: state.formData,
-               currentStep: state.currentStep
-           }));
-       }, 500);
-       return () => clearTimeout(timer);
-    }
-  }, [state.formData, state.currentStep, state.isInitialized]);
+    // If the store hydrated and we found saved data other than the initial data
+    // We display the welcome back toast, but only once.
+    if (store._hasHydrated && !hasToastFired.current) {
+        hasToastFired.current = true;
 
-  const updateField = useCallback((name, value) => {
-    setState(prev => {
-      if (!prev.formData) return prev;
-      let resolvedValue = typeof value === 'function' ? value(prev.formData[name]) : value;
-      if (['creditorName', 'creditorAddress', 'debtorName', 'debtorAddress'].includes(name) && typeof resolvedValue === 'string') {
-        resolvedValue = sanitizeInput(resolvedValue);
-      }
-      return {
-        ...prev,
-        formData: {
-            ...prev.formData,
-            [name]: resolvedValue
+        // Simple heuristic to check if it's restored data vs default empty data
+        // We check if the formData has been modified from default
+        const isRestored = store.currentStep > 1 ||
+            store.formData?.creditorName !== '' ||
+            store.formData?.debtorName !== '';
+
+        if (isRestored) {
+            toast.success("Welcome back! Your document progress has been restored.");
         }
-      };
-    });
-  }, []);
+    }
+  }, [store._hasHydrated, toast, store.currentStep, store.formData]);
 
-  const setStep = useCallback((step) => {
-      setState(prev => ({ ...prev, currentStep: step }));
-  }, []);
-
-  const resetForm = useCallback(() => {
-      const initialData = getInitialState();
-      setState({ formData: initialData, currentStep: 1, isInitialized: true });
-      localStorage.removeItem(STORAGE_KEY);
-      hasRestored.current = false;
-  }, [initialDataOrFn]);
+  const resetFormWrapped = useCallback(() => {
+    store.resetForm();
+    hasToastFired.current = false; // allow toast to fire again if rehydrated
+  }, [store]);
 
   return {
-      formData: state.formData,
-      currentStep: state.currentStep,
-      isInitialized: state.isInitialized,
-      updateField,
-      setStep,
-      resetForm
+    formData: store.formData,
+    currentStep: store.currentStep,
+    isInitialized: store._hasHydrated || store.isInitialized,
+    updateField: store.updateField,
+    setStep: store.setStep,
+    resetForm: resetFormWrapped
   };
 };
