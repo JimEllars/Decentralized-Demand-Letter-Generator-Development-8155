@@ -177,6 +177,11 @@ describe('usePayment', () => {
     });
 
     it('handlePayment works correctly on success', async () => {
+        globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ url: 'https://checkout.stripe.com/test' })
+        }));
+
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
         const onError = mock.fn();
@@ -188,7 +193,7 @@ describe('usePayment', () => {
         assert.strictEqual(onError.mock.callCount(), 0);
         // Loading state should be maintained because of redirect to success page
         assert.strictEqual(result.current.isProcessing, true);
-        // It no longer assigns to window.location.href because we mock `navigate` via `MemoryRouter`
+        assert.strictEqual(globalThis.window.location.href, 'https://checkout.stripe.com/test');
 
         unmount();
     });

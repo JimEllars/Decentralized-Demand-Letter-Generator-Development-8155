@@ -28,7 +28,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'framer-motion', 'react-icons'],
+          vendor: ['react', 'react-dom', 'framer-motion'],
           // Combine pdfmake and its fonts into one chunk to ensure they stay linked
           pdf: ['pdfmake/build/pdfmake', 'pdfmake/build/vfs_fonts'],
         },

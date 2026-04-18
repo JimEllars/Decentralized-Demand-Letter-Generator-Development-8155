@@ -13,10 +13,10 @@ const SummaryCard = ({ calculatedValues, jurisdiction }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-black/50 rounded-xl shadow-lg border border-subtle overflow-hidden relative"
+      className="bg-black/50 rounded-xl shadow-lg border border-subtle overflow-hidden relative watermark-bg"
     >
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-axim-teal to-axim-gold opacity-50"></div>
-      <div className="bg-black/60 border-b border-subtle px-6 py-4 flex items-center justify-between">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-axim-teal to-axim-gold opacity-50 z-10"></div>
+      <div className="bg-black/60 border-b border-subtle px-6 py-4 flex items-center justify-between relative z-10">
         <h3 className="font-inter font-semibold text-axim-gold text-sm tracking-wide flex items-center gap-2 uppercase">
           <SafeIcon icon={FiTrendingUp} /> Financial Summary
         </h3>
@@ -25,7 +25,7 @@ const SummaryCard = ({ calculatedValues, jurisdiction }) => {
         </span>
       </div>
 
-      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-subtle">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-subtle relative z-10">
 
         {/* Principal */}
         <div className="space-y-1 text-center md:text-left">

@@ -49,26 +49,6 @@ describe('paymentService', () => {
   });
 
   describe('processPayment', () => {
-    it('should fall back to simulation mode when VITE_PAYMENT_API_URL is not configured', async () => {
-      // Ensure VITE_PAYMENT_API_URL is undefined
-      delete process.env.VITE_PAYMENT_API_URL;
-
-      const productId = 'demand_letter';
-      const startTime = Date.now();
-
-      const result = await processPayment(productId);
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      // Check the timeout length (approx 1500ms)
-      assert.ok(duration >= 1400, `Duration was ${duration}ms, expected >= 1400ms`);
-
-      assert.strictEqual(result.success, true);
-      assert.strictEqual(result.transactionId, 'AXM-12345678');
-      assert.ok(result.timestamp);
-    });
-
     it('should initiate backend transaction when VITE_PAYMENT_API_URL is configured', async () => {
       process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
 
@@ -110,7 +90,7 @@ describe('paymentService', () => {
 
       await assert.rejects(
         async () => await processPayment('test_product'),
-        { message: 'Network error' }
+        { message: 'NETWORK_DEGRADED' }
       );
     });
 
@@ -140,7 +120,7 @@ describe('paymentService', () => {
       );
     });
 
-    it('should throw an error in production without VITE_PAYMENT_API_URL', async () => {
+    it('should throw an error without VITE_PAYMENT_API_URL', async () => {
       const originalNodeEnv = process.env.NODE_ENV;
       delete process.env.VITE_PAYMENT_API_URL;
       process.env.NODE_ENV = 'production';
@@ -148,7 +128,7 @@ describe('paymentService', () => {
       try {
         await assert.rejects(
           async () => await processPayment('test_product'),
-          { message: 'Payment API URL is not configured in production environment.' }
+          { message: 'Payment API URL is not configured.' }
         );
       } finally {
         process.env.NODE_ENV = originalNodeEnv;
@@ -211,7 +191,7 @@ describe('paymentService', () => {
 
       await assert.rejects(
         async () => await initiateBackendTransaction('http://test.api', 'test_product'),
-        { message: 'Network error' }
+        { message: 'NETWORK_DEGRADED' }
       );
     });
 
@@ -226,27 +206,6 @@ describe('paymentService', () => {
   });
 
   describe('verifyPaymentSession', () => {
-    it('should fall back to simulation mode and return isPaid true for valid IDs', async () => {
-      delete process.env.VITE_PAYMENT_API_URL;
-      globalThis.sessionStorage.setItem('axim_pending_transaction', 'AXM-123456');
-      const result = await verifyPaymentSession('AXM-123456');
-      assert.strictEqual(result.isPaid, true);
-      assert.strictEqual(globalThis.sessionStorage.getItem('axim_pending_transaction'), null);
-    });
-
-    it('should fall back to simulation mode and return isPaid false for valid prefix but mismatching pending transaction', async () => {
-      delete process.env.VITE_PAYMENT_API_URL;
-      globalThis.sessionStorage.setItem('axim_pending_transaction', 'AXM-OTHER');
-      const result = await verifyPaymentSession('AXM-123456');
-      assert.strictEqual(result.isPaid, false);
-    });
-
-    it('should fall back to simulation mode and return isPaid false for invalid IDs', async () => {
-      delete process.env.VITE_PAYMENT_API_URL;
-      const result = await verifyPaymentSession('INVALID-ID');
-      assert.strictEqual(result.isPaid, false);
-    });
-
     it('should call backend when VITE_PAYMENT_API_URL is configured', async () => {
       process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
       globalThis.fetch.mock.mockImplementationOnce(() => Promise.resolve({
@@ -291,7 +250,7 @@ describe('paymentService', () => {
       );
     });
 
-    it('should throw an error in production without VITE_PAYMENT_API_URL', async () => {
+    it('should throw an error without VITE_PAYMENT_API_URL', async () => {
       const originalNodeEnv = process.env.NODE_ENV;
       delete process.env.VITE_PAYMENT_API_URL;
       process.env.NODE_ENV = 'production';
@@ -299,7 +258,7 @@ describe('paymentService', () => {
       try {
         await assert.rejects(
           async () => await verifyPaymentSession('AXM-123456'),
-          { message: 'Payment API URL is not configured in production environment.' }
+          { message: 'Payment API URL is not configured.' }
         );
       } finally {
         process.env.NODE_ENV = originalNodeEnv;
