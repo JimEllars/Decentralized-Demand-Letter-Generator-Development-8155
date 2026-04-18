@@ -20,6 +20,9 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
     });
 
     if (!response.ok) {
+      if (response.status === 503) {
+        throw new Error('NETWORK_DEGRADED');
+      }
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || 'Failed to create payment session');
     }
@@ -51,6 +54,9 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
     throw new Error('Invalid response from payment provider: Missing checkout url');
   } catch (error) {
     console.error("Payment Service Error:", error);
+    if (error.message === 'NETWORK_DEGRADED' || error.message.includes('fetch') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+      throw new Error('NETWORK_DEGRADED');
+    }
     throw error;
   }
 };
@@ -69,34 +75,11 @@ export const processPayment = async (productId) => {
     ? import.meta.env.VITE_PAYMENT_API_URL
     : process.env.VITE_PAYMENT_API_URL;
 
-  if (paymentApiUrl) {
-    return initiateBackendTransaction(paymentApiUrl, productId);
+  if (!paymentApiUrl) {
+    throw new Error('Payment API URL is not configured.');
   }
 
-  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
-    ? import.meta.env.PROD
-    : process.env.NODE_ENV === 'production';
-
-  if (isProd) {
-    throw new Error('Payment API URL is not configured in production environment.');
-  }
-
-  // Fallback: Simulation Mode (No Backend Configured)
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const transactionId = `AXM-${crypto.randomUUID().toUpperCase().split('-')[0]}`;
-      // Store pending transaction to ensure secure verification in simulation mode
-      sessionStorage.setItem('axim_pending_transaction', transactionId);
-
-      const mockResponse = {
-        success: true,
-        transactionId: transactionId,
-        timestamp: new Date().toISOString()
-      };
-      
-      resolve(mockResponse);
-    }, 1500);
-  });
+  return initiateBackendTransaction(paymentApiUrl, productId);
 };
 
 /**
@@ -119,82 +102,32 @@ export const verifyPaymentSession = async (sessionId) => {
     ? import.meta.env.VITE_PAYMENT_API_URL
     : process.env.VITE_PAYMENT_API_URL;
 
-  if (paymentApiUrl) {
-    try {
-      const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${encodeURIComponent(sessionId)}`);
-      if (!response.ok) {
-        throw new Error('Failed to verify payment session');
-      }
-      const data = await response.json();
+  if (!paymentApiUrl) {
+    throw new Error('Payment API URL is not configured.');
+  }
 
-      if (data.accessToken) {
-        sessionStorage.setItem(PAYMENT_TOKEN_KEY, data.accessToken);
-        sessionStorage.setItem(TOKEN_EXPIRY_KEY, data.expiresAt);
-      }
-
-      return data;
-    } catch (error) {
-      console.error("Payment Verification Error:", error);
-      throw error;
+  try {
+    const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+    if (!response.ok) {
+      throw new Error('Failed to verify payment session');
     }
+    const data = await response.json();
+
+    if (data.accessToken) {
+      sessionStorage.setItem(PAYMENT_TOKEN_KEY, data.accessToken);
+      sessionStorage.setItem(TOKEN_EXPIRY_KEY, data.expiresAt);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Payment Verification Error:", error);
+    throw error;
   }
-
-  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
-    ? import.meta.env.PROD
-    : process.env.NODE_ENV === 'production';
-
-  if (isProd) {
-    throw new Error('Payment API URL is not configured in production environment.');
-  }
-
-  // Fallback: Simulation Mode
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const pendingTransaction = sessionStorage.getItem('axim_pending_transaction');
-      const isValid = typeof sessionId === 'string' &&
-                      sessionId.startsWith('AXM-') &&
-                      sessionId === pendingTransaction;
-
-      if (isValid) {
-        // Prevent replay attacks by clearing the pending transaction once verified
-        sessionStorage.removeItem('axim_pending_transaction');
-
-        const mockToken = `dev-token-${crypto.randomUUID()}`;
-        const mockExpiry = new Date(Date.now() + 3600000).toISOString();
-
-        // Use in-memory store for simulation mode instead of sessionStorage
-        simulationTokenStore = {
-          token: mockToken,
-          expiry: mockExpiry
-        };
-
-        resolve({ isPaid: true, accessToken: mockToken, expiresAt: mockExpiry });
-      } else {
-        resolve({ isPaid: false });
-      }
-    }, 500);
-  });
 };
 
 export const getValidAccessToken = () => {
-  const isProd = typeof import.meta !== 'undefined' && import.meta.env && typeof import.meta.env.PROD !== 'undefined'
-    ? import.meta.env.PROD
-    : process.env.NODE_ENV === 'production';
-
-  // Prioritize in-memory simulation token
-  let token = null;
-  let expiry = null;
-
-  if (!isProd) {
-    token = simulationTokenStore?.token;
-    expiry = simulationTokenStore?.expiry;
-  }
-
-  // Fallback to sessionStorage for real production tokens
-  if (!token || !expiry) {
-    token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
-    expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
-  }
+  let token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
+  let expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
 
   if (!token || !expiry) return null;
 

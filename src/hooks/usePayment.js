@@ -94,22 +94,12 @@ export const usePayment = () => {
         return;
       }
 
-      if (result && result.success) {
-        if (result.transactionId) {
-          // If simulating or not returning a direct redirect URL, simulate redirect
-          window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'begin_checkout', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
-          isRedirecting = true;
-          // Use client-side navigation for simulation mode to preserve in-memory module state
-          navigate(`/success?session_id=${result.transactionId}`);
-        } else {
-          // Fallback if no transactionId is provided
-          setIsPaid(true);
-          setShowPaymentModal(false);
-          toast.success("Payment successful!");
-        }
-      }
     } catch (error) {
-      toast.error(error.message);
+      if (error.message === 'NETWORK_DEGRADED') {
+        toast.error("We are currently experiencing high volume or a network degradation. Your draft is securely saved locally. Please try generating your document again in a few minutes.", { duration: 10000 });
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       // Maintain loading state if we are redirecting
       if (!isRedirecting) {

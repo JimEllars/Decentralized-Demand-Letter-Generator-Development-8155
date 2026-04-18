@@ -12,6 +12,11 @@ const Header = () => (
       </span>
     </Link>
 
+    {/* Ecosystem Backlink Top Right */}
+    <a href="https://axim.us.com" className="absolute top-8 right-4 md:right-8 flex items-center gap-2 hover:opacity-80 transition-opacity text-zinc-400 hover:text-white font-inter text-xs font-semibold tracking-wider uppercase">
+      ← Back to AXiM Hub
+    </a>
+
     {/* Subtle Background Glow behind the header */}
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-2xl h-32 bg-axim-teal/5 blur-[100px] rounded-full pointer-events-none z-[-1]"></div>
 

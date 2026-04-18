@@ -5,10 +5,11 @@ import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { verifyPaymentSession, clearAccessToken, getValidAccessToken, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
-import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail } from 'react-icons/fi';
+import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
+import { useAuth } from '../hooks/useAuth';
 
 const DEFAULT_FORM_DATA = {
   creditorName: '',
@@ -29,6 +30,7 @@ const SuccessPage = () => {
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
   const { handleDownload, isGenerating } = usePdfGenerator();
   const toast = useToast();
+  const { userSession } = useAuth();
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
   const hasVerified = useRef(false);
@@ -55,6 +57,21 @@ const SuccessPage = () => {
           setVerificationStatus('success');
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
+
+          // Sync Document History (Passport Write)
+          if (userSession?.id) {
+            try {
+              fetch('https://api.axim.us.com/v1/user/document-history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  document_id: sessionId,
+                  type: 'demand_letter',
+                  timestamp: new Date().toISOString()
+                })
+              }).catch(() => {}); // Fire and forget
+            } catch (e) {}
+          }
 
           // Trigger download automatically
           const calculatedValues = calculateTotal(
@@ -120,6 +137,33 @@ const SuccessPage = () => {
   const [email, setEmail] = useState(() => sessionStorage.getItem('axim_delivery_email') || '');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const hasSentInitialEmail = useRef(false);
+
+  const [feedbackState, setFeedbackState] = useState('idle'); // 'idle', 'rating', 'submitted'
+  const [feedbackRating, setFeedbackRating] = useState(null); // 'up', 'down'
+  const [feedbackComments, setFeedbackComments] = useState('');
+
+  const submitFeedback = async (e) => {
+    e?.preventDefault();
+    if (!feedbackRating) return;
+
+    setFeedbackState('submitted');
+    const sessionId = searchParams.get('session_id');
+
+    try {
+      await fetch('https://api.axim.us.com/v1/telemetry/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          document_id: sessionId,
+          rating: feedbackRating,
+          comments: feedbackComments
+        })
+      });
+      toast.success("Thank you for your feedback!");
+    } catch (err) {
+      console.error("Failed to submit feedback", err);
+    }
+  };
 
   // Auto-send email if user provided one during checkout
   useEffect(() => {
@@ -260,6 +304,58 @@ const SuccessPage = () => {
                 <SafeIcon icon={FiPlusCircle} />
                 Create Another Letter
               </button>
+
+              {/* Quality Feedback Micro-Survey */}
+              {feedbackState !== 'submitted' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 bg-black/20 border border-white/5 p-4 rounded-lg flex flex-col items-center gap-3"
+                >
+                  <p className="text-zinc-300 text-sm font-medium">How was your experience?</p>
+
+                  {feedbackState === 'idle' ? (
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => {
+                          setFeedbackRating('up');
+                          setFeedbackState('rating');
+                        }}
+                        className="p-3 bg-white/5 hover:bg-axim-teal/20 hover:text-axim-teal transition-colors rounded-full text-zinc-400"
+                        title="Good"
+                      >
+                        <SafeIcon icon={FiThumbsUp} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setFeedbackRating('down');
+                          setFeedbackState('rating');
+                        }}
+                        className="p-3 bg-white/5 hover:bg-red-500/20 hover:text-red-400 transition-colors rounded-full text-zinc-400"
+                        title="Needs Improvement"
+                      >
+                        <SafeIcon icon={FiThumbsDown} />
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={submitFeedback} className="w-full flex flex-col gap-2">
+                      <textarea
+                        value={feedbackComments}
+                        onChange={(e) => setFeedbackComments(e.target.value)}
+                        placeholder="Tell us what we can improve (optional)..."
+                        className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-axim-teal transition-colors resize-none h-20"
+                      />
+                      <button
+                        type="submit"
+                        className="w-full py-2 bg-axim-teal text-black font-semibold rounded-lg text-xs hover:bg-white transition-colors"
+                      >
+                        Submit Feedback
+                      </button>
+                    </form>
+                  )}
+                </motion.div>
+              )}
+
             </div>
           </div>
         )}

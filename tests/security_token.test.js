@@ -32,9 +32,19 @@ describe('Payment Token Security', () => {
       }
     }
 
-    // Ensure we are in simulation mode (no VITE_PAYMENT_API_URL)
-    delete process.env.VITE_PAYMENT_API_URL;
-    process.env.NODE_ENV = 'development';
+    // Configure production API since simulation mode is deprecated
+    process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';
+    process.env.NODE_ENV = 'production';
+
+    // Mock fetch for verifyPaymentSession
+    globalThis.fetch = mock.fn(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        isPaid: true,
+        accessToken: 'dev-token-test-uuid-1234',
+        expiresAt: new Date(Date.now() + 3600000).toISOString()
+      })
+    }));
 
     // Clear any existing tokens
     clearAccessToken();
@@ -42,35 +52,35 @@ describe('Payment Token Security', () => {
 
   afterEach(() => {
     Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, writable: true, configurable: true });
+    delete globalThis.fetch;
   });
 
-  it('should store simulation tokens in memory and NOT in sessionStorage', async () => {
+  it('should store tokens in sessionStorage when verifyPaymentSession is called via API', async () => {
     const sessionId = 'AXM-12345';
-    sessionStorage.setItem('axim_pending_transaction', sessionId);
 
     const result = await verifyPaymentSession(sessionId);
 
     assert.strictEqual(result.isPaid, true, 'Payment should be marked as paid');
     assert.ok(result.accessToken, 'Access token should be returned');
 
-    // VERIFY: Token should NOT be in sessionStorage
-    assert.strictEqual(sessionStorage.getItem('axim_access_token'), null, 'Token should NOT be in sessionStorage');
-    assert.strictEqual(sessionStorage.getItem('axim_token_expiry'), null, 'Expiry should NOT be in sessionStorage');
+    // VERIFY: Token SHOULD be in sessionStorage (since simulation memory store was removed)
+    assert.strictEqual(sessionStorage.getItem('axim_access_token'), 'dev-token-test-uuid-1234', 'Token should be in sessionStorage');
+    assert.ok(sessionStorage.getItem('axim_token_expiry'), 'Expiry should be in sessionStorage');
 
-    // VERIFY: getValidAccessToken should still work (retrieving from memory)
+    // VERIFY: getValidAccessToken should retrieve from sessionStorage
     const token = getValidAccessToken();
-    assert.strictEqual(token, result.accessToken, 'getValidAccessToken should return the in-memory token');
+    assert.strictEqual(token, result.accessToken, 'getValidAccessToken should return the token from sessionStorage');
   });
 
-  it('should clear in-memory token when clearAccessToken is called', async () => {
+  it('should clear token from sessionStorage when clearAccessToken is called', async () => {
     const sessionId = 'AXM-12345';
-    sessionStorage.setItem('axim_pending_transaction', sessionId);
 
     await verifyPaymentSession(sessionId);
     assert.ok(getValidAccessToken(), 'Token should exist before clearing');
 
     clearAccessToken();
     assert.strictEqual(getValidAccessToken(), null, 'Token should be null after clearing');
+    assert.strictEqual(sessionStorage.getItem('axim_access_token'), null);
   });
 
   it('should fallback to sessionStorage if in-memory token is missing (for production use case)', async () => {

@@ -23,7 +23,7 @@ describe('UpsellCard', () => {
 
   it('renders high value debt text when total is > 10000', () => {
     const { container } = render(<UpsellCard total={10001} />);
-    assert.ok(container.innerHTML.includes('High Value Debt Detected'));
+    assert.ok(container.innerHTML.includes('High-Value Claim Detected'));
     assert.ok(!container.innerHTML.includes('Need Other Documents?'));
   });
 });

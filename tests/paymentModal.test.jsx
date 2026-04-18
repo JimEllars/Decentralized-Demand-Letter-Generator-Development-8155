@@ -23,7 +23,7 @@ describe('PaymentModal', () => {
     assert.ok(screen.getByText('Quality and Satisfaction Guaranteed.'));
 
     // Renders buttons
-    const payButton = screen.getByText('Pay with Card');
+    const payButton = screen.queryByText('Pay with Card') || screen.queryByText('Generate with Partner Credit');
     assert.ok(payButton);
     const cancelButton = screen.getByText('Cancel');
     assert.ok(cancelButton);
@@ -39,7 +39,7 @@ describe('PaymentModal', () => {
     const onConfirmMock = mock.fn();
     render(<PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} />);
 
-    const payButton = screen.getByText('Pay with Card').closest('button');
+    const payButton = (screen.queryByText('Pay with Card') || screen.queryByText('Generate with Partner Credit')).closest('button');
     fireEvent.click(payButton);
     assert.strictEqual(onConfirmMock.mock.callCount(), 1);
   });
@@ -57,10 +57,10 @@ describe('PaymentModal', () => {
     render(<PaymentModal isProcessing={true} onConfirm={() => {}} onCancel={() => {}} />);
 
     // Verifying text should be present, standard Pay text shouldn't
-    assert.ok(screen.getByText(/Verifying\.\.\./));
+    assert.ok(screen.getByText(/Processing\.\.\./));
     assert.strictEqual(screen.queryByText('Pay with Card'), null);
 
-    const payButton = screen.getByText(/Verifying\.\.\./).closest('button');
+    const payButton = screen.getByText(/Processing\.\.\./).closest('button');
     const cancelButton = screen.getByText('Cancel').closest('button');
 
     // Both buttons should be disabled

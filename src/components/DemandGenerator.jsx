@@ -131,6 +131,20 @@ const DemandGenerator = () => {
 
   const handleNextStep = () => {
     if (isCurrentStepValid && currentStep < 3) {
+      // Telemetry: Log step completion
+      try {
+        fetch('https://api.axim.us.com/v1/telemetry/ingest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: `step_${currentStep}_completed`,
+            sessionId: userSession?.id || 'anonymous',
+            timestamp: new Date().toISOString()
+          })
+        }).catch(() => {}); // Fire and forget
+      } catch (e) {
+        // Ignore telemetry errors
+      }
       setStep(currentStep + 1);
     } else {
       setHasAttemptedSubmit(true);
@@ -150,13 +164,24 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
-  const onPaymentConfirm = (email) => {
+  const onPaymentConfirm = (email, isPartner) => {
     if (email) {
       sessionStorage.setItem('axim_delivery_email', email);
     } else {
       sessionStorage.removeItem('axim_delivery_email');
     }
-    handlePayment(isValid, onValidationFail);
+
+    if (isPartner) {
+      // Simulate successful payment redirect for partners
+      const mockSessionId = 'AXM-PARTNER-' + Date.now();
+      localStorage.setItem('axim_demand_letter_paid_status', mockSessionId);
+      // We set the token so the PDF generator works
+      sessionStorage.setItem('axim_access_token', 'partner_token_' + Date.now());
+      sessionStorage.setItem('axim_token_expiry', Date.now() + 1000 * 60 * 60);
+      window.location.href = `/success?session_id=${mockSessionId}&paid=true`;
+    } else {
+      handlePayment(isValid, onValidationFail);
+    }
   };
   const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid);
 

@@ -10,13 +10,13 @@ const UpsellCard = ({ total = 0 }) => {
       <motion.div whileHover={{ y: -2 }} className="bg-black/50 rounded-xl p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl border border-axim-teal/40 relative overflow-hidden">
         <div className="absolute inset-0 bg-axim-teal/5 z-0"></div>
         <div className="text-center sm:text-left relative z-10">
-          <h4 className="font-inter font-bold text-axim-teal text-sm uppercase tracking-wider leading-tight drop-shadow-[0_0_8px_rgba(0,229,255,0.3)]">High Value Debt Detected</h4>
+          <h4 className="font-inter font-bold text-axim-teal text-sm uppercase tracking-wider leading-tight drop-shadow-[0_0_8px_rgba(0,229,255,0.3)]">High-Value Claim Detected</h4>
           <p className="font-inter text-xs text-zinc-300 mt-2 tracking-wide leading-relaxed max-w-md">
-            Debts over $10,000 often require dedicated legal strategy. Let our specialists handle recovery for you.
+            For disputes exceeding $10,000, we highly recommend an attorney review.
           </p>
         </div>
         <button className="relative z-10 bg-axim-teal/10 text-axim-teal border border-axim-teal px-6 py-3 rounded-lg text-xs font-inter font-bold uppercase tracking-wider whitespace-nowrap hover:bg-axim-teal hover:text-black transition-all shadow-[0_0_15px_rgba(0,229,255,0.2)] flex items-center gap-2">
-          SPEAK TO A SPECIALIST <SafeIcon icon={FiArrowRight} />
+          Book a Consultation via AXiM Hub <SafeIcon icon={FiArrowRight} />
         </button>
       </motion.div>
     );
