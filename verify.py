@@ -12,17 +12,32 @@ def run_cuj(page):
     page.wait_for_selector("input#creditorName", timeout=10000)
 
     # Fill out the form
+    # Step 1: The Parties
     page.locator("input#creditorName").fill("Test Creditor")
     page.locator("textarea#creditorAddress").fill("Test Creditor Address")
     page.locator("input#debtorName").fill("Test Debtor")
     page.locator("textarea#debtorAddress").fill("Test Debtor Address")
-    page.locator("input#dueDate").fill("2025-12-31")
 
+    # Click Next
+    page.get_by_role("button", name="Next").click()
+    page.wait_for_timeout(1000)
+
+    # Step 2: The Debt
+    page.locator("input#dueDate").fill("2025-12-31")
     # Target the amount input inside the items map
     page.locator("input[placeholder='0.00']").fill("1000")
+    # Description inside items map
+    page.locator("input[placeholder='Description (e.g. Invoice #101)']").fill("Test Item")
 
     # Wait for calculations to update
     page.wait_for_timeout(500)
+
+    # Click Next
+    page.get_by_role("button", name="Next").click()
+    page.wait_for_timeout(1000)
+
+    # Step 3: Tone & Review
+    # Tone and Jurisdiction are prefilled or optional
 
     # Click proceed to checkout
     page.get_by_role("button", name="PROCEED TO CHECKOUT ($4.00)").click()
@@ -38,7 +53,7 @@ def run_cuj(page):
     page.wait_for_timeout(500)
 
     # Click pay
-    page.get_by_role("button", name="Pay $4.00 Now").click()
+    page.get_by_role("button", name="Pay with Card").click()
 
     # Wait for the simulated redirect and page load
     page.wait_for_timeout(5000)
