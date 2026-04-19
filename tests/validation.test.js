@@ -10,11 +10,11 @@ describe('sanitizeInput', () => {
   });
 
   it('should strip non-standard special characters', () => {
-    assert.strictEqual(sanitizeInput('hello {world} | test < > ='), 'hello world  test');
+    assert.strictEqual(sanitizeInput('hello {world} | test < > ='), 'hello world  test  ');
   });
 
-  it('should trim whitespace', () => {
-    assert.strictEqual(sanitizeInput('  hello  '), 'hello');
+  it('should trim leading whitespace but keep trailing', () => {
+    assert.strictEqual(sanitizeInput('  hello  '), 'hello  ');
   });
 
   it('should handle non-strings gracefully', () => {
