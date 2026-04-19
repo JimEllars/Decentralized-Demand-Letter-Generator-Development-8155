@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { FiShield } from 'react-icons/fi';
+import SafeIcon from '../common/SafeIcon';
 import {
   Terminal, ShieldCheck, Database, Map,
   ChevronDown, FileText, Briefcase, Home,
@@ -72,6 +75,21 @@ const DemandLanding = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-inter selection:bg-axim-gold selection:text-black overflow-x-hidden">
+      <Helmet>
+        <title>AXiM Demand Letter Generator | AI-Powered Legal Drafting</title>
+        <meta property="og:title" content="AXiM Demand Letter Generator | AI-Powered Legal Drafting" />
+        <meta property="og:description" content="Generate professional, jurisdiction-specific demand letters securely within your browser using AXiM's Zero-Knowledge architecture." />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
+      {/* AXiM Documents Logo Anchor */}
+      <a href="https://axim.us.com/tools" className="absolute top-8 left-4 md:left-8 flex items-center gap-2 hover:opacity-80 transition-opacity z-50">
+        <SafeIcon icon={FiShield} className="text-axim-gold w-5 h-5" />
+        <span className="font-inter font-bold tracking-tight text-white text-lg">
+          AXiM <span className="text-axim-teal font-medium">Documents</span>
+        </span>
+      </a>
+
       {/* 1. Hero Section */}
       <section className="relative pt-24 pb-32 px-4 flex flex-col items-center justify-center text-center min-h-[90vh]">
         {/* Background Grid & Radial Gradient */}
