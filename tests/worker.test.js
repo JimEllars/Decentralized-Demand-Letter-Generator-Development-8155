@@ -63,7 +63,7 @@ describe('Cloudflare Worker API Proxy', () => {
   });
 
   it('should proxy /api requests to BACKEND_URL', async () => {
-    const request = new Request('https://quickdemandletter.com/api/test', {
+    const request = new Request('https://quickdemandletter.com/api/create-checkout-session', {
       method: 'GET',
       headers: new Headers()
     });
@@ -73,11 +73,11 @@ describe('Cloudflare Worker API Proxy', () => {
     const fetchCall = globalThis.fetch.mock.calls[0];
     const proxiedRequest = fetchCall.arguments[0];
 
-    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/test');
+    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/create-checkout-session');
   });
 
   it('should handle missing BACKEND_URL gracefully (test URL constructor behavior)', async () => {
-    const request = new Request('https://quickdemandletter.com/api/test', {
+    const request = new Request('https://quickdemandletter.com/api/create-checkout-session', {
       method: 'GET',
       headers: new Headers()
     });
@@ -91,11 +91,11 @@ describe('Cloudflare Worker API Proxy', () => {
 
   it('should pass Original Headers through and not spoof Origin/Referer', async () => {
     const initialHeaders = new Headers();
-    initialHeaders.set('Origin', 'https://attacker.com');
-    initialHeaders.set('Referer', 'https://attacker.com/malicious');
+    initialHeaders.set('Origin', 'https://quickdemandletter.com');
+    initialHeaders.set('Referer', 'https://quickdemandletter.com/');
     initialHeaders.set('X-Custom-Header', 'custom-value');
 
-    const request = new Request('https://quickdemandletter.com/api/test', {
+    const request = new Request('https://quickdemandletter.com/api/verify-session', {
       method: 'POST',
       headers: initialHeaders
     });
@@ -105,8 +105,8 @@ describe('Cloudflare Worker API Proxy', () => {
     const fetchCall = globalThis.fetch.mock.calls[0];
     const proxiedRequest = fetchCall.arguments[0];
 
-    assert.strictEqual(proxiedRequest.headers.get('Origin'), 'https://attacker.com');
-    assert.strictEqual(proxiedRequest.headers.get('Referer'), 'https://attacker.com/malicious');
+    assert.strictEqual(proxiedRequest.headers.get('Origin'), 'https://quickdemandletter.com');
+    assert.strictEqual(proxiedRequest.headers.get('Referer'), 'https://quickdemandletter.com/');
     assert.strictEqual(proxiedRequest.headers.get('X-Custom-Header'), 'custom-value');
   });
 });

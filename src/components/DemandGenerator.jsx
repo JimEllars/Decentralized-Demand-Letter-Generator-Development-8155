@@ -12,6 +12,7 @@ import { usePayment } from '../hooks/usePayment';
 import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
+import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
@@ -48,6 +49,7 @@ const DemandGenerator = () => {
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
   const { userSession } = useAuth();
+  const { data: legalStatutes } = useLegalStatutes();
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
@@ -76,9 +78,10 @@ const DemandGenerator = () => {
       formData.statutoryInterest,
       formData.dueDate,
       formData.jurisdiction,
-      formData.letterDate
+      formData.letterDate,
+      legalStatutes.details
     );
-  }, [formData]);
+  }, [formData, legalStatutes.details]);
 
   const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
@@ -183,7 +186,7 @@ const DemandGenerator = () => {
       handlePayment(isValid, onValidationFail);
     }
   };
-  const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid);
+  const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, legalStatutes.clauses);
 
   if (!isInitialized) {
     return (

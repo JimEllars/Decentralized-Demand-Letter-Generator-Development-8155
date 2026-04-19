@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { generatePdfDefinition } from '../services/pdfGenerator';
 import { getValidAccessToken } from '../services/paymentService';
+import { useAuth } from './useAuth';
 
 export const usePdfGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const toast = useToast();
+  const { userSession } = useAuth();
 
-  const handleDownload = async (isValid, onError, formData, calculatedValues, toneTemplate, isPaid) => {
+  const handleDownload = async (isValid, onError, formData, calculatedValues, toneTemplate, isPaid, legalStatutesClauses) => {
     if (!isValid) {
       onError();
       return;
@@ -57,7 +59,7 @@ export const usePdfGenerator = () => {
     // Ensure default empty arrays/values are passed correctly for generator resilience
     const safeFormData = { ...formData, items: Array.isArray(formData?.items) ? formData.items : [] };
     const safeCalculatedValues = calculatedValues || {};
-    const docDefinition = generatePdfDefinition(safeFormData, safeCalculatedValues, toneTemplate || {}, { watermark: !isPaid });
+    const docDefinition = generatePdfDefinition(safeFormData, safeCalculatedValues, toneTemplate || {}, { watermark: !isPaid, legalStatutesClauses });
 
     try {
       // 1. Import both modules concurrently
@@ -82,12 +84,86 @@ export const usePdfGenerator = () => {
 
       const safeJurisdiction = (safeFormData.jurisdiction || 'DEFAULT').replace(/[^a-zA-Z0-9]/g, '_');
 
-      // 4. Create and trigger download
-      pdfMake.createPdf(docDefinition).download(`Demand_Letter_${safeJurisdiction}.pdf`);
+      // 4. Create PDF Document
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+
+      let generatedHash = null;
+
+      if (isPaid) {
+        // Generate Buffer/Blob, hash it, stamp it via API, and then download
+        const blob = await new Promise((resolve, reject) => {
+          pdfDocGenerator.getBlob((blob) => {
+            resolve(blob);
+          });
+        });
+
+        const arrayBuffer = await blob.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        generatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        try {
+          const stampResponse = await fetch('/api/ledger/stamp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+            },
+            body: JSON.stringify({
+              hash: generatedHash,
+              jurisdiction: safeJurisdiction
+            })
+          });
+
+          if (!stampResponse.ok) {
+            console.warn("Failed to stamp document to ledger", stampResponse.status);
+          }
+        } catch (stampErr) {
+          console.warn("Failed to reach ledger stamp endpoint", stampErr);
+        }
+
+        if (userSession) {
+          try {
+            const vaultFormData = new FormData();
+            vaultFormData.append('file', blob, `Demand_Letter_${safeJurisdiction}.pdf`);
+
+            const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
+              ? import.meta.env.VITE_PAYMENT_API_URL
+              : process.env.VITE_PAYMENT_API_URL;
+            const vaultUrl = paymentApiUrl ? `${paymentApiUrl}/v1/user/secure-artifacts` : '/api/v1/user/secure-artifacts';
+
+            const vaultResponse = await fetch(vaultUrl, {
+              method: 'POST',
+              headers: {
+                ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
+              },
+              body: vaultFormData
+            });
+            if (!vaultResponse.ok) {
+              console.warn("Failed to vault document", vaultResponse.status);
+            }
+          } catch (vaultErr) {
+            console.warn("Failed to reach secure-artifacts endpoint", vaultErr);
+          }
+        }
+
+        // Trigger download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Demand_Letter_${safeJurisdiction}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // Trigger download immediately for non-paid versions
+        pdfDocGenerator.download(`Demand_Letter_${safeJurisdiction}.pdf`);
+      }
 
       toast.success("Download started!");
+      return generatedHash;
     } catch (error) {
       toast.error(`Failed to generate PDF: ${error.message || 'An unknown error occurred.'}`);
+      return null;
     } finally {
       setIsGenerating(false);
     }

@@ -3,6 +3,65 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname.startsWith('/api/')) {
+      // Route Whitelist Validation
+      const allowedRoutes = [
+        '/api/create-checkout-session',
+        '/api/verify-session',
+        '/api/webhooks/stripe',
+        '/api/ledger/stamp',
+        '/api/send-email',
+        '/api/v1/legal-statutes',
+        '/api/v1/user/drafts',
+        '/api/v1/user/secure-artifacts'
+      ];
+
+      const isAllowed = allowedRoutes.some(route => url.pathname.startsWith(route));
+      if (!isAllowed) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': url.origin
+          }
+        });
+      }
+
+      // Origin validation
+      const allowedOrigins = ['https://quickdemandletter.com', 'http://localhost', 'http://127.0.0.1', 'null'];
+      const origin = request.headers.get('Origin');
+      if (origin && !allowedOrigins.includes(origin) && !origin.startsWith('http://localhost:')) {
+        return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+
+      // Authorization Header Validation
+      const authHeader = request.headers.get('Authorization');
+      if (authHeader) {
+        // Must start with Bearer
+        if (!authHeader.startsWith('Bearer ')) {
+          return new Response(JSON.stringify({ error: 'Invalid Authorization header format' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+
+        const token = authHeader.split(' ')[1];
+        // Ensure token has expected shape (JWT structure or axm_live / dev prefix)
+        const isAxmToken = token.startsWith('axm_live_') || token.startsWith('dev-token-');
+        const isJwt = token.split('.').length === 3;
+
+        if (!isAxmToken && !isJwt) {
+          return new Response(JSON.stringify({ error: 'Invalid token structure' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+      }
+
       // Ensure the subpath is treated as a path, not a potential URL override
       // We strip all leading slashes and then prepend './' to ensure it is
       // interpreted as a relative path component.
@@ -34,6 +93,9 @@ export default {
             console.error('Failed to parse request body for URL injection', e);
             fetchOptions.body = request.clone().body;
           }
+        } else if (url.pathname === '/api/ledger/stamp') {
+          // Additional logging/processing could be handled here before forwarding
+          fetchOptions.body = request.clone().body;
         } else {
             fetchOptions.body = request.clone().body;
         }

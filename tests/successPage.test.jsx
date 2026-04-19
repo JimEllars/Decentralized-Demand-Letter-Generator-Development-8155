@@ -2,9 +2,18 @@ import { test, describe, mock, afterEach, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { render, screen, cleanup, act, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SuccessPage from '../src/components/SuccessPage';
 import { ToastContext } from '../src/contexts/ToastContext';
 import * as paymentService from '../src/services/paymentService';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 // Just mock fetch
 describe('SuccessPage', () => {
@@ -52,13 +61,15 @@ describe('SuccessPage', () => {
     });
 
     render(
-      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
-        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
-          <Routes>
-            <Route path="/" element={<SuccessPage />} />
-          </Routes>
-        </MemoryRouter>
-      </ToastContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+          <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+            <Routes>
+              <Route path="/" element={<SuccessPage />} />
+            </Routes>
+          </MemoryRouter>
+        </ToastContext.Provider>
+      </QueryClientProvider>
     );
 
     await waitFor(() => {
@@ -105,13 +116,15 @@ describe('SuccessPage', () => {
     });
 
     render(
-      <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
-        <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
-          <Routes>
-            <Route path="/" element={<SuccessPage />} />
-          </Routes>
-        </MemoryRouter>
-      </ToastContext.Provider>
+      <QueryClientProvider client={queryClient}>
+        <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
+          <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
+            <Routes>
+              <Route path="/" element={<SuccessPage />} />
+            </Routes>
+          </MemoryRouter>
+        </ToastContext.Provider>
+      </QueryClientProvider>
     );
 
     await waitFor(() => {

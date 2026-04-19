@@ -11,8 +11,10 @@
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.99.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.0.8",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^1.7.0",
     "pdfmake": "^0.2.10",
     "react": "^18.3.1",

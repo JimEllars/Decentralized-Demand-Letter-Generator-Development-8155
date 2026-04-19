@@ -59,13 +59,9 @@ describe('SSRF Protection in Worker Proxy', () => {
       headers: new Headers()
     });
 
-    await worker.fetch(request, mockEnv);
+    const response = await worker.fetch(request, mockEnv);
 
-    const fetchCall = globalThis.fetch.mock.calls[0];
-    const proxiedRequest = fetchCall.arguments[0];
-
-    // Should be correctly mapped to the trusted backend
-    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/attacker.com');
+    assert.strictEqual(response.status, 403);
   });
 
   it('should NOT be vulnerable to SSRF via protocol in pathname', async () => {
@@ -74,16 +70,13 @@ describe('SSRF Protection in Worker Proxy', () => {
       headers: new Headers()
     });
 
-    await worker.fetch(request, mockEnv);
+    const response = await worker.fetch(request, mockEnv);
 
-    const fetchCall = globalThis.fetch.mock.calls[0];
-    const proxiedRequest = fetchCall.arguments[0];
-
-    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/http://attacker.com');
+    assert.strictEqual(response.status, 403);
   });
 
   it('should preserve normal path structure', async () => {
-    const request = new Request('https://quickdemandletter.com/api/v1/test', {
+    const request = new Request('https://quickdemandletter.com/api/verify-session/123', {
       method: 'GET',
       headers: new Headers()
     });
@@ -93,6 +86,6 @@ describe('SSRF Protection in Worker Proxy', () => {
     const fetchCall = globalThis.fetch.mock.calls[0];
     const proxiedRequest = fetchCall.arguments[0];
 
-    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/v1/test');
+    assert.strictEqual(proxiedRequest.url, 'https://api.trusted-backend.com/verify-session/123');
   });
 });
