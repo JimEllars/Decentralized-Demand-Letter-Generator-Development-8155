@@ -3,11 +3,12 @@ import { FiUser, FiDollarSign, FiEdit3, FiPlus } from 'react-icons/fi';
 import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
-import { STATE_LEGAL_DETAILS } from '../utils/constants';
+import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calculatedValues }) => {
+  const { data: legalStatutes } = useLegalStatutes();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -237,16 +238,16 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             onChange={handleChange}
                             className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors"
                             >
-                            {Object.entries(STATE_LEGAL_DETAILS).map(([code, details]) => (
+                            {Object.entries(legalStatutes.details).map(([code, details]) => (
                                 <option key={code} value={code} className="bg-black text-white">
                                 {details.name} ({details.rate}%)
                                 </option>
                             ))}
                             </select>
-                            {formData.jurisdiction && STATE_LEGAL_DETAILS[formData.jurisdiction] && (
+                            {formData.jurisdiction && legalStatutes.details[formData.jurisdiction] && (
                             <p className="font-mono text-[0.65rem] tracking-widest text-zinc-400 mt-1 flex items-center gap-1 bg-black/40 p-1.5 rounded-sm border border-subtle">
                                 <SafeIcon name="FiInfo" className="text-axim-teal w-3 h-3" />
-                                Legal Basis: {STATE_LEGAL_DETAILS[formData.jurisdiction].statute}
+                                Legal Basis: {legalStatutes.details[formData.jurisdiction].statute}
                             </p>
                             )}
                         </div>
@@ -260,7 +261,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                                 id="statutoryInterest"
                                 type="number"
                                 name="statutoryInterest"
-                                placeholder={`Current Default: ${STATE_LEGAL_DETAILS[formData.jurisdiction]?.rate || 6}%`}
+                                placeholder={`Current Default: ${legalStatutes.details[formData.jurisdiction]?.rate || 6}%`}
                                 value={formData.statutoryInterest}
                                 onChange={handleChange}
                                 className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600 pr-8"
@@ -332,7 +333,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             <SafeIcon name="FiFileText" /> Live Draft Summary
                         </h3>
                         <p className="text-zinc-300 text-sm leading-relaxed font-mono">
-                            This letter will demand <strong className="text-axim-teal">${calculatedValues?.total?.toFixed(2) || "0.00"}</strong> from <strong className="text-white">{formData.debtorName || '[Debtor Name]'}</strong> for services related to <strong className="text-white">{(formData.items || []).map(i => i.description || '').filter(Boolean).join(', ') || '[Item Descriptions]'}</strong>. It will be drafted using a <strong className="text-axim-teal">{formData.tone}</strong> tone under the jurisdiction of <strong className="text-white">{STATE_LEGAL_DETAILS[formData.jurisdiction]?.name || 'the selected state'}</strong>.
+                            This letter will demand <strong className="text-axim-teal">${calculatedValues?.total?.toFixed(2) || "0.00"}</strong> from <strong className="text-white">{formData.debtorName || '[Debtor Name]'}</strong> for services related to <strong className="text-white">{(formData.items || []).map(i => i.description || '').filter(Boolean).join(', ') || '[Item Descriptions]'}</strong>. It will be drafted using a <strong className="text-axim-teal">{formData.tone}</strong> tone under the jurisdiction of <strong className="text-white">{legalStatutes.details[formData.jurisdiction]?.name || 'the selected state'}</strong>.
                         </p>
                     </div>
                 </FormSection>

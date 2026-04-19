@@ -60,7 +60,8 @@ export const generatePdfDefinition = (formData, calculatedValues, tone, options 
   const { formattedTotal, formattedInterest, rateUsed, statuteUsed } = calculatedValues;
   const items = Array.isArray(formData.items) ? formData.items : [];
 
-  const legalDisclosure = STATE_SPECIFIC_CLAUSES[formData.jurisdiction] || STATE_SPECIFIC_CLAUSES['DEFAULT'];
+  const clauses = options.legalStatutesClauses || STATE_SPECIFIC_CLAUSES;
+  const legalDisclosure = clauses[formData.jurisdiction] || clauses['DEFAULT'];
 
   const itemRows = items.map(i => [
     i.description || 'Item',

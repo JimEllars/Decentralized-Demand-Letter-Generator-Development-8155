@@ -10,6 +10,7 @@ import SafeIcon from '../common/SafeIcon';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
+import { useLegalStatutes } from '../hooks/useLegalStatutes';
 
 const DEFAULT_FORM_DATA = {
   creditorName: '',
@@ -31,9 +32,11 @@ const SuccessPage = () => {
   const { handleDownload, isGenerating } = usePdfGenerator();
   const toast = useToast();
   const { userSession } = useAuth();
+  const { data: legalStatutes } = useLegalStatutes();
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
   const hasVerified = useRef(false);
+  const [documentHash, setDocumentHash] = useState(null);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -79,15 +82,19 @@ const SuccessPage = () => {
             formData.statutoryInterest,
             formData.dueDate,
             formData.jurisdiction,
-            formData.letterDate
+              formData.letterDate,
+              legalStatutes.details
           );
           const toneTemplate = TONE_TEMPLATES[formData.tone];
 
           // Delay download slightly to ensure UI updates and is perceived as a smooth transition
-          setTimeout(() => {
+          setTimeout(async () => {
             if (isMounted) {
               try {
-                handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
+                const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
+                if (hash && isMounted) {
+                  setDocumentHash(hash);
+                }
               } catch (err) {
                 console.error("PDF generation error:", err);
                 toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
@@ -114,16 +121,20 @@ const SuccessPage = () => {
     };
   }, [isInitialized, searchParams, formData, handleDownload, toast]);
 
-  const handleDownloadAgain = () => {
+  const handleDownloadAgain = async () => {
     const calculatedValues = calculateTotal(
       formData.items,
       formData.statutoryInterest,
       formData.dueDate,
       formData.jurisdiction,
-      formData.letterDate
+      formData.letterDate,
+      legalStatutes.details
     );
     const toneTemplate = TONE_TEMPLATES[formData.tone];
-    handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true);
+    const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
+    if (hash) {
+      setDocumentHash(hash);
+    }
   };
 
   const handleCreateAnother = () => {
@@ -304,6 +315,23 @@ const SuccessPage = () => {
                 <SafeIcon icon={FiPlusCircle} />
                 Create Another Letter
               </button>
+
+              {/* Decentralized Proof of Generation Badge */}
+              {documentHash && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 bg-axim-teal/5 border border-axim-teal/20 p-4 rounded-lg flex flex-col items-center gap-2"
+                >
+                  <p className="text-axim-teal text-xs font-bold uppercase tracking-widest flex items-center gap-1">
+                    <SafeIcon icon={FiCheckCircle} /> Verified via AXiM Network
+                  </p>
+                  <p className="text-zinc-500 text-[10px] font-mono break-all text-center leading-tight">
+                    Document Hash (SHA-256):<br/>
+                    {documentHash}
+                  </p>
+                </motion.div>
+              )}
 
               {/* Quality Feedback Micro-Survey */}
               {feedbackState !== 'submitted' && (

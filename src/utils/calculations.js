@@ -11,7 +11,7 @@ import { formatCurrency } from './formatters.js';
  * - Simple interest calculation based on days overdue
  */
 
-export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null) => {
+export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction = 'DEFAULT', letterDate = null, legalStatutesDetails = STATE_LEGAL_DETAILS) => {
   // Ensure items is an array
   const safeItems = Array.isArray(items) ? items : [];
 
@@ -19,11 +19,11 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
   const principal = safeItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   
   // Resolve jurisdiction safely
-  const safeJurisdiction = (STATE_LEGAL_DETAILS && STATE_LEGAL_DETAILS[jurisdiction])
+  const safeJurisdiction = (legalStatutesDetails && legalStatutesDetails[jurisdiction])
     ? jurisdiction
     : 'DEFAULT';
 
-  const legalDetails = STATE_LEGAL_DETAILS[safeJurisdiction];
+  const legalDetails = legalStatutesDetails[safeJurisdiction] || legalStatutesDetails['DEFAULT'];
 
   // Check for custom rate override
   const customRate = parseFloat(interestRate);
