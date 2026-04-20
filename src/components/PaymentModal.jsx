@@ -10,9 +10,6 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
   // Note: Web3 and Partner Credit features are dormant.
   // We rely entirely on Stripe Checkout until revenue generation is solid.
   // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
-  if (import.meta?.env?.VITE_ENABLE_WEB3 === 'true') {
-    console.warn("Web3 features are dormant but VITE_ENABLE_WEB3 is set to true.");
-  }
 
   const handleConfirm = async () => {
     onConfirm(sendEmail ? email : null);

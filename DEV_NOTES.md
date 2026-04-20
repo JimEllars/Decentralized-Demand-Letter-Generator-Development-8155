@@ -34,3 +34,23 @@ When Web3 features are re-enabled, the following components and logic paths will
 ### Important Considerations
 
 Before fully reactivating Web3 features, ensure that the corresponding backend infrastructure (e.g., smart contracts, ledger APIs, vault storage) is deployed, secure, and properly integrated. The current `worker.js` proxy may need updates to whitelist new routes or handle different authorization mechanisms required by the Web3 services.
+
+## QA Process: State Handoff Verification
+
+To ensure that the user's data persists correctly across the Stripe checkout redirect boundary, QA should perform the following checks:
+
+1. **Email Handoff Check (Pre-redirect):**
+   - Fill out the demand letter generator completely.
+   - Click "Proceed to Checkout".
+   - In the `PaymentModal`, check the "Email me the PDF" box and enter a valid test email address.
+   - Open Developer Tools -> Application -> `sessionStorage`.
+   - Click "Pay with Card". Before the redirect to Stripe occurs, verify that the `axim_delivery_email` key is set in `sessionStorage` with the correct email address.
+
+2. **Email Delivery Check (Post-redirect):**
+   - Complete the Stripe checkout (or use a test card/mock depending on environment).
+   - Upon redirecting back to the `SuccessPage`, verify that the system automatically attempts to send the document to the entered email.
+   - Verify that the `axim_delivery_email` key is subsequently cleared from `sessionStorage` after the automatic email trigger completes.
+
+3. **Fallback Resiliency Check:**
+   - In `SuccessPage.jsx`, simulate a PDF generation failure (e.g., temporarily throw an error in `handleDownload`).
+   - Confirm that the "Generating PDF..." loading state forcefully clears (i.e. `isGenerating` becomes `false`), and a clear error toast appears, directing the user to use the email delivery option instead.

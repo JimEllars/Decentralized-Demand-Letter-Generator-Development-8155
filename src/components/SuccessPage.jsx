@@ -29,7 +29,7 @@ const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
-  const { handleDownload, isGenerating } = usePdfGenerator();
+  const { handleDownload, isGenerating, setIsGenerating } = usePdfGenerator();
   const toast = useToast();
   const { userSession } = useAuth();
   const { data: legalStatutes } = useLegalStatutes();
@@ -100,6 +100,7 @@ const SuccessPage = () => {
                 }
               } catch (err) {
                 console.error("PDF generation error:", err);
+                if (setIsGenerating) setIsGenerating(false);
                 toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
               }
             }
@@ -125,18 +126,24 @@ const SuccessPage = () => {
   }, [isInitialized, searchParams, formData, handleDownload, toast]);
 
   const handleDownloadAgain = async () => {
-    const calculatedValues = calculateTotal(
-      formData.items,
-      formData.statutoryInterest,
-      formData.dueDate,
-      formData.jurisdiction,
-      formData.letterDate,
-      legalStatutes.details
-    );
-    const toneTemplate = TONE_TEMPLATES[formData.tone];
-    const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
-    if (hash) {
-      setDocumentHash(hash);
+    try {
+      const calculatedValues = calculateTotal(
+        formData.items,
+        formData.statutoryInterest,
+        formData.dueDate,
+        formData.jurisdiction,
+        formData.letterDate,
+        legalStatutes.details
+      );
+      const toneTemplate = TONE_TEMPLATES[formData.tone];
+      const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
+      if (hash) {
+        setDocumentHash(hash);
+      }
+    } catch (err) {
+      console.error("Manual PDF generation error:", err);
+      if (setIsGenerating) setIsGenerating(false);
+      toast.error('Failed to generate PDF. Try the email delivery option instead.');
     }
   };
 

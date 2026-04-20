@@ -167,17 +167,11 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
-  const onPaymentConfirm = (email) => {
-    if (email) {
-      sessionStorage.setItem('axim_delivery_email', email);
+  const onPaymentConfirm = async (deliveryEmail) => {
+    if (deliveryEmail) {
+      sessionStorage.setItem('axim_delivery_email', deliveryEmail);
     } else {
-      sessionStorage.removeItem('axim_delivery_email');
-    }
-
-    // Note: Partner/Web3 logic is dormant, default to Stripe exclusively.
-    // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
-    if (import.meta.env && import.meta.env.VITE_ENABLE_WEB3 === 'true') {
-        console.warn("Web3 features are dormant but VITE_ENABLE_WEB3 is set to true.");
+      sessionStorage.removeItem('axim_delivery_email'); // Clean up stale data
     }
     handlePayment(isValid, onValidationFail);
   };

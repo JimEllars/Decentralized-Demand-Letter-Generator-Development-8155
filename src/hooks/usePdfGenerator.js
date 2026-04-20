@@ -129,5 +129,5 @@ export const usePdfGenerator = () => {
     }
   };
 
-  return { handleDownload, isGenerating };
+  return { handleDownload, isGenerating, setIsGenerating };
 };
