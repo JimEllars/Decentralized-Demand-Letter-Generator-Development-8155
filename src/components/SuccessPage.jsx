@@ -47,7 +47,10 @@ const SuccessPage = () => {
     const sessionId = searchParams.get('session_id');
 
     if (!sessionId) {
-      if (isMounted) setVerificationStatus('failed');
+      if (isMounted) {
+        toast.error('Invalid checkout session.');
+        setVerificationStatus('failed');
+      }
       return;
     }
 
