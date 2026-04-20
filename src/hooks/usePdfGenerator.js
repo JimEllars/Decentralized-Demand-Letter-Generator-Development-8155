@@ -105,6 +105,7 @@ export const usePdfGenerator = () => {
         // Note: Ledger stamp and secure-artifacts vault API logic have been disabled
         // as they rely on dormant Web3 / User Session functionality.
         // We are relying entirely on local generation and Stripe checkout.
+        // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
 
         // Trigger download
         const url = URL.createObjectURL(blob);

@@ -2,6 +2,9 @@
  * AXiM Payment Bridge
  * * To integrate a real provider:
  * 1. Set VITE_PAYMENT_API_URL in your .env file.
+ *
+ * Note: Web3 payment and partner credit features are dormant. This service exclusively handles Stripe checkout.
+ * To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
  */
 
 /**

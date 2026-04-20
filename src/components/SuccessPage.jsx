@@ -317,6 +317,7 @@ const SuccessPage = () => {
               </button>
 
               {/* Note: Decentralized Proof of Generation Badge was removed since Web3 features are dormant */}
+              {/* To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment. */}
 
               {/* Quality Feedback Micro-Survey */}
               {feedbackState !== 'submitted' && (
