@@ -13,7 +13,8 @@ export const sanitizeInput = (input) => {
   sanitized = sanitized.replace(/[<>{}|=]/g, '');
   // Replace excessive newlines
   sanitized = sanitized.replace(/\n{3,}/g, '\n\n');
-  return sanitized.trim();
+  // Trim leading whitespace but allow trailing whitespace for typing spaces between words
+  return sanitized.trimStart();
 };
 
 export const sanitizeFormData = (formData) => {
