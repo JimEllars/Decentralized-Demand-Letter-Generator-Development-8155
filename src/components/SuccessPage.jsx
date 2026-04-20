@@ -316,22 +316,7 @@ const SuccessPage = () => {
                 Create Another Letter
               </button>
 
-              {/* Decentralized Proof of Generation Badge */}
-              {documentHash && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 bg-axim-teal/5 border border-axim-teal/20 p-4 rounded-lg flex flex-col items-center gap-2"
-                >
-                  <p className="text-axim-teal text-xs font-bold uppercase tracking-widest flex items-center gap-1">
-                    <SafeIcon icon={FiCheckCircle} /> Verified via AXiM Network
-                  </p>
-                  <p className="text-zinc-500 text-[10px] font-mono break-all text-center leading-tight">
-                    Document Hash (SHA-256):<br/>
-                    {documentHash}
-                  </p>
-                </motion.div>
-              )}
+              {/* Note: Decentralized Proof of Generation Badge was removed since Web3 features are dormant */}
 
               {/* Quality Feedback Micro-Survey */}
               {feedbackState !== 'submitted' && (
