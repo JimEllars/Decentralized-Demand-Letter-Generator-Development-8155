@@ -143,7 +143,12 @@ const SuccessPage = () => {
     } catch (err) {
       console.error("Manual PDF generation error:", err);
       if (setIsGenerating) setIsGenerating(false);
-      toast.error('Failed to generate PDF. Try the email delivery option instead.');
+      if (err.status === 401 || err.status === 403 || err.message === 'Your secure session has expired.') {
+        clearAccessToken();
+        toast.error("Your secure session has expired. Please return to the dashboard.");
+      } else {
+        toast.error('Failed to generate PDF. Try the email delivery option instead.');
+      }
     }
   };
 

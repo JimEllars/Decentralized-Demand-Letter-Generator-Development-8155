@@ -1,5 +1,6 @@
-import { useState, useMemo, useDeferredValue } from 'react';
+import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import SafeIcon from '../common/SafeIcon';
 import Header from './Header';
 import Instructions from './Instructions';
@@ -46,6 +47,7 @@ const STEPS = [
 ];
 
 const DemandGenerator = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
   const { userSession } = useAuth();
@@ -65,10 +67,21 @@ const DemandGenerator = () => {
 
   const { handleDownload: triggerDownload, isGenerating } = usePdfGenerator();
 
+  useEffect(() => {
+    if (searchParams.get('canceled') === 'true') {
+      toast.info("Checkout was canceled. Your draft has been saved.");
+      setSearchParams(params => {
+        params.delete('canceled');
+        return params;
+      });
+    }
+  }, [searchParams, setSearchParams, toast]);
+
   const resetForm = () => {
     resetStore();
     resetPayment();
     setHasAttemptedSubmit(false);
+    sessionStorage.removeItem('axim_delivery_email');
     toast.success("Form reset successfully.");
   };
 
