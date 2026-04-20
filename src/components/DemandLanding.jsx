@@ -60,7 +60,7 @@ const FAQS = [
 ];
 
 const OPERATIONAL_STEPS = [
-  { num: '01', title: 'Upload Evidence', desc: 'Drop records directly into the encrypted, zero-retention vault.' },
+  { num: '01', title: 'Upload Evidence', desc: 'Securely attach your records for processing.' },
   { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
   { num: '03', title: 'State Formatting', desc: 'Automatically cross-references local jurisdictional requirements.' },
   { num: '04', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }

@@ -1,31 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiShield, FiCreditCard, FiLock, FiMail, FiZap } from 'react-icons/fi';
+import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
-import { useAuth } from '../hooks/useAuth';
 
 const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
   const [sendEmail, setSendEmail] = useState(false);
   const [email, setEmail] = useState('');
-  const { userSession } = useAuth();
 
-  const isPartner = userSession?.is_partner === true;
+  // Note: Web3 and Partner Credit features are dormant.
+  // We rely entirely on Stripe Checkout until revenue generation is solid.
 
   const handleConfirm = async () => {
-    if (isPartner) {
-      // Simulate RPC deduction and fast-track immediately
-      try {
-        fetch('https://api.axim.us.com/v1/partner/deduct-credit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            partnerId: userSession?.id,
-            action: 'document_generation'
-          })
-        }).catch(() => {});
-      } catch (e) {}
-    }
-    onConfirm(sendEmail ? email : null, isPartner);
+    onConfirm(sendEmail ? email : null);
   };
 
   return (
@@ -96,14 +82,10 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
             <button
               onClick={handleConfirm}
               disabled={isProcessing || (sendEmail && !email)}
-              className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none ${
-                isPartner ? 'bg-axim-teal border-axim-teal shadow-[0_0_15px_rgba(0,229,255,0.2)] hover:shadow-[0_20px_40px_-10px_rgba(0,229,255,0.5)]' : 'bg-axim-gold border-axim-gold'
-              }`}
+              className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
             >
               {isProcessing ? (
                 <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Processing...</>
-              ) : isPartner ? (
-                <><SafeIcon icon={FiZap} /> Generate with Partner Credit</>
               ) : (
                 <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
               )}

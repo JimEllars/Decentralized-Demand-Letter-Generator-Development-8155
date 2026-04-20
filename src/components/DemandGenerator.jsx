@@ -167,24 +167,15 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
-  const onPaymentConfirm = (email, isPartner) => {
+  const onPaymentConfirm = (email) => {
     if (email) {
       sessionStorage.setItem('axim_delivery_email', email);
     } else {
       sessionStorage.removeItem('axim_delivery_email');
     }
 
-    if (isPartner) {
-      // Simulate successful payment redirect for partners
-      const mockSessionId = 'AXM-PARTNER-' + Date.now();
-      localStorage.setItem('axim_demand_letter_paid_status', mockSessionId);
-      // We set the token so the PDF generator works
-      sessionStorage.setItem('axim_access_token', 'partner_token_' + Date.now());
-      sessionStorage.setItem('axim_token_expiry', Date.now() + 1000 * 60 * 60);
-      window.location.href = `/success?session_id=${mockSessionId}&paid=true`;
-    } else {
-      handlePayment(isValid, onValidationFail);
-    }
+    // Partner/Web3 logic removed, default to stripe exclusively
+    handlePayment(isValid, onValidationFail);
   };
   const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, legalStatutes.clauses);
 
@@ -200,13 +191,6 @@ const DemandGenerator = () => {
     <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
       <Header />
       <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8 relative z-10">
-        {userSession && userSession.health_index < 40 && (
-          <div className="bg-axim-teal/10 border border-axim-teal/30 text-axim-teal px-4 py-3 rounded-xl text-sm flex items-center justify-center gap-2 font-medium">
-            <SafeIcon name="FiInfo" />
-            Need assistance? Our legal support team is available to help you complete this draft.
-          </div>
-        )}
-
         <Instructions />
 
         {/* Stepper Progress Indicator */}

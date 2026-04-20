@@ -1,10 +1,8 @@
 export const useAuth = () => {
-    // Mock userSession to demonstrate Passport Integration UI
+    // Note: Partner credit, user vault, and Web3 features are currently dormant.
+    // Development priority is ensuring Stripe checkout functionality is robust
+    // and generating revenue before adding external authentication / token credits.
     return {
-        userSession: {
-            id: 'usr_mock_12345',
-            health_index: 35,
-            is_partner: true
-        }
+        userSession: null
     };
 };

@@ -102,50 +102,9 @@ export const usePdfGenerator = () => {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         generatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        try {
-          const stampResponse = await fetch('/api/ledger/stamp', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
-            },
-            body: JSON.stringify({
-              hash: generatedHash,
-              jurisdiction: safeJurisdiction
-            })
-          });
-
-          if (!stampResponse.ok) {
-            console.warn("Failed to stamp document to ledger", stampResponse.status);
-          }
-        } catch (stampErr) {
-          console.warn("Failed to reach ledger stamp endpoint", stampErr);
-        }
-
-        if (userSession) {
-          try {
-            const vaultFormData = new FormData();
-            vaultFormData.append('file', blob, `Demand_Letter_${safeJurisdiction}.pdf`);
-
-            const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
-              ? import.meta.env.VITE_PAYMENT_API_URL
-              : process.env.VITE_PAYMENT_API_URL;
-            const vaultUrl = paymentApiUrl ? `${paymentApiUrl}/v1/user/secure-artifacts` : '/api/v1/user/secure-artifacts';
-
-            const vaultResponse = await fetch(vaultUrl, {
-              method: 'POST',
-              headers: {
-                ...(accessToken && { 'Authorization': `Bearer ${accessToken}` })
-              },
-              body: vaultFormData
-            });
-            if (!vaultResponse.ok) {
-              console.warn("Failed to vault document", vaultResponse.status);
-            }
-          } catch (vaultErr) {
-            console.warn("Failed to reach secure-artifacts endpoint", vaultErr);
-          }
-        }
+        // Note: Ledger stamp and secure-artifacts vault API logic have been disabled
+        // as they rely on dormant Web3 / User Session functionality.
+        // We are relying entirely on local generation and Stripe checkout.
 
         // Trigger download
         const url = URL.createObjectURL(blob);
