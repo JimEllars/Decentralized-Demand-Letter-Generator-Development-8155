@@ -74,6 +74,12 @@ export const usePayment = () => {
       return;
     }
 
+    // Safety check to enforce Stripe checkout exclusively until Web3 is reactivated
+    const isWeb3Enabled = import.meta.env && import.meta.env.VITE_ENABLE_WEB3 === 'true';
+    if (isWeb3Enabled) {
+      console.warn('Web3 features are dormant. Ignoring web3 flow and proceeding with Stripe checkout.');
+    }
+
     setIsProcessing(true);
     let isRedirecting = false;
 

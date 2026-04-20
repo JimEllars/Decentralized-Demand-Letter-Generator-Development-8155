@@ -174,7 +174,11 @@ const DemandGenerator = () => {
       sessionStorage.removeItem('axim_delivery_email');
     }
 
-    // Partner/Web3 logic removed, default to stripe exclusively
+    // Note: Partner/Web3 logic is dormant, default to Stripe exclusively.
+    // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
+    if (import.meta.env && import.meta.env.VITE_ENABLE_WEB3 === 'true') {
+        console.warn("Web3 features are dormant but VITE_ENABLE_WEB3 is set to true.");
+    }
     handlePayment(isValid, onValidationFail);
   };
   const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, legalStatutes.clauses);

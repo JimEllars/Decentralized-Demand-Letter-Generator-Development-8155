@@ -7,6 +7,7 @@ const Header = () => {
   // Note: Web3 user session, partner features, and the document "Vault"
   // features are dormant. Strategy is to ensure Stripe checkout and
   // immediate revenue capture are working first.
+  // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
 
   return (
   <header className="max-w-7xl mx-auto px-4 py-8 relative z-10">
