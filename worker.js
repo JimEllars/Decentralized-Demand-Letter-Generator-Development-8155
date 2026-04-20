@@ -63,11 +63,7 @@ export default {
       }
 
       // Ensure the subpath is treated as a path, not a potential URL override
-      // We strip all leading slashes and then prepend './' to ensure it is
-      // interpreted as a relative path component.
-      const subPath = './' + url.pathname.replace(/^\/api/, '').replace(/^\/+/, '');
-
-      // Ensure backendUrl has a trailing slash for proper relative joining
+      const subPath = url.pathname.replace(/^\/api\//, '');
       const baseUrl = env.BACKEND_URL.endsWith('/') ? env.BACKEND_URL : `${env.BACKEND_URL}/`;
       const backendUrl = new URL(subPath, baseUrl);
       backendUrl.search = url.search;
@@ -83,8 +79,9 @@ export default {
             const body = await request.clone().json();
 
             // Inject the correct success and cancel URLs into the payload
-            body.success_url = 'https://quickdemandletter.com/success?session_id={CHECKOUT_SESSION_ID}';
-            body.cancel_url = 'https://quickdemandletter.com/app/demand-generator?canceled=true';
+            const clientOrigin = request.headers.get('Origin') || url.origin;
+            body.success_url = `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
+            body.cancel_url = `${clientOrigin}/app/demand-generator?canceled=true`;
 
             fetchOptions.body = JSON.stringify(body);
             // Ensure Content-Type is application/json after modifying the body
