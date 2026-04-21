@@ -149,7 +149,7 @@ const DemandGenerator = () => {
     if (isCurrentStepValid && currentStep < 3) {
       // Telemetry: Log step completion
       try {
-        fetch('https://api.axim.us.com/v1/telemetry/ingest', {
+        fetch('/api/v1/telemetry/ingest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

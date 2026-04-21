@@ -67,7 +67,7 @@ const SuccessPage = () => {
           // Sync Document History (Passport Write)
           if (userSession?.id) {
             try {
-              fetch('https://api.axim.us.com/v1/user/document-history', {
+              fetch('/api/v1/user/document-history', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -176,7 +176,7 @@ const SuccessPage = () => {
     const sessionId = searchParams.get('session_id');
 
     try {
-      await fetch('https://api.axim.us.com/v1/telemetry/feedback', {
+      await fetch('/api/v1/telemetry/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

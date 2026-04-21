@@ -12,7 +12,10 @@ export default {
         '/api/send-email',
         '/api/v1/legal-statutes',
         '/api/v1/user/drafts',
-        '/api/v1/user/secure-artifacts'
+        '/api/v1/user/secure-artifacts',
+        '/api/v1/telemetry/ingest',
+        '/api/v1/telemetry/feedback',
+        '/api/v1/user/document-history'
       ];
 
       const isAllowed = allowedRoutes.some(route => url.pathname.startsWith(route));
