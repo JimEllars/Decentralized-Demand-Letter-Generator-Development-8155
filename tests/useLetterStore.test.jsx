@@ -25,14 +25,14 @@ class LocalStorageMock {
 }
 
 describe('useLetterStore', () => {
-  let localStorageMock;
+  let sessionStorage;
 
   beforeEach(() => {
-    localStorageMock = new LocalStorageMock();
+    sessionStorage = new LocalStorageMock();
 
     if (globalThis.window) {
       Object.defineProperty(globalThis.window, 'localStorage', {
-        value: localStorageMock,
+        value: sessionStorage,
         writable: true,
         configurable: true
       });
@@ -44,7 +44,7 @@ describe('useLetterStore', () => {
     }
 
     Object.defineProperty(globalThis, 'localStorage', {
-      value: localStorageMock,
+      value: sessionStorage,
       writable: true,
       configurable: true
     });
@@ -53,7 +53,7 @@ describe('useLetterStore', () => {
   afterEach(() => {
     cleanup();
     mock.restoreAll();
-    localStorageMock.clear();
+    sessionStorage.clear();
   });
 
   it('initializes with initialData if storage is empty', () => {
@@ -70,7 +70,8 @@ describe('useLetterStore', () => {
   });
 
   it('initializes gracefully when storage contains invalid JSON', () => {
-    localStorageMock.setItem('axim_demand_letter_draft', '{invalid_json}');
+    const encrypt = (text) => btoa(encodeURIComponent(text));
+    sessionStorage.setItem('axim_demand_letter_draft', encrypt('{invalid_json}'));
 
     const { result, unmount } = renderHook(() => useLetterStore({ test2: 'fallback' }), { wrapper });
 
@@ -86,7 +87,8 @@ describe('useLetterStore', () => {
 
   it('initializes from valid JSON in storage', () => {
     const validData = { state: { formData: { test3: 'saved_value', items: [] }, currentStep: 2 }, version: 0 };
-    localStorageMock.setItem('axim_demand_letter_draft', JSON.stringify(validData));
+    const encrypt = (text) => btoa(encodeURIComponent(text));
+    sessionStorage.setItem('axim_demand_letter_draft', encrypt(JSON.stringify(validData)));
 
     const { result, unmount } = renderHook(() => useLetterStore({ test3: 'fallback' }), { wrapper });
 

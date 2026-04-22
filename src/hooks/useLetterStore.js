@@ -6,8 +6,22 @@ import { useToast } from '../contexts/ToastContext';
 import { useAuth } from './useAuth';
 import debounce from 'lodash.debounce';
 import { getValidAccessToken } from '../services/paymentService';
+import { encrypt, decrypt } from '../utils/crypto';
 
 const STORAGE_KEY = 'axim_demand_letter_draft';
+
+const secureStorage = {
+  getItem: (name) => {
+    const str = sessionStorage.getItem(name);
+    if (!str) return null;
+    try { return JSON.parse(decrypt(str)); } catch(e) { return null; }
+  },
+  setItem: (name, value) => {
+    sessionStorage.setItem(name, encrypt(JSON.stringify(value)));
+  },
+  removeItem: (name) => sessionStorage.removeItem(name),
+};
+
 
 // Factory function to create the Zustand store with initial data
 const createStore = (initialDataOrFn) => {
@@ -42,12 +56,12 @@ const createStore = (initialDataOrFn) => {
         resetForm: () => {
             set({ formData: getInitialState(), currentStep: 1 });
             // Since we're re-assigning formData, force clear storage to avoid stale data during reload
-            localStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(STORAGE_KEY);
         }
       }),
       {
         name: STORAGE_KEY,
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => secureStorage),
         partialize: (state) => ({
           formData: state.formData,
           currentStep: state.currentStep
