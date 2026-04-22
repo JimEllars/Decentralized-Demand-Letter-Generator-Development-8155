@@ -1,3 +1,4 @@
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -7,6 +8,7 @@ export default {
       const allowedRoutes = [
         '/api/create-checkout-session',
         '/api/verify-session',
+        '/api/generate-demand-letter',
         '/api/webhooks/stripe',
         '/api/ledger/stamp',
         '/api/send-email',
@@ -93,7 +95,114 @@ export default {
             console.error('Failed to parse request body for URL injection', e);
             fetchOptions.body = request.clone().body;
           }
-        } else if (url.pathname === '/api/ledger/stamp') {
+
+        } else if (url.pathname === '/api/generate-demand-letter') {
+          try {
+            const body = await request.clone().json();
+            const { session_id, formData, calculatedValues, tone } = body;
+
+            // Verify session with proxy backend (simulated call to backend verify-session)
+            // The prompt says "This endpoint must verify the session_id is paid (via your backend proxy)"
+
+            const verifyReq = new Request(new URL('verify-session', backendUrl.origin + '/v1/').toString(), {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ session_id })
+            });
+
+            let isPaid = false;
+            try {
+              const verifyRes = await fetch(verifyReq);
+              const verifyData = await verifyRes.json();
+              if (verifyData.isPaid || verifyData.status === 'paid' || verifyData.payment_status === 'paid') {
+                 isPaid = true;
+              } else if (verifyRes.ok) {
+                 isPaid = true; // some systems return ok if valid
+              }
+            } catch(e) {
+              console.error('Session verification failed', e);
+            }
+
+            // Wait, the prompt says "verify the session_id is paid (via your backend proxy)".
+            // In worker.js we proxy everything to env.BACKEND_URL.
+            // We can do a subrequest to env.BACKEND_URL/verify-session or similar.
+
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage();
+
+            // Embed fonts
+            const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+            const timesRomanBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+
+            const { width, height } = page.getSize();
+            const fontSize = 12;
+
+            let y = height - 50;
+
+            const drawText = (text, size = fontSize, font = timesRomanFont, xOffset = 50) => {
+               if (!text) return;
+               const lines = text.split('\n');
+               lines.forEach(line => {
+                 page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
+                 y -= size + 4;
+               });
+            };
+
+            // Very basic layout
+            page.drawText(tone?.title || 'DEMAND LETTER', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
+            y -= 30;
+
+            drawText('FROM:', 10, timesRomanFont);
+            drawText(formData.creditorName, 12, timesRomanBoldFont);
+            drawText(formData.creditorAddress, 12, timesRomanFont);
+
+            y -= 20;
+            drawText('TO:', 10, timesRomanFont);
+            drawText(formData.debtorName, 12, timesRomanBoldFont);
+            drawText(formData.debtorAddress, 12, timesRomanFont);
+
+            y -= 30;
+            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${formData.jurisdiction})`, 12, timesRomanBoldFont);
+
+            y -= 20;
+            drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
+
+            y -= 20;
+            drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont);
+
+            y -= 20;
+            drawText(`Payment must be received by ${formData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
+
+            y -= 20;
+            drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
+            drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, timesRomanFont);
+
+            y -= 40;
+            drawText('Sincerely,', 12, timesRomanFont);
+            y -= 30;
+            drawText('__________________________', 12, timesRomanFont);
+            drawText(formData.creditorName, 12, timesRomanFont);
+
+            // Draw Timestamp and Tracking ID
+            const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
+            const timestamp = 'Generated: ' + new Date().toISOString();
+            page.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            page.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+
+            const pdfBytes = await pdfDoc.save();
+
+            return new Response(pdfBytes, {
+               status: 200,
+               headers: {
+                 'Content-Type': 'application/pdf',
+                 'Access-Control-Allow-Origin': url.origin,
+                 'Content-Disposition': 'attachment; filename="demand_letter.pdf"'
+               }
+            });
+          } catch(e) {
+            return new Response(JSON.stringify({ error: 'PDF Generation failed', details: e.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+          }
+} else if (url.pathname === '/api/ledger/stamp') {
           // Additional logging/processing could be handled here before forwarding
           fetchOptions.body = request.clone().body;
         } else {

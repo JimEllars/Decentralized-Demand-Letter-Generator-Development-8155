@@ -10,7 +10,6 @@ import UpsellCard from './UpsellCard';
 import PaymentModal from './PaymentModal';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
-import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../hooks/useAuth';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
@@ -65,7 +64,49 @@ const DemandGenerator = () => {
     resetPayment
   } = usePayment();
 
-  const { handleDownload: triggerDownload, isGenerating } = usePdfGenerator();
+
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const triggerDownload = async (isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, clauses) => {
+    if (!isValid) {
+      onValidationFail();
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-demand-letter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          session_id: isPaid ? 'preview' : null,
+          formData,
+          calculatedValues,
+          tone: toneTemplate
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to generate preview PDF');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'demand_letter_preview.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch(e) {
+      console.error(e);
+      // fallback or toast error
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
 
   useEffect(() => {
     if (searchParams.get('canceled') === 'true') {

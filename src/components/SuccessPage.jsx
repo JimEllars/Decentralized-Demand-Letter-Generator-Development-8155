@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
-import { usePdfGenerator } from '../hooks/usePdfGenerator';
 import { verifyPaymentSession, clearAccessToken, getValidAccessToken, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
@@ -29,7 +28,44 @@ const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
-  const { handleDownload, isGenerating, setIsGenerating } = usePdfGenerator();
+
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleDownload = async (isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, clauses, overrideSessionId) => {
+     setIsGenerating(true);
+     try {
+       const response = await fetch('/api/generate-demand-letter', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+           session_id: overrideSessionId || sessionId,
+           formData,
+           calculatedValues,
+           tone: toneTemplate
+         })
+       });
+
+       if (!response.ok) throw new Error('Failed to generate PDF');
+
+       const blob = await response.blob();
+       const url = window.URL.createObjectURL(blob);
+       const a = document.createElement('a');
+       a.style.display = 'none';
+       a.href = url;
+       a.download = 'demand_letter_final.pdf';
+       document.body.appendChild(a);
+       a.click();
+       window.URL.revokeObjectURL(url);
+     } catch (err) {
+       console.error("PDF download failed", err);
+       toast.error("Failed to generate PDF. Please try again.");
+     } finally {
+       setIsGenerating(false);
+     }
+  };
+
   const toast = useToast();
   const { userSession } = useAuth();
   const { data: legalStatutes } = useLegalStatutes();

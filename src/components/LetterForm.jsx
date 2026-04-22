@@ -328,13 +328,29 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                     </div>
 
                     {/* Live Draft Pane */}
-                    <div className="mt-8 bg-black/60 p-5 rounded-sm border border-subtle">
-                        <h3 className="font-inter font-semibold text-xs tracking-wider text-axim-gold uppercase mb-3 flex items-center gap-2">
-                            <SafeIcon name="FiFileText" /> Live Draft Summary
-                        </h3>
-                        <p className="text-zinc-300 text-sm leading-relaxed font-mono">
-                            This letter will demand <strong className="text-axim-teal">${calculatedValues?.total?.toFixed(2) || "0.00"}</strong> from <strong className="text-white">{formData.debtorName || '[Debtor Name]'}</strong> for services related to <strong className="text-white">{(formData.items || []).map(i => i.description || '').filter(Boolean).join(', ') || '[Item Descriptions]'}</strong>. It will be drafted using a <strong className="text-axim-teal">{formData.tone}</strong> tone under the jurisdiction of <strong className="text-white">{legalStatutes.details[formData.jurisdiction]?.name || 'the selected state'}</strong>.
-                        </p>
+                    <div className="mt-8 bg-black/60 p-5 rounded-sm border border-subtle relative select-none user-select-none overflow-hidden">
+
+      {/* Hardened CSS Watermark */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none flex flex-wrap justify-center items-center opacity-[0.08] mix-blend-multiply">
+        {Array.from({ length: 40 }).map((_, i) => (
+          <div
+            key={i}
+            className="text-white font-bold text-xl whitespace-nowrap p-4"
+            style={{ transform: `rotate(${(i * 17) % 360}deg)` }}
+          >
+            SAMPLE DRAFT - NOT FOR EXECUTION
+          </div>
+        ))}
+      </div>
+
+                        <div className="relative z-10 select-none user-select-none">
+                            <h3 className="font-inter font-semibold text-xs tracking-wider text-axim-gold uppercase mb-3 flex items-center gap-2">
+                                <SafeIcon name="FiFileText" /> Live Draft Summary
+                            </h3>
+                            <p className="text-zinc-300 text-sm leading-relaxed font-mono">
+                                This letter will demand <strong className="text-axim-teal">${calculatedValues?.total?.toFixed(2) || "0.00"}</strong> from <strong className="text-white">{formData.debtorName || '[Debtor Name]'}</strong> for services related to <strong className="text-white">{(formData.items || []).map(i => i.description || '').filter(Boolean).join(', ') || '[Item Descriptions]'}</strong>. It will be drafted using a <strong className="text-axim-teal">{formData.tone}</strong> tone under the jurisdiction of <strong className="text-white">{legalStatutes.details[formData.jurisdiction]?.name || 'the selected state'}</strong>.
+                            </p>
+                        </div>
                     </div>
                 </FormSection>
             </motion.div>
