@@ -97,6 +97,7 @@ export const usePayment = () => {
         // A direct redirect to a payment provider is happening.
         window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'begin_checkout', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
         isRedirecting = true;
+        window.location.href = result.url;
         return;
       }
 
