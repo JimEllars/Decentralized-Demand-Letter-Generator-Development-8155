@@ -112,8 +112,7 @@ const DemandLanding = () => {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 uppercase"
           >
-            Stop Drafting. <br/>
-            <span className="text-axim-gold drop-shadow-[0_0_15px_rgba(255,234,0,0.3)]">Start Settling.</span>
+            Recover Your Revenue Instantly.
           </motion.h1>
 
           <motion.p

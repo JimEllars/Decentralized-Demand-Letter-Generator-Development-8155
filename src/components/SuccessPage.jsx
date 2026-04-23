@@ -40,7 +40,7 @@ const SuccessPage = () => {
            'Content-Type': 'application/json'
          },
          body: JSON.stringify({
-           session_id: overrideSessionId || sessionId,
+           session_id: overrideSessionId || searchParams.get('session_id'),
            formData,
            calculatedValues,
            tone: toneTemplate
@@ -112,7 +112,9 @@ const SuccessPage = () => {
                   timestamp: new Date().toISOString()
                 })
               }).catch(() => {}); // Fire and forget
-            } catch (e) {}
+            } catch (e) {
+              console.error('History sync failed', e);
+            }
           }
 
           // Trigger download automatically

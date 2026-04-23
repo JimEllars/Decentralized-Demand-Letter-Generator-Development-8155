@@ -139,14 +139,47 @@ export default {
 
             let y = height - 50;
 
-            const drawText = (text, size = fontSize, font = timesRomanFont, xOffset = 50) => {
+            const wrapText = (text, maxWidth, font, fontSize) => {
+              const words = text.split(' ');
+              let lines = [];
+              let currentLine = '';
+
+              for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+                if (textWidth > maxWidth && currentLine) {
+                  lines.push(currentLine);
+                  currentLine = word;
+                } else {
+                  currentLine = testLine;
+                }
+              }
+              if (currentLine) {
+                lines.push(currentLine);
+              }
+              return lines;
+            };
+
+            const drawText = (text, size = fontSize, font = timesRomanFont, xOffset = 50, maxWidth = width - 100) => {
                if (!text) return;
-               const lines = text.split('\n');
-               lines.forEach(line => {
-                 page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
-                 y -= size + 4;
+               const rawLines = text.split('\n');
+               rawLines.forEach(rawLine => {
+                 if (rawLine.trim() === '') {
+                   y -= size + 4;
+                   return;
+                 }
+                 const wrappedLines = wrapText(rawLine, maxWidth, font, size);
+                 wrappedLines.forEach(line => {
+                   page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
+                   y -= size + 4;
+                 });
+                 y -= 4; // Add a bit of space after paragraph
                });
             };
+
+            // Header Polish
+            drawText('Sent via Certified Mail: [ Tracking Number ]', 10, timesRomanBoldFont);
+            y -= 10;
 
             // Very basic layout
             page.drawText(tone?.title || 'DEMAND LETTER', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
@@ -167,7 +200,18 @@ export default {
             y -= 20;
             drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
 
-            y -= 20;
+            // Itemized Ledger
+            y -= 10;
+            drawText('ITEMIZED DEBTS:', 12, timesRomanBoldFont);
+            if (formData.items && formData.items.length > 0) {
+              formData.items.forEach(item => {
+                const itemDateStr = item.date ? ` (${item.date})` : '';
+                const amountStr = item.amount ? `${parseFloat(item.amount).toFixed(2)}` : '$0.00';
+                drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
+              });
+            }
+            y -= 10;
+
             drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont);
 
             y -= 20;

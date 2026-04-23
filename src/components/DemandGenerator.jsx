@@ -220,8 +220,18 @@ const DemandGenerator = () => {
     toast.error("Please complete all required fields (marked in red).");
   };
 
-  const onCheckoutClick = () => handleProceedToCheckout(isValid, onValidationFail);
+  const onCheckoutClick = () => {
+    if (!isValid || !formData.creditorName || !formData.debtorName || !formData.jurisdiction || !formData.items || formData.items.length === 0) {
+      setHasAttemptedSubmit(true);
+      onValidationFail();
+      return;
+    }
+    handleProceedToCheckout(true, onValidationFail);
+  };
   const onPaymentConfirm = async (deliveryEmail) => {
+    // Fortify state before redirect
+    sessionStorage.setItem('axim_demand_draft', JSON.stringify(formData));
+    sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
     if (deliveryEmail) {
       sessionStorage.setItem('axim_delivery_email', deliveryEmail);
     } else {
