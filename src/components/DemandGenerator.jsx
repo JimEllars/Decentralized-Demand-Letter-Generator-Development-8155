@@ -11,7 +11,6 @@ import PaymentModal from './PaymentModal';
 import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
 import { useToast } from '../contexts/ToastContext';
-import { useAuth } from '../hooks/useAuth';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
@@ -49,7 +48,6 @@ const DemandGenerator = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
-  const { userSession } = useAuth();
   const { data: legalStatutes } = useLegalStatutes();
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
@@ -75,7 +73,7 @@ const DemandGenerator = () => {
 
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/generate-demand-letter', {
+      const response = await fetch(isPaid ? '/api/generate-demand-letter' : '/api/generate-preview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -221,6 +219,7 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => {
+    fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_checkout_initiated" }) }).catch(() => {});
     if (!isValid || !formData.creditorName || !formData.debtorName || !formData.jurisdiction || !formData.items || formData.items.length === 0) {
       setHasAttemptedSubmit(true);
       onValidationFail();

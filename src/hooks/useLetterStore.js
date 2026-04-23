@@ -3,23 +3,22 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { sanitizeInput } from '../utils/validation';
 import { useToast } from '../contexts/ToastContext';
-import { useAuth } from './useAuth';
 import debounce from 'lodash.debounce';
-import { getValidAccessToken } from '../services/paymentService';
 import { encrypt, decrypt } from '../utils/crypto';
 
 const STORAGE_KEY = 'axim_demand_letter_draft';
 
+// Update to use localStorage instead of sessionStorage
 const secureStorage = {
   getItem: (name) => {
-    const str = sessionStorage.getItem(name);
+    const str = localStorage.getItem(name);
     if (!str) return null;
     try { return JSON.parse(decrypt(str)); } catch(e) { return null; }
   },
   setItem: (name, value) => {
-    sessionStorage.setItem(name, encrypt(JSON.stringify(value)));
+    localStorage.setItem(name, encrypt(JSON.stringify(value)));
   },
-  removeItem: (name) => sessionStorage.removeItem(name),
+  removeItem: (name) => localStorage.removeItem(name),
 };
 
 
@@ -56,7 +55,7 @@ const createStore = (initialDataOrFn) => {
         resetForm: () => {
             set({ formData: getInitialState(), currentStep: 1 });
             // Since we're re-assigning formData, force clear storage to avoid stale data during reload
-            sessionStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(STORAGE_KEY);
         }
       }),
       {
@@ -83,7 +82,6 @@ const storeCache = new Map();
 export const useLetterStore = (initialDataOrFn) => {
   const toast = useToast();
   const hasToastFired = useRef(false);
-  const { userSession } = useAuth();
 
   // We use a cached store to avoid creating a new store instance on every render
   let useBoundStore = storeCache.get(STORAGE_KEY);
@@ -93,39 +91,6 @@ export const useLetterStore = (initialDataOrFn) => {
   }
 
   const store = useBoundStore();
-
-  const syncDraft = useCallback(
-    debounce(async (data) => {
-      if (userSession) {
-        try {
-          const token = getValidAccessToken();
-          const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
-            ? import.meta.env.VITE_PAYMENT_API_URL
-            : process.env.VITE_PAYMENT_API_URL;
-
-          const fetchUrl = paymentApiUrl ? `${paymentApiUrl}/v1/user/drafts` : '/api/v1/user/drafts';
-
-          await fetch(fetchUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token && { 'Authorization': `Bearer ${token}` })
-            },
-            body: JSON.stringify({ draftData: data })
-          });
-        } catch (error) {
-          console.warn('Failed to sync draft to server', error);
-        }
-      }
-    }, 1000),
-    [userSession]
-  );
-
-  useEffect(() => {
-    if (store.formData) {
-      syncDraft(store.formData);
-    }
-  }, [store.formData, syncDraft]);
 
   useEffect(() => {
     // If the store hydrated and we found saved data other than the initial data

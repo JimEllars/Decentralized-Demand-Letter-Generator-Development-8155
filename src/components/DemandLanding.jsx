@@ -131,6 +131,7 @@ const DemandLanding = () => {
             className="flex flex-col items-center w-full sm:w-auto"
           >
             <Link
+              onClick={() => { fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {}); }}
               to="/app/demand-generator"
               className="w-full sm:w-auto px-10 py-5 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group"
             >
@@ -434,6 +435,7 @@ const DemandLanding = () => {
           </h2>
 
           <Link
+            onClick={() => { fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {}); }}
             to="/app/demand-generator"
             className="w-full sm:w-auto px-12 py-6 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_40px_rgba(255,234,0,0.5)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group mx-auto"
           >
