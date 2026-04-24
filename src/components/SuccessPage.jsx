@@ -99,7 +99,7 @@ const SuccessPage = () => {
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           // Sync Document History (Passport Write)
-          if (userSession?.id) {
+          if (false?.id) {
             try {
               fetch('/api/v1/user/document-history', {
                 method: 'POST',
