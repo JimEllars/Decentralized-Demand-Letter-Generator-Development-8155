@@ -86,7 +86,7 @@ export default {
             // Inject the correct success and cancel URLs into the payload
             const clientOrigin = request.headers.get('Origin') || url.origin;
             body.success_url = `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
-            body.cancel_url = `${clientOrigin}/app/demand-generator?canceled=true`;
+            body.cancel_url = `${clientOrigin}/start?canceled=true`;
 
             fetchOptions.body = JSON.stringify(body);
             // Ensure Content-Type is application/json after modifying the body

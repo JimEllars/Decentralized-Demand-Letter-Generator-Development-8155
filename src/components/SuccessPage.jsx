@@ -73,7 +73,6 @@ const SuccessPage = () => {
   const [documentHash, setDocumentHash] = useState(null);
 
   useEffect(() => {
-    if (!isInitialized) return;
     if (hasVerified.current) return;
     hasVerified.current = true;
 
@@ -81,10 +80,7 @@ const SuccessPage = () => {
     const sessionId = searchParams.get('session_id');
 
     if (!sessionId) {
-      if (isMounted) {
-        toast.error('Invalid checkout session.');
-        setVerificationStatus('failed');
-      }
+      navigate('/start');
       return;
     }
 
