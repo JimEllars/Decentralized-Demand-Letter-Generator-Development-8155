@@ -187,7 +187,7 @@ const SuccessPage = () => {
     resetForm();
     localStorage.removeItem('axim_demand_letter_paid_status');
     sessionStorage.removeItem('axim_delivery_email');
-    navigate('/app/demand-generator');
+    navigate('/#/start');
   };
 
   const [email, setEmail] = useState(() => sessionStorage.getItem('axim_delivery_email') || '');
@@ -289,7 +289,7 @@ const SuccessPage = () => {
             <h2 className="text-xl font-bold tracking-tight text-red-500">Verification Failed</h2>
             <p className="text-zinc-400 mt-2 text-sm mb-8">We could not verify your payment session.</p>
             <button
-              onClick={() => navigate('/start')}
+              onClick={() => navigate('/#/start')}
               className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg font-medium w-full"
             >
               Return Home

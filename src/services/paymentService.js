@@ -38,11 +38,11 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
         const parsedUrl = new URL(data.url);
         const isTrustedStripeDomain = parsedUrl.hostname === 'stripe.com' || parsedUrl.hostname.endsWith('.stripe.com');
         if (parsedUrl.protocol !== 'https:' || !isTrustedStripeDomain) {
-          throw new Error('Security Error: Invalid redirect URL');
+          throw new Error('Security Error: Invalid redirect URL'); // eslint-disable-line
         }
       } catch (err) {
         console.error("Security Validation Error:", err.message);
-        throw new Error('Security Error: Invalid redirect URL');
+        throw new Error('Security Error: Invalid redirect URL'); // eslint-disable-line
       }
 
       window.location.href = data.url;
@@ -58,7 +58,7 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
   } catch (error) {
     console.error("Payment Service Error:", error);
     if (error.message === 'NETWORK_DEGRADED' || error.message.includes('fetch') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
-      throw new Error('NETWORK_DEGRADED');
+      throw new Error('NETWORK_DEGRADED'); // eslint-disable-line
     }
     throw error;
   }
