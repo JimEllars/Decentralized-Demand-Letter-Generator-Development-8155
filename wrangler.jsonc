@@ -7,7 +7,7 @@
   },
   "main": "worker.js",
   "assets": {
-    "directory": "./dist",
+    "directory": "./dist/client",
     "binding": "ASSETS"
   },
   "compatibility_flags": [
