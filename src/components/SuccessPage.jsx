@@ -1,14 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
-import { verifyPaymentSession, clearAccessToken, getValidAccessToken, deliverOrchestratedDocument } from '../services/paymentService';
+import { verifyPaymentSession, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
-import { useAuth } from '../hooks/useAuth';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 
 const DEFAULT_FORM_DATA = {
@@ -67,7 +66,6 @@ const SuccessPage = () => {
   };
 
   const toast = useToast();
-  const { userSession } = useAuth();
   const { data: legalStatutes } = useLegalStatutes();
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
@@ -101,7 +99,7 @@ const SuccessPage = () => {
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           // Sync Document History (Passport Write)
-          if (userSession?.id) {
+          if (false?.id) {
             try {
               fetch('/api/v1/user/document-history', {
                 method: 'POST',
@@ -181,12 +179,7 @@ const SuccessPage = () => {
     } catch (err) {
       console.error("Manual PDF generation error:", err);
       if (setIsGenerating) setIsGenerating(false);
-      if (err.status === 401 || err.status === 403 || err.message === 'Your secure session has expired.') {
-        clearAccessToken();
-        toast.error("Your secure session has expired. Please return to the dashboard.");
-      } else {
-        toast.error('Failed to generate PDF. Try the email delivery option instead.');
-      }
+      toast.error('Failed to generate PDF. Try the email delivery option instead.');
     }
   };
 
@@ -194,7 +187,6 @@ const SuccessPage = () => {
     resetForm();
     localStorage.removeItem('axim_demand_letter_paid_status');
     sessionStorage.removeItem('axim_delivery_email');
-    clearAccessToken();
     navigate('/app/demand-generator');
   };
 
@@ -241,9 +233,6 @@ const SuccessPage = () => {
           sessionStorage.removeItem('axim_delivery_email');
         } catch (err) {
           console.error('Auto-send error:', err);
-          if (err.message === 'Your secure session has expired.') {
-            toast.error('Your secure session has expired. Please download your document directly using the button above.');
-          }
         } finally {
           setIsSendingEmail(false);
         }
@@ -265,11 +254,7 @@ const SuccessPage = () => {
       toast.success(`Document sent to ${email}`);
       setEmail('');
     } catch (err) {
-      if (err.message === 'Your secure session has expired.') {
-        toast.error('Your secure session has expired. Please download your document directly using the button above.');
-      } else {
-        toast.error('Failed to send email. Please try again.');
-      }
+      toast.error('Failed to send email. Please try again.');
       console.error('Email send error:', err);
     } finally {
       setIsSendingEmail(false);

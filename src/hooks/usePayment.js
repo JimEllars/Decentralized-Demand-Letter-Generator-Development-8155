@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
-import { processPayment, verifyPaymentSession, getValidAccessToken, clearAccessToken } from '../services/paymentService';
+import { processPayment, verifyPaymentSession } from '../services/paymentService';
 
 export const usePayment = () => {
   const [isPaid, setIsPaid] = useState(false);
@@ -15,20 +15,16 @@ export const usePayment = () => {
       setIsProcessing(true);
       try {
         const data = await verifyPaymentSession(sessionId);
-        if (data.isPaid && data.accessToken) {
+        if (data.isPaid) {
           setIsPaid(true);
           if (isFromRedirect) {
             toast.success("Payment verified! You can now download your document.");
           }
-        } else {
-          // Clean up invalid session
-          clearAccessToken();
         }
       } catch (err) {
         if (isFromRedirect) {
           toast.error("Payment verification failed.");
         }
-        clearAccessToken();
       } finally {
         setIsProcessing(false);
         if (isFromRedirect) {
@@ -40,13 +36,9 @@ export const usePayment = () => {
     // Check for payment parameters from Stripe redirect
     const query = new URLSearchParams(window.location.search);
     const urlSessionId = query.get('session_id');
-    const hasValidToken = !!getValidAccessToken();
 
     if (urlSessionId) {
       verifySession(urlSessionId, true);
-    } else if (hasValidToken) {
-      // If we have a valid token, we're paid
-      setIsPaid(true);
     } else if (query.get('canceled') === 'true') {
       toast.error("Payment was canceled.");
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -54,7 +46,6 @@ export const usePayment = () => {
   }, [toast]);
 
   const resetPayment = () => {
-    clearAccessToken();
     setIsPaid(false);
   };
 

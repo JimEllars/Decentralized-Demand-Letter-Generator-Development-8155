@@ -96,7 +96,143 @@ export default {
             fetchOptions.body = request.clone().body;
           }
 
-        } else if (url.pathname === '/api/generate-demand-letter') {
+
+        } else if (url.pathname === '/api/generate-preview') {
+          try {
+            const body = await request.clone().json();
+            const { session_id, formData, calculatedValues, tone } = body;
+
+            // Generate Watermarked Preview
+
+            const pdfDoc = await PDFDocument.create();
+            const page = pdfDoc.addPage();
+
+            const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+            const timesRomanBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+
+            const { width, height } = page.getSize();
+            const fontSize = 12;
+
+            let y = height - 50;
+
+            const wrapText = (text, maxWidth, font, fontSize) => {
+              const words = text.split(' ');
+              let lines = [];
+              let currentLine = '';
+
+              for (const word of words) {
+                const testLine = currentLine ? `${currentLine} ${word}` : word;
+                const textWidth = font.widthOfTextAtSize(testLine, fontSize);
+                if (textWidth > maxWidth && currentLine) {
+                  lines.push(currentLine);
+                  currentLine = word;
+                } else {
+                  currentLine = testLine;
+                }
+              }
+              if (currentLine) {
+                lines.push(currentLine);
+              }
+              return lines;
+            };
+
+            const drawText = (text, size = fontSize, font = timesRomanFont, xOffset = 50, maxWidth = width - 100) => {
+               if (!text) return;
+               const rawLines = text.split('\n');
+               rawLines.forEach(rawLine => {
+                 if (rawLine.trim() === '') {
+                   y -= size + 4;
+                   return;
+                 }
+                 const wrappedLines = wrapText(rawLine, maxWidth, font, size);
+                 wrappedLines.forEach(line => {
+                   page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
+                   y -= size + 4;
+                 });
+                 y -= 4;
+               });
+            };
+
+            // Watermark
+            page.drawText('DRAFT - NOT FOR LEGAL USE', {
+              x: width / 2 - 250,
+              y: height / 2 - 100,
+              size: 60,
+              font: timesRomanBoldFont,
+              color: rgb(0.8, 0.8, 0.8),
+              rotate: degrees(-45),
+              opacity: 0.5,
+            });
+
+            // Header Polish
+            drawText('Sent via Certified Mail: [ Tracking Number ]', 10, timesRomanBoldFont);
+            y -= 10;
+
+            // Very basic layout
+            page.drawText(tone?.title || 'DEMAND LETTER', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
+            y -= 30;
+
+            drawText('FROM:', 10, timesRomanFont);
+            drawText(formData.creditorName, 12, timesRomanBoldFont);
+            drawText(formData.creditorAddress, 12, timesRomanFont);
+
+            y -= 20;
+            drawText('TO:', 10, timesRomanFont);
+            drawText(formData.debtorName, 12, timesRomanBoldFont);
+            drawText(formData.debtorAddress, 12, timesRomanFont);
+
+            y -= 30;
+            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${formData.jurisdiction})`, 12, timesRomanBoldFont);
+
+            y -= 20;
+            drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
+
+            // Itemized Ledger
+            y -= 10;
+            drawText('ITEMIZED DEBTS:', 12, timesRomanBoldFont);
+            if (formData.items && formData.items.length > 0) {
+              formData.items.forEach(item => {
+                const itemDateStr = item.date ? ` (${item.date})` : '';
+                const amountStr = item.amount ? `${parseFloat(item.amount).toFixed(2)}` : '$0.00';
+                drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
+              });
+            }
+            y -= 10;
+
+            drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont);
+
+            y -= 20;
+            drawText(`Payment must be received by ${formData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
+
+            y -= 20;
+            drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
+            drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, timesRomanFont);
+
+            y -= 40;
+            drawText('Sincerely,', 12, timesRomanFont);
+            y -= 30;
+            drawText('__________________________', 12, timesRomanFont);
+            drawText(formData.creditorName, 12, timesRomanFont);
+
+            const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
+            const timestamp = 'Generated: ' + new Date().toISOString();
+            page.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            page.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+
+            const pdfBytes = await pdfDoc.save();
+
+            return new Response(pdfBytes, {
+               status: 200,
+               headers: {
+                 'Content-Type': 'application/pdf',
+                 'Access-Control-Allow-Origin': url.origin,
+                 'Content-Disposition': 'inline; filename="demand_letter_preview.pdf"'
+               }
+            });
+          } catch(e) {
+            return new Response(JSON.stringify({ error: 'PDF Generation failed', details: e.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+          }
+} else if (url.pathname === '/api/generate-demand-letter') {
           try {
             const body = await request.clone().json();
             const { session_id, formData, calculatedValues, tone } = body;

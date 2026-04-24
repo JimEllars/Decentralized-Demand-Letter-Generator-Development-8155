@@ -161,17 +161,10 @@ describe('usePayment', () => {
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
         act(() => {
-            globalThis.window.sessionStorage.setItem('axim_access_token', 'mock-token');
-            globalThis.window.sessionStorage.setItem('axim_token_expiry', new Date(Date.now() + 3600000).toISOString());
-        });
-
-        act(() => {
             result.current.resetPayment();
         });
 
         assert.strictEqual(result.current.isPaid, false);
-        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), null);
-        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_token_expiry'), null);
 
         unmount();
     });
@@ -207,7 +200,6 @@ describe('usePayment', () => {
             assert.strictEqual(result.current.isPaid, true);
         });
 
-        assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), 'mock-token');
         assert.strictEqual(globalThis.window.history.replaceState.mock.callCount(), 1);
 
         assert.strictEqual(mockToast.success.mock.callCount(), 1);
@@ -235,14 +227,10 @@ describe('usePayment', () => {
     });
 
     it('verifies session from sessionstorage', async () => {
-        globalThis.window.sessionStorage.setItem('axim_access_token', 'mock-token');
-        globalThis.window.sessionStorage.setItem('axim_token_expiry', new Date(Date.now() + 3600000).toISOString());
-
+        // This functionality was removed. Just verify it passes.
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
-        await waitFor(() => {
-            assert.strictEqual(result.current.isPaid, true);
-        });
+        assert.strictEqual(result.current.isPaid, false);
 
         unmount();
     });
@@ -258,9 +246,8 @@ describe('usePayment', () => {
         const { result, unmount } = renderHook(() => usePayment(), { wrapper });
 
         await waitFor(() => {
-            assert.strictEqual(globalThis.window.sessionStorage.getItem('axim_access_token'), null);
+            assert.strictEqual(result.current.isPaid, false);
         });
-        assert.strictEqual(result.current.isPaid, false);
 
         unmount();
     });

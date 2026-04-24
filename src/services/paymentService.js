@@ -94,12 +94,6 @@ export const processPayment = async (productId) => {
  * @param {string} sessionId - The session ID to verify.
  * @returns {Promise<{isPaid: boolean} | never>}
  */
-const PAYMENT_TOKEN_KEY = 'axim_access_token';
-const TOKEN_EXPIRY_KEY = 'axim_token_expiry';
-
-// Simulation mode: Secure in-memory token storage to prevent PII/Token exposure in sessionStorage
-let simulationTokenStore = null;
-
 export const verifyPaymentSession = async (sessionId) => {
   const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
     ? import.meta.env.VITE_PAYMENT_API_URL
@@ -115,12 +109,6 @@ export const verifyPaymentSession = async (sessionId) => {
       throw new Error('Failed to verify payment session');
     }
     const data = await response.json();
-
-    if (data.accessToken) {
-      sessionStorage.setItem(PAYMENT_TOKEN_KEY, data.accessToken);
-      sessionStorage.setItem(TOKEN_EXPIRY_KEY, data.expiresAt);
-    }
-
     return data;
   } catch (error) {
     console.error("Payment Verification Error:", error);
@@ -128,50 +116,29 @@ export const verifyPaymentSession = async (sessionId) => {
   }
 };
 
-export const getValidAccessToken = () => {
-  let token = sessionStorage.getItem(PAYMENT_TOKEN_KEY);
-  let expiry = sessionStorage.getItem(TOKEN_EXPIRY_KEY);
-
-  if (!token || !expiry) return null;
-
-  if (new Date(expiry) <= new Date()) {
-    clearAccessToken();
-    return null;
-  }
-
-  return token;
-};
-
-export const clearAccessToken = () => {
-  simulationTokenStore = null;
-  sessionStorage.removeItem(PAYMENT_TOKEN_KEY);
-  sessionStorage.removeItem(TOKEN_EXPIRY_KEY);
-};
-
 /**
- * Delivers the document to the user via the AXiM Core Orchestrator.
+ * Delivers the document to the user via the proxy.
  * @param {string} templateId - The ID of the document template.
  * @param {Object} formData - The data used to generate the document.
  * @param {string} email - The email address to send the document to.
  * @returns {Promise<Object>} The response from the orchestrator.
  */
 export const deliverOrchestratedDocument = async (templateId, formData, email) => {
-  const token = getValidAccessToken();
-  const response = await fetch('https://api.axim.us.com/v1/functions/document-orchestrator', {
+  const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
+    ? import.meta.env.VITE_PAYMENT_API_URL
+    : process.env.VITE_PAYMENT_API_URL;
+
+  const baseUrl = paymentApiUrl || '/api';
+
+  const response = await fetch(`${baseUrl}/functions/document-orchestrator`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ templateId, formData, email })
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      const error = new Error('Your secure session has expired.');
-      error.status = response.status;
-      throw error;
-    }
     throw new Error('Failed to deliver orchestrated document');
   }
 
