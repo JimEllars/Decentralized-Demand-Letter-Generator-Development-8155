@@ -47,54 +47,7 @@ describe('SuccessPage', () => {
     delete process.env.VITE_PAYMENT_API_URL;
   });
 
-  test('handles 401/403 token expirations gracefully when sending email', async () => {
-    sessionStorage.removeItem('axim_delivery_email');
 
-    globalThis.fetch = mock.fn(async (url) => {
-      if (typeof url === 'string' && url.includes('verify')) {
-        return { ok: true, json: () => Promise.resolve({ isPaid: true, accessToken: 'mock-token' }) };
-      }
-      if (typeof url === 'string' && url.includes('document-orchestrator')) {
-        return { ok: false, status: 401 };
-      }
-      return { ok: false };
-    });
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <ToastContext.Provider value={{ error: mockToastError, success: mockToastSuccess, info: mock.fn() }}>
-          <MemoryRouter initialEntries={['/?session_id=test-session-id']}>
-            <Routes>
-              <Route path="/" element={<SuccessPage />} />
-            </Routes>
-          </MemoryRouter>
-        </ToastContext.Provider>
-      </QueryClientProvider>
-    );
-
-    await waitFor(() => {
-      assert.ok(screen.queryByText('Payment Successful'));
-    });
-
-    const emailInput = screen.getByPlaceholderText('Enter email address');
-    await act(async () => {
-      fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    });
-
-    const emailForm = emailInput.closest('form');
-    const sendButton = emailForm.querySelector('button[type="submit"]');
-
-    await act(async () => {
-      fireEvent.click(sendButton);
-      await new Promise(r => setTimeout(r, 0));
-    });
-
-    await waitFor(() => {
-      assert.ok(mockToastError.mock.calls.some(call =>
-        call.arguments[0] === 'Your secure session has expired. Please download your document directly using the button above.'
-      ), 'Should show specific error message for 401/403');
-    });
-  });
 
   test('handles email sending successfully', async () => {
     sessionStorage.removeItem('axim_delivery_email');
@@ -103,7 +56,7 @@ describe('SuccessPage', () => {
       if (typeof url === 'string' && url.includes('verify')) {
         return {
           ok: true,
-          json: () => Promise.resolve({ isPaid: true, accessToken: 'mock-token' })
+          json: () => Promise.resolve({ isPaid: true, status: 'paid', payment_status: 'paid' })
         };
       }
       if (typeof url === 'string' && url.includes('document-orchestrator')) {

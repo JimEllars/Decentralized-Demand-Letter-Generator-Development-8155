@@ -179,11 +179,7 @@ const SuccessPage = () => {
     } catch (err) {
       console.error("Manual PDF generation error:", err);
       if (setIsGenerating) setIsGenerating(false);
-      if (err.status === 401 || err.status === 403 || err.message === 'Your secure session has expired.') {
-        toast.error("Your secure session has expired. Please return to the dashboard.");
-      } else {
-        toast.error('Failed to generate PDF. Try the email delivery option instead.');
-      }
+      toast.error('Failed to generate PDF. Try the email delivery option instead.');
     }
   };
 
@@ -237,9 +233,6 @@ const SuccessPage = () => {
           sessionStorage.removeItem('axim_delivery_email');
         } catch (err) {
           console.error('Auto-send error:', err);
-          if (err.message === 'Your secure session has expired.') {
-            toast.error('Your secure session has expired. Please download your document directly using the button above.');
-          }
         } finally {
           setIsSendingEmail(false);
         }
@@ -261,11 +254,7 @@ const SuccessPage = () => {
       toast.success(`Document sent to ${email}`);
       setEmail('');
     } catch (err) {
-      if (err.message === 'Your secure session has expired.') {
-        toast.error('Your secure session has expired. Please download your document directly using the button above.');
-      } else {
-        toast.error('Failed to send email. Please try again.');
-      }
+      toast.error('Failed to send email. Please try again.');
       console.error('Email send error:', err);
     } finally {
       setIsSendingEmail(false);
