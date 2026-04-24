@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -68,6 +68,19 @@ export default {
       }
 
       // Ensure the subpath is treated as a path, not a potential URL override
+
+      // Handle OPTIONS requests
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': url.origin,
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          }
+        });
+      }
+
       const subPath = url.pathname.replace(/^\/api\//, '');
       const baseUrl = env.BACKEND_URL.endsWith('/') ? env.BACKEND_URL : `${env.BACKEND_URL}/`;
       const backendUrl = new URL(subPath, baseUrl);
@@ -85,8 +98,8 @@ export default {
 
             // Inject the correct success and cancel URLs into the payload
             const clientOrigin = request.headers.get('Origin') || url.origin;
-            body.success_url = `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
-            body.cancel_url = `${clientOrigin}/app/demand-generator?canceled=true`;
+            body.success_url = `${clientOrigin}/#/success?session_id={CHECKOUT_SESSION_ID}`;
+            body.cancel_url = `${clientOrigin}/#/start?canceled=true`;
 
             fetchOptions.body = JSON.stringify(body);
             // Ensure Content-Type is application/json after modifying the body

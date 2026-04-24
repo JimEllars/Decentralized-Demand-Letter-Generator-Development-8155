@@ -33,7 +33,7 @@ class ErrorBoundary extends Component {
     }
   }
 
-  handleReset = () => {
+  handleReset() {
     this.setState({ hasError: false, error: null, errorInfo: null });
     window.location.reload();
   };
@@ -56,7 +56,7 @@ class ErrorBoundary extends Component {
                </div>
             )}
             <button
-              onClick={this.handleReset}
+              onClick={this.handleReset.bind(this)}
               className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg"
             >
               Refresh Page

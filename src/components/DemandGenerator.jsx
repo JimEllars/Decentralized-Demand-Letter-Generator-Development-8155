@@ -193,7 +193,7 @@ const DemandGenerator = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             event: `step_${currentStep}_completed`,
-            sessionId: userSession?.id || 'anonymous',
+            sessionId: window.userSession?.id || 'anonymous',
             timestamp: new Date().toISOString()
           })
         }).catch(() => {}); // Fire and forget
