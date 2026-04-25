@@ -16,6 +16,8 @@ class ErrorBoundary extends Component {
     this.setState({ errorInfo });
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
       fetch('https://api.axim.us.com/v1/telemetry/errors', {
         method: 'POST',
         headers: {
@@ -26,8 +28,10 @@ class ErrorBoundary extends Component {
           message: error.message,
           stack: errorInfo.componentStack,
           timestamp: new Date().toISOString()
-        })
-      }).catch(err => console.error("Telemetry failed:", err));
+        }),
+        signal: controller.signal
+      }).catch(err => console.error("Telemetry failed:", err))
+        .finally(() => clearTimeout(timeoutId));
     } catch (e) {
       console.error("Failed to send telemetry:", e);
     }

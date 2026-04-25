@@ -115,6 +115,24 @@ export default {
             const body = await request.clone().json();
             const { session_id, formData, calculatedValues, tone } = body;
 
+            if (!formData || typeof formData !== 'object') {
+              return new Response(JSON.stringify({ error: 'Invalid or missing formData' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            }
+            if (!calculatedValues || typeof calculatedValues !== 'object') {
+               return new Response(JSON.stringify({ error: 'Invalid or missing calculatedValues' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            }
+            const sanitize = (str) => (typeof str === 'string' ? str : String(str || ''));
+            const sFormData = {
+               creditorName: sanitize(sFormData.creditorName),
+               creditorAddress: sanitize(sFormData.creditorAddress),
+               debtorName: sanitize(sFormData.debtorName),
+               debtorAddress: sanitize(sFormData.debtorAddress),
+               jurisdiction: sanitize(sFormData.jurisdiction),
+               dueDate: sanitize(sFormData.dueDate),
+               items: Array.isArray(sFormData.items) ? sFormData.items : []
+            };
+
+
             // Generate Watermarked Preview
 
             const pdfDoc = await PDFDocument.create();
@@ -186,16 +204,16 @@ export default {
             y -= 30;
 
             drawText('FROM:', 10, timesRomanFont);
-            drawText(formData.creditorName, 12, timesRomanBoldFont);
-            drawText(formData.creditorAddress, 12, timesRomanFont);
+            drawText(sFormData.creditorName, 12, timesRomanBoldFont);
+            drawText(sFormData.creditorAddress, 12, timesRomanFont);
 
             y -= 20;
             drawText('TO:', 10, timesRomanFont);
-            drawText(formData.debtorName, 12, timesRomanBoldFont);
-            drawText(formData.debtorAddress, 12, timesRomanFont);
+            drawText(sFormData.debtorName, 12, timesRomanBoldFont);
+            drawText(sFormData.debtorAddress, 12, timesRomanFont);
 
             y -= 30;
-            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${formData.jurisdiction})`, 12, timesRomanBoldFont);
+            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 12, timesRomanBoldFont);
 
             y -= 20;
             drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
@@ -203,8 +221,8 @@ export default {
             // Itemized Ledger
             y -= 10;
             drawText('ITEMIZED DEBTS:', 12, timesRomanBoldFont);
-            if (formData.items && formData.items.length > 0) {
-              formData.items.forEach(item => {
+            if (sFormData.items && sFormData.items.length > 0) {
+              sFormData.items.forEach(item => {
                 const itemDateStr = item.date ? ` (${item.date})` : '';
                 const amountStr = item.amount ? `${parseFloat(item.amount).toFixed(2)}` : '$0.00';
                 drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
@@ -215,7 +233,7 @@ export default {
             drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont);
 
             y -= 20;
-            drawText(`Payment must be received by ${formData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
+            drawText(`Payment must be received by ${sFormData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
 
             y -= 20;
             drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
@@ -225,7 +243,7 @@ export default {
             drawText('Sincerely,', 12, timesRomanFont);
             y -= 30;
             drawText('__________________________', 12, timesRomanFont);
-            drawText(formData.creditorName, 12, timesRomanFont);
+            drawText(sFormData.creditorName, 12, timesRomanFont);
 
             const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
             const timestamp = 'Generated: ' + new Date().toISOString();
@@ -249,6 +267,24 @@ export default {
           try {
             const body = await request.clone().json();
             const { session_id, formData, calculatedValues, tone } = body;
+
+            if (!formData || typeof formData !== 'object') {
+              return new Response(JSON.stringify({ error: 'Invalid or missing formData' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            }
+            if (!calculatedValues || typeof calculatedValues !== 'object') {
+               return new Response(JSON.stringify({ error: 'Invalid or missing calculatedValues' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            }
+            const sanitize = (str) => (typeof str === 'string' ? str : String(str || ''));
+            const sFormData = {
+               creditorName: sanitize(sFormData.creditorName),
+               creditorAddress: sanitize(sFormData.creditorAddress),
+               debtorName: sanitize(sFormData.debtorName),
+               debtorAddress: sanitize(sFormData.debtorAddress),
+               jurisdiction: sanitize(sFormData.jurisdiction),
+               dueDate: sanitize(sFormData.dueDate),
+               items: Array.isArray(sFormData.items) ? sFormData.items : []
+            };
+
 
             // Verify session with proxy backend (simulated call to backend verify-session)
             // The prompt says "This endpoint must verify the session_id is paid (via your backend proxy)"
@@ -335,16 +371,16 @@ export default {
             y -= 30;
 
             drawText('FROM:', 10, timesRomanFont);
-            drawText(formData.creditorName, 12, timesRomanBoldFont);
-            drawText(formData.creditorAddress, 12, timesRomanFont);
+            drawText(sFormData.creditorName, 12, timesRomanBoldFont);
+            drawText(sFormData.creditorAddress, 12, timesRomanFont);
 
             y -= 20;
             drawText('TO:', 10, timesRomanFont);
-            drawText(formData.debtorName, 12, timesRomanBoldFont);
-            drawText(formData.debtorAddress, 12, timesRomanFont);
+            drawText(sFormData.debtorName, 12, timesRomanBoldFont);
+            drawText(sFormData.debtorAddress, 12, timesRomanFont);
 
             y -= 30;
-            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${formData.jurisdiction})`, 12, timesRomanBoldFont);
+            drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 12, timesRomanBoldFont);
 
             y -= 20;
             drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
@@ -352,8 +388,8 @@ export default {
             // Itemized Ledger
             y -= 10;
             drawText('ITEMIZED DEBTS:', 12, timesRomanBoldFont);
-            if (formData.items && formData.items.length > 0) {
-              formData.items.forEach(item => {
+            if (sFormData.items && sFormData.items.length > 0) {
+              sFormData.items.forEach(item => {
                 const itemDateStr = item.date ? ` (${item.date})` : '';
                 const amountStr = item.amount ? `${parseFloat(item.amount).toFixed(2)}` : '$0.00';
                 drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
@@ -364,7 +400,7 @@ export default {
             drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont);
 
             y -= 20;
-            drawText(`Payment must be received by ${formData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
+            drawText(`Payment must be received by ${sFormData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont);
 
             y -= 20;
             drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
@@ -374,7 +410,7 @@ export default {
             drawText('Sincerely,', 12, timesRomanFont);
             y -= 30;
             drawText('__________________________', 12, timesRomanFont);
-            drawText(formData.creditorName, 12, timesRomanFont);
+            drawText(sFormData.creditorName, 12, timesRomanFont);
 
             // Draw Timestamp and Tracking ID
             const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
