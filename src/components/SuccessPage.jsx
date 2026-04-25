@@ -50,13 +50,16 @@ const SuccessPage = () => {
 
        const blob = await response.blob();
        const url = window.URL.createObjectURL(blob);
-       const a = document.createElement('a');
-       a.style.display = 'none';
-       a.href = url;
-       a.download = 'demand_letter_final.pdf';
-       document.body.appendChild(a);
-       a.click();
-       window.URL.revokeObjectURL(url);
+       try {
+         const a = document.createElement('a');
+         a.style.display = 'none';
+         a.href = url;
+         a.download = 'demand_letter_final.pdf';
+         document.body.appendChild(a);
+         a.click();
+       } finally {
+         window.URL.revokeObjectURL(url);
+       }
      } catch (err) {
        console.error("PDF download failed", err);
        toast.error("Failed to generate PDF. Please try again.");
@@ -187,7 +190,7 @@ const SuccessPage = () => {
     resetForm();
     localStorage.removeItem('axim_demand_letter_paid_status');
     sessionStorage.removeItem('axim_delivery_email');
-    navigate('/#/start');
+    navigate('/start');
   };
 
   const [email, setEmail] = useState(() => sessionStorage.getItem('axim_delivery_email') || '');
@@ -223,22 +226,29 @@ const SuccessPage = () => {
 
   // Auto-send email if user provided one during checkout
   useEffect(() => {
+    let isMounted = true;
     if (verificationStatus === 'success' && email && !hasSentInitialEmail.current) {
       hasSentInitialEmail.current = true;
       const sendInitialEmail = async () => {
+        if (!isMounted) return;
         setIsSendingEmail(true);
         try {
           await deliverOrchestratedDocument('demand_letter_v1', formData, email);
-          toast.success(`Document automatically sent to ${email}`);
-          sessionStorage.removeItem('axim_delivery_email');
+          if (isMounted) {
+             toast.success(`Document automatically sent to ${email}`);
+             sessionStorage.removeItem('axim_delivery_email');
+          }
         } catch (err) {
-          console.error('Auto-send error:', err);
+          if (isMounted) console.error('Auto-send error:', err);
         } finally {
-          setIsSendingEmail(false);
+          if (isMounted) setIsSendingEmail(false);
         }
       };
       sendInitialEmail();
     }
+    return () => {
+       isMounted = false;
+    };
   }, [verificationStatus, email, toast, formData]);
 
   const handleSendEmail = async (e) => {
@@ -289,7 +299,7 @@ const SuccessPage = () => {
             <h2 className="text-xl font-bold tracking-tight text-red-500">Verification Failed</h2>
             <p className="text-zinc-400 mt-2 text-sm mb-8">We could not verify your payment session.</p>
             <button
-              onClick={() => navigate('/#/start')}
+              onClick={() => navigate('/start')}
               className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg font-medium w-full"
             >
               Return Home

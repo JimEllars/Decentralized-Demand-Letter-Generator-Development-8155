@@ -1,6 +1,6 @@
 import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import SafeIcon from '../common/SafeIcon';
 import Header from './Header';
 import Instructions from './Instructions';
@@ -48,6 +48,7 @@ const DemandGenerator = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
+  const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
@@ -90,13 +91,16 @@ const DemandGenerator = () => {
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = 'demand_letter_preview.pdf';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
+      try {
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'demand_letter_preview.pdf';
+        document.body.appendChild(a);
+        a.click();
+      } finally {
+        window.URL.revokeObjectURL(url);
+      }
     } catch(e) {
       console.error(e);
       // fallback or toast error
@@ -105,6 +109,22 @@ const DemandGenerator = () => {
     }
   };
 
+
+
+  useEffect(() => {
+    let timeoutId;
+    if (!isInitialized) {
+      timeoutId = setTimeout(() => {
+        console.warn("Store initialization timed out, forcing redirect...");
+        navigate('/start', { replace: true });
+        // Alternatively, we could force a reload
+        // window.location.reload();
+      }, 5000);
+    }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isInitialized, navigate]);
 
   useEffect(() => {
     if (searchParams.get('canceled') === 'true') {
