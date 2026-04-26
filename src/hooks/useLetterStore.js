@@ -6,7 +6,7 @@ import { useToast } from '../contexts/ToastContext';
 import debounce from 'lodash.debounce';
 import { encrypt, decrypt } from '../utils/crypto';
 
-const STORAGE_KEY = 'axim_demand_letter_draft';
+const STORAGE_KEY = 'axim_demand_draft';
 
 // Update to use localStorage instead of sessionStorage
 const secureStorage = {

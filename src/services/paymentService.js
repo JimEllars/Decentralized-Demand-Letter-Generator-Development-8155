@@ -38,7 +38,7 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
         const parsedUrl = new URL(data.url);
         const isTrustedStripeDomain = parsedUrl.hostname === 'stripe.com' || parsedUrl.hostname.endsWith('.stripe.com');
         if (parsedUrl.protocol !== 'https:' || !isTrustedStripeDomain) {
-          throw new Error('Security Error: Invalid redirect URL'); // eslint-disable-line
+          throw new Error('Security Error: Invalid redirect URL');
         }
       } catch (err) {
         console.error("Security Validation Error:", err.message);

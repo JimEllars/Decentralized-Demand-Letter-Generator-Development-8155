@@ -420,6 +420,24 @@ export default {
 
             const pdfBytes = await pdfDoc.save();
 
+            // Fire and forget accounting sync
+            const coreUrl = env.BACKEND_URL || 'https://api.axim.us.com';
+            ctx.waitUntil(
+              fetch(new URL('/api/v1/telemetry/ingest', coreUrl).toString(), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + (env.AXIM_SERVICE_KEY || 'default-key')
+                },
+                body: JSON.stringify({
+                  event: 'revenue_generated',
+                  app_type: 'demand_letter',
+                  amount: 4.00,
+                  currency: 'usd'
+                })
+              }).catch(err => console.error('Accounting sync failed:', err))
+            );
+
             return new Response(pdfBytes, {
                status: 200,
                headers: {

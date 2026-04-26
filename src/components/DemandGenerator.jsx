@@ -15,7 +15,8 @@ import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
-import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
+import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, FiLoader, FiAlertTriangle } from 'react-icons/fi';
+import { useDebounce } from '../hooks/useDebounce';
 
 const getInitialState = () => ({
   jurisdiction: 'CA',
@@ -63,6 +64,79 @@ const DemandGenerator = () => {
     resetPayment
   } = usePayment();
 
+
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [previewRateLimited, setPreviewRateLimited] = useState(false);
+  const debouncedFormData = useDebounce(formData, 1000);
+  const debouncedCalculatedValues = useDebounce(calculatedValues, 1000);
+
+  useEffect(() => {
+    // Only generate preview if basic fields are populated
+    const hasData = debouncedFormData.creditorName || debouncedFormData.debtorName || (debouncedFormData.items && debouncedFormData.items[0]?.description);
+
+    if (!hasData) {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      return;
+    }
+
+    let isMounted = true;
+    const fetchPreview = async () => {
+      setIsPreviewLoading(true);
+      setPreviewRateLimited(false);
+      try {
+        const response = await fetch('/api/generate-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: 'preview',
+            formData: debouncedFormData,
+            calculatedValues: debouncedCalculatedValues,
+            tone: toneTemplate
+          })
+        });
+
+        if (response.status === 429) {
+          if (isMounted) setPreviewRateLimited(true);
+          return;
+        }
+
+        if (!response.ok) throw new Error('Failed to generate preview PDF');
+
+        const blob = await response.blob();
+        if (isMounted) {
+          const url = window.URL.createObjectURL(blob);
+          setPreviewUrl(prev => {
+            if (prev) window.URL.revokeObjectURL(prev);
+            return url;
+          });
+        }
+      } catch (error) {
+        console.error('Preview generation failed', error);
+      } finally {
+        if (isMounted) setIsPreviewLoading(false);
+      }
+    };
+
+    fetchPreview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [debouncedFormData, debouncedCalculatedValues, toneTemplate]);
+
+  // Clean up object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        window.URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -249,7 +323,7 @@ const DemandGenerator = () => {
   };
   const onPaymentConfirm = async (deliveryEmail) => {
     // Fortify state before redirect
-    sessionStorage.setItem('axim_demand_draft', JSON.stringify(formData));
+
     sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
     if (deliveryEmail) {
       sessionStorage.setItem('axim_delivery_email', deliveryEmail);
@@ -271,7 +345,10 @@ const DemandGenerator = () => {
   return (
     <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
       <Header />
-      <main className="max-w-4xl mx-auto px-4 flex flex-col gap-8 relative z-10">
+
+      <main className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-12 relative z-10">
+        <div className="lg:w-1/2 flex flex-col gap-8">
+
         <Instructions />
 
         {/* Stepper Progress Indicator */}
@@ -444,7 +521,44 @@ const DemandGenerator = () => {
             <UpsellCard total={calculatedValues.total} />
             </motion.section>
         )}
+
+        </div>
+
+        {/* Right Column: Live Preview */}
+        <div className="hidden lg:flex lg:w-1/2 flex-col gap-4 sticky top-24 h-[calc(100vh-8rem)]">
+          <div className="flex justify-between items-center px-2">
+            <h2 className="font-inter font-semibold text-xs tracking-wider text-axim-gold uppercase flex items-center gap-2">
+              <SafeIcon name="FiFileText" /> Live Preview
+            </h2>
+            {isPreviewLoading && <SafeIcon icon={FiLoader} className="text-axim-gold w-4 h-4 animate-spin" />}
+          </div>
+          <div className="bg-glass border border-white/10 rounded-xl backdrop-blur-md overflow-hidden relative flex-1">
+            {previewRateLimited && (
+              <div className="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm">
+                <SafeIcon icon={FiAlertTriangle} className="text-axim-gold w-12 h-12 mb-4" />
+                <p className="text-white font-mono text-sm tracking-wider">Too many preview requests. Please wait a moment.</p>
+              </div>
+            )}
+            {isPreviewLoading && previewUrl && (
+               <div className="absolute top-4 right-4 z-10">
+                 <SafeIcon icon={FiLoader} className="text-axim-teal w-6 h-6 animate-spin drop-shadow-md" />
+               </div>
+            )}
+            {!previewUrl && !previewRateLimited ? (
+              <div className="absolute inset-0 flex items-center justify-center text-zinc-500 font-mono text-sm uppercase tracking-widest text-center px-4">
+                Start typing to generate preview
+              </div>
+            ) : previewUrl ? (
+              <iframe
+                src={previewUrl + '#toolbar=0&navpanes=0&scrollbar=0'}
+                className="w-full h-full border-0"
+                title="Live PDF Preview"
+              />
+            ) : null}
+          </div>
+        </div>
       </main>
+
 
       <AnimatePresence>
         {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} />}

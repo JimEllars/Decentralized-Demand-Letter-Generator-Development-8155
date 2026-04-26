@@ -100,6 +100,7 @@ const SuccessPage = () => {
           setVerificationStatus('success');
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
+          localStorage.removeItem('axim_demand_draft');
 
           // Sync Document History (Passport Write)
           if (false?.id) {
