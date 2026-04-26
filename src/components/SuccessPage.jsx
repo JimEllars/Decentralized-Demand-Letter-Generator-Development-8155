@@ -26,6 +26,7 @@ const DEFAULT_FORM_DATA = {
 const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -68,7 +69,6 @@ const SuccessPage = () => {
      }
   };
 
-  const toast = useToast();
   const { data: legalStatutes } = useLegalStatutes();
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
@@ -101,24 +101,6 @@ const SuccessPage = () => {
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
           localStorage.removeItem('axim_demand_draft');
-
-          // Sync Document History (Passport Write)
-          if (false?.id) {
-            try {
-              fetch('/api/v1/user/document-history', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  document_id: sessionId,
-                  type: 'demand_letter',
-                  timestamp: new Date().toISOString()
-                })
-              }).catch(() => {}); // Fire and forget
-            } catch (e) {
-              console.error('History sync failed', e);
-            }
-          }
-
           // Trigger download automatically
           const calculatedValues = calculateTotal(
             formData.items,
