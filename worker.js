@@ -98,8 +98,8 @@ export default {
 
             // Inject the correct success and cancel URLs into the payload
             const clientOrigin = request.headers.get('Origin') || url.origin;
-            body.success_url = `${clientOrigin}/#/success?session_id={CHECKOUT_SESSION_ID}`;
-            body.cancel_url = `${clientOrigin}/#/start?canceled=true`;
+            body.success_url = `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
+            body.cancel_url = `${clientOrigin}/start?canceled=true`;
 
             fetchOptions.body = JSON.stringify(body);
             // Ensure Content-Type is application/json after modifying the body
@@ -123,13 +123,13 @@ export default {
             }
             const sanitize = (str) => (typeof str === 'string' ? str : String(str || ''));
             const sFormData = {
-               creditorName: sanitize(sFormData.creditorName),
-               creditorAddress: sanitize(sFormData.creditorAddress),
-               debtorName: sanitize(sFormData.debtorName),
-               debtorAddress: sanitize(sFormData.debtorAddress),
-               jurisdiction: sanitize(sFormData.jurisdiction),
-               dueDate: sanitize(sFormData.dueDate),
-               items: Array.isArray(sFormData.items) ? sFormData.items : []
+               creditorName: sanitize(formData.creditorName),
+               creditorAddress: sanitize(formData.creditorAddress),
+               debtorName: sanitize(formData.debtorName),
+               debtorAddress: sanitize(formData.debtorAddress),
+               jurisdiction: sanitize(formData.jurisdiction),
+               dueDate: sanitize(formData.dueDate),
+               items: Array.isArray(formData.items) ? formData.items : []
             };
 
 
@@ -276,13 +276,13 @@ export default {
             }
             const sanitize = (str) => (typeof str === 'string' ? str : String(str || ''));
             const sFormData = {
-               creditorName: sanitize(sFormData.creditorName),
-               creditorAddress: sanitize(sFormData.creditorAddress),
-               debtorName: sanitize(sFormData.debtorName),
-               debtorAddress: sanitize(sFormData.debtorAddress),
-               jurisdiction: sanitize(sFormData.jurisdiction),
-               dueDate: sanitize(sFormData.dueDate),
-               items: Array.isArray(sFormData.items) ? sFormData.items : []
+               creditorName: sanitize(formData.creditorName),
+               creditorAddress: sanitize(formData.creditorAddress),
+               debtorName: sanitize(formData.debtorName),
+               debtorAddress: sanitize(formData.debtorAddress),
+               jurisdiction: sanitize(formData.jurisdiction),
+               dueDate: sanitize(formData.dueDate),
+               items: Array.isArray(formData.items) ? formData.items : []
             };
 
 

@@ -13,10 +13,10 @@ const secureStorage = {
   getItem: (name) => {
     const str = localStorage.getItem(name);
     if (!str) return null;
-    try { return JSON.parse(decrypt(str)); } catch(e) { return null; }
+    try { return decrypt(str); } catch(e) { return null; }
   },
   setItem: (name, value) => {
-    localStorage.setItem(name, encrypt(JSON.stringify(value)));
+    localStorage.setItem(name, encrypt(value));
   },
   removeItem: (name) => localStorage.removeItem(name),
 };
