@@ -9,6 +9,8 @@ export default {
         '/api/create-checkout-session',
         '/api/verify-session',
         '/api/generate-demand-letter',
+        '/api/generate-preview',
+        '/api/functions/document-orchestrator',
         '/api/webhooks/stripe',
         '/api/ledger/stamp',
         '/api/send-email',
@@ -481,17 +483,24 @@ export default {
       }
     }
 
-    // Serve assets for all other requests
-    const assetResponse = await env.ASSETS.fetch(request);
+                // Serve assets for all other requests
+    let assetResponse = await env.ASSETS.fetch(request);
 
-    // If the asset is not found, and it's a request for a page (not an asset like .js or .css),
-    // serve index.html to allow client-side routing to handle it
     if (assetResponse.status === 404 && request.method === 'GET') {
       const isAssetRequest = url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/i);
       if (!isAssetRequest) {
         const indexRequest = new Request(new URL('/', request.url), request);
-        return env.ASSETS.fetch(indexRequest);
+        assetResponse = await env.ASSETS.fetch(indexRequest);
       }
+    }
+
+    // CRITICAL FIX: Prevent browser caching of index.html so new deployments don't break
+    const contentType = assetResponse.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      assetResponse = new Response(assetResponse.body, assetResponse);
+      assetResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      assetResponse.headers.set('Pragma', 'no-cache');
+      assetResponse.headers.set('Expires', '0');
     }
 
     return assetResponse;
