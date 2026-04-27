@@ -52,8 +52,6 @@ const DemandGenerator = () => {
   const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();
 
-  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-
   const calculatedValues = useMemo(() => {
     return calculateTotal(
       formData.items,
@@ -67,6 +65,7 @@ const DemandGenerator = () => {
 
   const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const {
     isPaid,
@@ -78,11 +77,10 @@ const DemandGenerator = () => {
     resetPayment
   } = usePayment();
 
-
-
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [previewRateLimited, setPreviewRateLimited] = useState(false);
+
   const debouncedFormData = useDebounce(formData, 1000);
   const debouncedCalculatedValues = useDebounce(calculatedValues, 1000);
 
