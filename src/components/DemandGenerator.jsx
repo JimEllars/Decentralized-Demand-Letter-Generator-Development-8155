@@ -52,6 +52,19 @@ const DemandGenerator = () => {
   const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();
 
+  const calculatedValues = useMemo(() => {
+    return calculateTotal(
+      formData.items,
+      formData.statutoryInterest,
+      formData.dueDate,
+      formData.jurisdiction,
+      formData.letterDate,
+      legalStatutes.details
+    );
+  }, [formData, legalStatutes.details]);
+
+  const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
+
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const {
@@ -218,18 +231,7 @@ const DemandGenerator = () => {
     toast.success("Form reset successfully.");
   };
 
-  const calculatedValues = useMemo(() => {
-    return calculateTotal(
-      formData.items,
-      formData.statutoryInterest,
-      formData.dueDate,
-      formData.jurisdiction,
-      formData.letterDate,
-      legalStatutes.details
-    );
-  }, [formData, legalStatutes.details]);
 
-  const toneTemplate = useMemo(() => getToneTemplate(formData.tone), [formData.tone]);
 
   const deferredFormData = useDeferredValue(formData);
   const validationSource = hasAttemptedSubmit ? formData : deferredFormData;
