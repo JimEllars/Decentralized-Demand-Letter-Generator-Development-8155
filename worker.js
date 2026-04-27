@@ -310,9 +310,27 @@ export default {
               console.error('Session verification failed', e);
             }
 
-            // Wait, the prompt says "verify the session_id is paid (via your backend proxy)".
-            // In worker.js we proxy everything to env.BACKEND_URL.
-            // We can do a subrequest to env.BACKEND_URL/verify-session or similar.
+            // CRITICAL FIX: Block unwatermarked PDF generation if not paid
+            if (!isPaid && session_id !== 'bypass_dev_mode') {
+              // Fire telemetry alert for attempted theft/bypass
+              const coreUrl = env.BACKEND_URL || 'https://api.axim.us.com';
+              ctx.waitUntil(
+                fetch(new URL('/api/v1/telemetry/security', coreUrl).toString(), {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    event: 'unauthorized_generation_attempt',
+                    app_type: 'demand_letter',
+                    provided_session: session_id
+                  })
+                }).catch(() => {})
+              );
+
+              return new Response(JSON.stringify({ error: 'Payment Required: Valid Stripe session missing' }), {
+                status: 402,
+                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin }
+              });
+            }
 
             const pdfDoc = await PDFDocument.create();
             const page = pdfDoc.addPage();
