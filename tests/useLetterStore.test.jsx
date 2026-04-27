@@ -71,7 +71,7 @@ describe('useLetterStore', () => {
 
   it('initializes gracefully when storage contains invalid JSON', () => {
     const encrypt = (text) => btoa(encodeURIComponent(text));
-    sessionStorage.setItem('axim_demand_letter_draft', encrypt('{invalid_json}'));
+    sessionStorage.setItem('axim_demand_draft', encrypt('{invalid_json}'));
 
     const { result, unmount } = renderHook(() => useLetterStore({ test2: 'fallback' }), { wrapper });
 
@@ -88,7 +88,7 @@ describe('useLetterStore', () => {
   it('initializes from valid JSON in storage', () => {
     const validData = { state: { formData: { test3: 'saved_value', items: [] }, currentStep: 2 }, version: 0 };
     const encrypt = (text) => btoa(encodeURIComponent(text));
-    sessionStorage.setItem('axim_demand_letter_draft', encrypt(JSON.stringify(validData)));
+    sessionStorage.setItem('axim_demand_draft', encrypt(JSON.stringify(validData)));
 
     const { result, unmount } = renderHook(() => useLetterStore({ test3: 'fallback' }), { wrapper });
 
