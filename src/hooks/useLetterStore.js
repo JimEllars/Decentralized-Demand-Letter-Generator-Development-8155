@@ -17,7 +17,7 @@ const secureStorage = {
   },
   setItem: (name, value) => {
     try {
-      localStorage.setItem(name, encrypt(JSON.stringify(value)));
+      localStorage.setItem(name, encrypt(value));
     } catch (e) {
       console.error('Failed to persist demand draft to localStorage:', e);
     }
