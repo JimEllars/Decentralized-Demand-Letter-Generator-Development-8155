@@ -22,18 +22,15 @@ export default defineConfig({
       },
     },
   },
-   build: {
+  build: {
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'framer-motion'],
-          // Combine pdfmake and its fonts into one chunk to ensure they stay linked
-          pdf: ['pdfmake/build/pdfmake', 'pdfmake/build/vfs_fonts'],
         },
       },
-    },
-    chunkSizeWarningLimit: 2000, // Increased limit since fonts are large
+    }
   },
 });
