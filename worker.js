@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -191,7 +191,7 @@ export default {
               size: 60,
               font: timesRomanBoldFont,
               color: rgb(0.8, 0.8, 0.8),
-              rotate: degrees(-45),
+              rotate: (Math.PI / 180) * -45,
               opacity: 0.5,
             });
 
