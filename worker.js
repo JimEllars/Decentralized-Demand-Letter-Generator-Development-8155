@@ -432,6 +432,7 @@ export default {
                 body: JSON.stringify({
                   event: 'revenue_generated',
                   app_type: 'demand_letter',
+                  transaction_id: session_id,
                   amount: 4.00,
                   currency: 'usd'
                 })

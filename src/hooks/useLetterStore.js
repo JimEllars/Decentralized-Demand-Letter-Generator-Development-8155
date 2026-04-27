@@ -16,7 +16,11 @@ const secureStorage = {
     try { return decrypt(str); } catch(e) { return null; }
   },
   setItem: (name, value) => {
-    localStorage.setItem(name, encrypt(value));
+    try {
+      localStorage.setItem(name, encrypt(JSON.stringify(value)));
+    } catch (e) {
+      console.error('Failed to persist demand draft to localStorage:', e);
+    }
   },
   removeItem: (name) => localStorage.removeItem(name),
 };
