@@ -1,18 +1,14 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
-  const [sendEmail, setSendEmail] = useState(false);
   const [email, setEmail] = useState('');
-
-  // Note: Web3 and Partner Credit features are dormant.
-  // We rely entirely on Stripe Checkout until revenue generation is solid.
-  // To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment.
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
 
   const handleConfirm = async () => {
-    onConfirm(sendEmail ? email : null);
+    onConfirm(email, marketingOptIn);
   };
 
   return (
@@ -35,54 +31,49 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
           </div>
 
           <div className="flex flex-col gap-3">
-            <label className="flex items-center gap-3 cursor-pointer group">
+            <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+              <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Address (Required)
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email for document delivery"
+              className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
+              disabled={isProcessing}
+              required
+            />
+            <label className="flex items-center gap-3 cursor-pointer group mt-2">
               <div className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
                   className="appearance-none w-5 h-5 border border-zinc-600 rounded bg-black/50 checked:bg-axim-teal checked:border-axim-teal transition-colors cursor-pointer"
-                  checked={sendEmail}
-                  onChange={(e) => setSendEmail(e.target.checked)}
+                  checked={marketingOptIn}
+                  onChange={(e) => setMarketingOptIn(e.target.checked)}
                   disabled={isProcessing}
                 />
-                {sendEmail && (
+                {marketingOptIn && (
                   <svg className="absolute w-3 h-3 text-black pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
-              <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors flex items-center gap-2">
-                <SafeIcon icon={FiMail} className="text-axim-teal" /> Email me the PDF
+              <span className="text-xs font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                Send me legal updates & templates from AXiM (Optional)
               </span>
             </label>
-
-            <AnimatePresence>
-              {sendEmail && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter email address"
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors mt-2"
-                    disabled={isProcessing}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
           <div className="space-y-4 pt-2 border-t border-white/5">
-            <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-2 uppercase tracking-widest">
+            <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-1 uppercase tracking-widest">
               Quality and Satisfaction Guaranteed.
+            </div>
+            <div className="text-center font-mono text-[0.65rem] text-amber-500 font-bold mb-4 uppercase tracking-widest">
+              ⚠️ DO NOT CLOSE THIS TAB DURING PAYMENT.
             </div>
             <button
               onClick={handleConfirm}
-              disabled={isProcessing || (sendEmail && !email)}
+              disabled={isProcessing || !email.includes('@')}
               className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
             >
               {isProcessing ? (

@@ -122,7 +122,7 @@ export default {
             if (!calculatedValues || typeof calculatedValues !== 'object') {
                return new Response(JSON.stringify({ error: 'Invalid or missing calculatedValues' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
-            const sanitize = (str) => (typeof str === 'string' ? str : String(str || ''));
+            const sanitize = (str, maxLen = 2000) => (typeof str === 'string' ? str.substring(0, maxLen) : String(str || '').substring(0, maxLen));
             const sFormData = {
                creditorName: sanitize(formData.creditorName),
                creditorAddress: sanitize(formData.creditorAddress),

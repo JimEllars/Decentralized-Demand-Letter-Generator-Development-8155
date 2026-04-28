@@ -39,6 +39,10 @@ describe('PaymentModal', () => {
     const onConfirmMock = mock.fn();
     render(<PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} />);
 
+    // Fill in the email to enable the pay button
+    const emailInput = screen.getByPlaceholderText('Enter email for document delivery');
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+
     const payButton = (screen.queryByText('Pay with Card') || screen.queryByText('Generate with Partner Credit')).closest('button');
     fireEvent.click(payButton);
     assert.strictEqual(onConfirmMock.mock.callCount(), 1);

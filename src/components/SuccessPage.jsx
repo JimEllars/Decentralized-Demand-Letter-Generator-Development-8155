@@ -298,7 +298,8 @@ const SuccessPage = () => {
 
             <h2 className="text-2xl font-bold tracking-tight text-white mb-2">Payment Successful</h2>
             <p className="text-zinc-400 text-sm leading-relaxed mb-8">
-              Your compliant Demand Letter is generating. If your browser blocks the automatic download, please click the Download button below.
+              Your compliant Demand Letter is generating.
+              <span className="text-amber-400 block mt-2 font-semibold">iOS / Safari Users: Auto-downloads are often blocked. Please click the manual 'Download Again' button below if your file does not appear.</span>
               {isGenerating && <span className="block mt-2 text-axim-teal animate-pulse">Generating PDF...</span>}
             </p>
 
