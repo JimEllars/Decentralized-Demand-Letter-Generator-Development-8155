@@ -15,7 +15,7 @@ import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
-import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, FiLoader, FiAlertTriangle } from 'react-icons/fi';
+import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
 import { useDebounce } from '../hooks/useDebounce';
 
 const getInitialState = () => ({
@@ -83,7 +83,6 @@ const DemandGenerator = () => {
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const {
-    isPaid,
     isProcessing,
     showPaymentModal,
     setShowPaymentModal,
@@ -92,123 +91,12 @@ const DemandGenerator = () => {
     resetPayment
   } = usePayment();
 
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-  const [previewRateLimited, setPreviewRateLimited] = useState(false);
 
   const debouncedFormData = useDebounce(formData, 1000);
   const debouncedCalculatedValues = useDebounce(calculatedValues, 1000);
 
-  useEffect(() => {
-    // Only generate preview if basic fields are populated
-    const hasData = debouncedFormData.creditorName || debouncedFormData.debtorName || (debouncedFormData.items && debouncedFormData.items[0]?.description);
 
-    if (!hasData) {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-        setPreviewUrl(null);
-      }
-      return;
-    }
 
-    let isMounted = true;
-    const fetchPreview = async () => {
-      setIsPreviewLoading(true);
-      setPreviewRateLimited(false);
-      try {
-        const response = await fetch('/api/generate-preview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_id: 'preview',
-            formData: debouncedFormData,
-            calculatedValues: debouncedCalculatedValues,
-            tone: toneTemplate
-          })
-        });
-
-        if (response.status === 429) {
-          if (isMounted) setPreviewRateLimited(true);
-          return;
-        }
-
-        if (!response.ok) throw new Error('Failed to generate preview PDF');
-
-        const blob = await response.blob();
-        if (isMounted) {
-          const url = window.URL.createObjectURL(blob);
-          setPreviewUrl(prev => {
-            if (prev) window.URL.revokeObjectURL(prev);
-            return url;
-          });
-        }
-      } catch (error) {
-        console.error('Preview generation failed', error);
-      } finally {
-        if (isMounted) setIsPreviewLoading(false);
-      }
-    };
-
-    fetchPreview();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [debouncedFormData, debouncedCalculatedValues, toneTemplate]);
-
-  // Clean up object URL on unmount
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        window.URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const triggerDownload = async (isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, clauses) => {
-    if (!isValid) {
-      onValidationFail();
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const response = await fetch(isPaid ? '/api/generate-demand-letter' : '/api/generate-preview', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          session_id: isPaid ? 'preview' : null,
-          formData,
-          calculatedValues,
-          tone: toneTemplate
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to generate preview PDF');
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      try {
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'demand_letter_preview.pdf';
-        document.body.appendChild(a);
-        a.click();
-      } finally {
-        window.URL.revokeObjectURL(url);
-      }
-    } catch(e) {
-      console.error(e);
-      // fallback or toast error
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
 
 
@@ -348,7 +236,6 @@ const DemandGenerator = () => {
     }
     handlePayment(isValid, onValidationFail);
   };
-  const onDownloadClick = () => triggerDownload(isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, legalStatutes.clauses);
 
   if (!isInitialized) {
     return (
@@ -470,35 +357,7 @@ const DemandGenerator = () => {
                     </div>
                 )}
 
-                {isPaid ? (
-                    <>
-                    <button
-                        onClick={onDownloadClick}
-                        disabled={isGenerating}
-                        className={getActionButtonStyles(isValid && !isGenerating)}
-                    >
-                        {isGenerating ? (
-                        <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            GENERATING PDF...
-                        </>
-                        ) : (
-                        <>
-                            <SafeIcon name="FiDownload" /> DOWNLOAD COMPLIANT PDF
-                        </>
-                        )}
-                    </button>
-                    <button
-                        onClick={resetForm}
-                        disabled={isGenerating}
-                        className="w-full py-3 rounded-sm font-mono text-xs flex items-center justify-center gap-2 text-red-500 hover:text-red-400 hover:bg-red-900/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest border border-transparent hover:border-red-900/30"
-                    >
-                        <SafeIcon name="FiTrash2" /> CLEAR DATA & RESET
-                    </button>
-                    </>
-                ) : (
-                    <>
-                    <button
+                <button
                         onClick={onCheckoutClick}
                         disabled={isProcessing}
                         className={getActionButtonStyles(isValid && !isProcessing)}
@@ -514,17 +373,6 @@ const DemandGenerator = () => {
                         </>
                         )}
                     </button>
-                    {isValid && (
-                        <button
-                        onClick={onDownloadClick}
-                        disabled={isGenerating}
-                        className="w-full py-4 rounded-sm font-mono text-xs flex items-center justify-center gap-2 text-zinc-400 hover:text-white hover:bg-glass border border-subtle hover:border-active transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest"
-                        >
-                        {isGenerating ? "GENERATING PREVIEW..." : <> <SafeIcon name="FiDownload" /> DOWNLOAD WATERMARKED PREVIEW </>}
-                        </button>
-                    )}
-                    </>
-                )}
 
                 <div className="text-center font-mono text-[0.65rem] text-zinc-500 tracking-widest mt-4 uppercase">
                     Secure 256-bit SSL Encrypted Payment via Stripe
@@ -540,40 +388,7 @@ const DemandGenerator = () => {
 
         </div>
 
-        {/* Right Column: Live Preview */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col gap-4 sticky top-24 h-[calc(100vh-8rem)]">
-          <div className="flex justify-between items-center px-2">
-            <h2 className="font-inter font-semibold text-xs tracking-wider text-axim-gold uppercase flex items-center gap-2">
-              <SafeIcon name="FiFileText" /> Live Preview
-            </h2>
-            {isPreviewLoading && <SafeIcon icon={FiLoader} className="text-axim-gold w-4 h-4 animate-spin" />}
-          </div>
-          <div className="bg-glass border border-white/10 rounded-xl backdrop-blur-md overflow-hidden relative flex-1">
-            {previewRateLimited && (
-              <div className="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm">
-                <SafeIcon icon={FiAlertTriangle} className="text-axim-gold w-12 h-12 mb-4" />
-                <p className="text-white font-mono text-sm tracking-wider">Too many preview requests. Please wait a moment.</p>
-              </div>
-            )}
-            {isPreviewLoading && previewUrl && (
-               <div className="absolute top-4 right-4 z-10">
-                 <SafeIcon icon={FiLoader} className="text-axim-teal w-6 h-6 animate-spin drop-shadow-md" />
-               </div>
-            )}
-            {!previewUrl && !previewRateLimited ? (
-              <div className="absolute inset-0 flex items-center justify-center text-zinc-500 font-mono text-sm uppercase tracking-widest text-center px-4">
-                Start typing to generate preview
-              </div>
-            ) : previewUrl ? (
-              <iframe
-                src={previewUrl + '#toolbar=0&navpanes=0&scrollbar=0'}
-                className="w-full h-full border-0"
-                title="Live PDF Preview"
-              />
-            ) : null}
-          </div>
-        </div>
-      </main>
+        </main>
 
 
       <AnimatePresence>
