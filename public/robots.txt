@@ -1,3 +1,7 @@
 User-agent: *
 Disallow: /success
 Disallow: /api/
+Allow: /
+Allow: /llms.txt
+
+Sitemap: https://quickdemandletter.com/sitemap.xml
