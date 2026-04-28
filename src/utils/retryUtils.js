@@ -3,7 +3,7 @@ export const fetchWithRetry = async (url, options = {}, retries = 3, backoff = 5
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
-        throw new Error(\`HTTP error! status: \${response.status}\`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       return response;
     } catch (error) {
