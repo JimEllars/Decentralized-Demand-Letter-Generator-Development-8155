@@ -97,10 +97,10 @@ export default {
           try {
             const body = await request.clone().json();
 
-            // Inject the correct success and cancel URLs into the payload
-            const clientOrigin = request.headers.get('Origin') || url.origin;
-            body.success_url = `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
-            body.cancel_url = `${clientOrigin}/start?canceled=true`;
+            // Prefer URLs sent explicitly from the client browser, fallback to custom domain
+            const clientOrigin = request.headers.get('Origin') || 'https://quickdemandletter.com';
+            body.success_url = body.success_url || `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
+            body.cancel_url = body.cancel_url || `${clientOrigin}/start?canceled=true`;
 
             fetchOptions.body = JSON.stringify(body);
             // Ensure Content-Type is application/json after modifying the body
