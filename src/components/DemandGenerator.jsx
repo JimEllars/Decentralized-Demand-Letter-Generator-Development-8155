@@ -222,14 +222,11 @@ const DemandGenerator = () => {
     }
     handleProceedToCheckout(true, onValidationFail);
   };
-  const onPaymentConfirm = async (deliveryEmail) => {
-    // Fortify state before redirect
-
+  const onPaymentConfirm = async (deliveryEmail, marketingOptIn) => {
     sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
     if (deliveryEmail) {
       sessionStorage.setItem('axim_delivery_email', deliveryEmail);
-    } else {
-      sessionStorage.removeItem('axim_delivery_email'); // Clean up stale data
+      sessionStorage.setItem('axim_marketing_optin', marketingOptIn ? 'true' : 'false');
     }
     handlePayment(isValid, onValidationFail);
   };
