@@ -69,7 +69,11 @@ describe('paymentService', () => {
       const fetchCall = globalThis.fetch.mock.calls[0];
       assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/create-checkout-session');
       assert.strictEqual(fetchCall.arguments[1].method, 'POST');
-      assert.strictEqual(fetchCall.arguments[1].body, JSON.stringify({ productId: 'test_product' }));
+      assert.strictEqual(fetchCall.arguments[1].body, JSON.stringify({
+        productId: 'test_product',
+        success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${window.location.origin}/start?canceled=true`
+      }));
     });
     it('should throw an error when fetch fails (response not ok) via processPayment', async () => {
       process.env.VITE_PAYMENT_API_URL = 'http://api.example.com';

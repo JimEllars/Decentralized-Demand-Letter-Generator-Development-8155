@@ -19,7 +19,11 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ productId }),
+      body: JSON.stringify({
+        productId,
+        success_url: `${window.location.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${window.location.origin}/start?canceled=true`
+      }),
     });
 
     if (!response.ok) {
