@@ -16,7 +16,6 @@ import { calculateTotal, getToneTemplate } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
 import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
-import { useDebounce } from '../hooks/useDebounce';
 
 const getInitialState = () => ({
   jurisdiction: 'CA',
@@ -92,8 +91,6 @@ const DemandGenerator = () => {
   } = usePayment();
 
 
-  const debouncedFormData = useDebounce(formData, 1000);
-  const debouncedCalculatedValues = useDebounce(calculatedValues, 1000);
 
 
 
@@ -249,8 +246,8 @@ const DemandGenerator = () => {
     <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-12 relative z-10">
-        <div className="lg:w-1/2 flex flex-col gap-8">
+      <main className="max-w-3xl mx-auto px-4 flex flex-col gap-12 relative z-10">
+        <div className="w-full flex flex-col gap-8">
 
         <Instructions />
 
