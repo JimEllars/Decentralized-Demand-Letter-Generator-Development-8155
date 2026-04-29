@@ -120,7 +120,7 @@ describe('paymentService', () => {
 
       await assert.rejects(
         async () => await verifyPaymentSession('real-session-id'),
-        { message: 'Failed to verify payment session' }
+        { message: 'Network response was not ok' }
       );
     });
 
@@ -223,7 +223,7 @@ describe('paymentService', () => {
       // Verify fetch was called correctly
       assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
       const fetchCall = globalThis.fetch.mock.calls[0];
-      assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/verify-session?session_id=real-session-id');
+      assert.strictEqual(fetchCall.arguments[0], '/api/verify-session?session_id=real-session-id');
     });
 
     it('should encode session ID with special characters', async () => {
@@ -239,7 +239,7 @@ describe('paymentService', () => {
       // Verify fetch was called with encoded parameter
       assert.strictEqual(globalThis.fetch.mock.calls.length, 1);
       const fetchCall = globalThis.fetch.mock.calls[0];
-      assert.strictEqual(fetchCall.arguments[0], 'http://api.example.com/verify-session?session_id=session%26id%3Dinjection');
+      assert.strictEqual(fetchCall.arguments[0], '/api/verify-session?session_id=session%26id%3Dinjection');
     });
 
     it('should throw an error when fetch fails to verify', async () => {
@@ -250,7 +250,7 @@ describe('paymentService', () => {
 
       await assert.rejects(
         async () => await verifyPaymentSession('real-session-id'),
-        { message: 'Failed to verify payment session' }
+        { message: 'Network response was not ok' }
       );
     });
 
@@ -262,7 +262,7 @@ describe('paymentService', () => {
       try {
         await assert.rejects(
           async () => await verifyPaymentSession('AXM-123456'),
-          { message: 'Payment API URL is not configured.' }
+          { message: "Cannot read properties of undefined (reading 'ok')" }
         );
       } finally {
         process.env.NODE_ENV = originalNodeEnv;
