@@ -137,10 +137,9 @@ export default {
             // Verify session with proxy backend (simulated call to backend verify-session)
             // The prompt says "This endpoint must verify the session_id is paid (via your backend proxy)"
 
-            const verifyReq = new Request(new URL('verify-session', backendUrl.origin + '/v1/').toString(), {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ session_id })
+            const verifyReq = new Request(new URL(`/verify-session?session_id=${encodeURIComponent(session_id)}`, backendUrl.origin).toString(), {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' }
             });
 
             let isPaid = false;
