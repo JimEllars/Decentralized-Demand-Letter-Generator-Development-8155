@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { FiShield } from 'react-icons/fi';
+import { FiShield, FiClock, FiFileText } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import {
   Terminal, ShieldCheck, Database, Map,
@@ -33,6 +33,24 @@ const TerminalLine = ({ text, delay }) => {
   );
 };
 
+const FEATURES = [
+  {
+    icon: FiClock,
+    title: "Quick & Easy",
+    description: "Answer a few simple questions and generate your completed PDF in under 3 minutes."
+  },
+  {
+    icon: FiShield,
+    title: "No Lawyer Required",
+    description: "Professional, assertive formatting designed to get you paid without the expensive hourly legal fees."
+  },
+  {
+    icon: FiFileText,
+    title: "State-Specific Rules",
+    description: "Our system automatically calculates maximum statutory interest rates based on your specific state."
+  }
+];
+
 const USE_CASES = [
   { title: 'Personal Injury', icon: <FileWarning size={20} className="text-axim-teal" /> },
   { title: 'Breach of Contract', icon: <Briefcase size={20} className="text-axim-purple" /> },
@@ -59,11 +77,22 @@ const FAQS = [
   }
 ];
 
-const OPERATIONAL_STEPS = [
-  { num: '01', title: 'Upload Evidence', desc: 'Securely attach your records for processing.' },
-  { num: '02', title: 'AI Fact Extraction', desc: 'AXiM Intelligence maps data nodes and verifies chronological damages.' },
-  { num: '03', title: 'State Formatting', desc: 'Automatically cross-references local jurisdictional requirements.' },
-  { num: '04', title: 'Instant Download', desc: 'Receive a strictly formatted PDF ready for final deployment.' }
+const STEPS = [
+  {
+    step: "01",
+    title: "Enter Details",
+    description: "Provide the names, addresses, and details of the outstanding debt."
+  },
+  {
+    step: "02",
+    title: "Choose Your Tone",
+    description: "Select from a Friendly Reminder, a Firm Notice, or an Aggressive Intent to Sue."
+  },
+  {
+    step: "03",
+    title: "Download Instantly",
+    description: "Pay a flat $4.00 fee and instantly download your legally-formatted PDF."
+  }
 ];
 
 const DemandLanding = () => {
@@ -110,18 +139,17 @@ const DemandLanding = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 uppercase"
+            className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 relative z-10"
           >
-            Recover Your Revenue Instantly.
+            Demand Letter PDF in <span className="text-transparent bg-clip-text bg-gradient-to-r from-axim-teal to-cyan-300">3 Easy Steps.</span>
           </motion.h1>
-
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-zinc-400 max-w-2xl mb-12 leading-relaxed"
+            className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed relative z-10"
           >
-            Get quick, professional Demand Letters in 12 minutes. No hourly fees. No 7-day waits. Our system does the work for <strong className="text-white">$4.00 per draft.</strong>
+            A quick, affordable solution when you need a professional demand letter fast. Skip the expensive attorney fees and generate a legally formatted PDF instantly for just $4.00.
           </motion.p>
 
           <motion.div
@@ -192,9 +220,9 @@ const DemandLanding = () => {
       {/* 2. Social Proof & Compliance Strip */}
       <section className="border-y border-white/5 bg-black/50 overflow-hidden relative z-10 py-4">
         <div className="flex gap-12 items-center justify-center animate-scroll whitespace-nowrap opacity-80 font-mono text-xs uppercase tracking-widest text-zinc-400">
-          <div className="flex items-center gap-2">
-            <span className="text-axim-gold">★★★★★</span> Trusted by 2,500+ professionals
-          </div>
+          <p className="text-sm font-medium text-zinc-400 uppercase tracking-widest relative z-10">
+            The fast, affordable alternative to hiring a lawyer.
+          </p>
           <span className="text-zinc-700">•</span>
           <div className="flex items-center gap-2">
             <ShieldCheck size={14} className="text-axim-teal" /> 256-Bit AES Encryption
@@ -221,14 +249,14 @@ const DemandLanding = () => {
             <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-axim-teal/30 to-transparent -translate-y-1/2 z-0"></div>
 
             {/* Steps */}
-            {OPERATIONAL_STEPS.map((step, idx) => (
+            {STEPS.map((step, idx) => (
               <div key={idx} className="relative z-10 bg-[#0A0A0A] border border-white/10 p-8 rounded-xl text-center shadow-xl group hover:border-white/20 transition-colors">
-                <div className="absolute top-2 right-4 text-[80px] font-black font-mono text-white/[0.03] select-none pointer-events-none group-hover:text-white/[0.05] transition-colors">{step.num}</div>
+                <div className="absolute top-2 right-4 text-[80px] font-black font-mono text-white/[0.03] select-none pointer-events-none group-hover:text-white/[0.05] transition-colors">{step.step}</div>
                 <div className="w-12 h-12 bg-black border border-white/10 rounded-full flex items-center justify-center font-mono text-axim-teal text-lg font-bold mx-auto mb-6 relative shadow-[0_0_15px_rgba(0,229,255,0.1)]">
                   {idx + 1}
                 </div>
                 <h3 className="text-lg font-bold mb-3 uppercase tracking-wide">{step.title}</h3>
-                <p className="text-zinc-400 text-sm leading-relaxed">{step.desc}</p>
+                <p className="text-zinc-400 text-sm leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
