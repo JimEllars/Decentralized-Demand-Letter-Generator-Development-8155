@@ -99,23 +99,17 @@ export const processPayment = async (productId) => {
  * @returns {Promise<{isPaid: boolean} | never>}
  */
 export const verifyPaymentSession = async (sessionId) => {
-  const paymentApiUrl = typeof import.meta !== 'undefined' && import.meta.env
-    ? import.meta.env.VITE_PAYMENT_API_URL
-    : process.env.VITE_PAYMENT_API_URL;
-
-  if (!paymentApiUrl) {
-    throw new Error('Payment API URL is not configured.');
-  }
-
   try {
-    const response = await fetch(`${paymentApiUrl}/verify-session?session_id=${encodeURIComponent(sessionId)}`);
-    if (!response.ok) {
-      throw new Error('Failed to verify payment session');
-    }
-    const data = await response.json();
-    return data;
+    const response = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.json();
   } catch (error) {
-    console.error("Payment Verification Error:", error);
+    console.error('Error verifying payment session:', error);
     throw error;
   }
 };

@@ -13,7 +13,7 @@ const secureStorage = {
   getItem: (name) => {
     const str = localStorage.getItem(name);
     if (!str) return null;
-    try { return decrypt(str); /* Fixed double JSON parsing crash by removing JSON.parse */ } catch(e) { return null; }
+    try { return decrypt(str); } catch(e) { return null; }
   },
   setItem: (name, value) => {
     try {

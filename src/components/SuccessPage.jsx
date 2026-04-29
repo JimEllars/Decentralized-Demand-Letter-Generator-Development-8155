@@ -55,7 +55,7 @@ const SuccessPage = () => {
          const a = document.createElement('a');
          a.style.display = 'none';
          a.href = url;
-         a.download = `Demand_Letter_${formData.debtorName?.replace(/\s+/g, '_') || 'Draft'}.pdf`;
+         a.download = `Demand_Letter_${formData.debtorName?.replace(/\s+/g, '_') || 'Final'}.pdf`;
          document.body.appendChild(a);
          a.click();
        } finally {
