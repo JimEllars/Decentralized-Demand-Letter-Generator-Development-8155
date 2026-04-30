@@ -346,7 +346,9 @@ export default {
       const newRequest = new Request(backendUrl.toString(), fetchOptions);
 
       try {
-        const response = await fetch(newRequest);
+        // CRITICAL ENHANCEMENT: Cache standard GET requests (like legal-statutes) at the Edge for 1 hour to drastically improve app load times
+        const fetchConfig = request.method === 'GET' ? { cf: { cacheTtl: 3600, cacheEverything: true } } : {};
+        const response = await fetch(newRequest, fetchConfig);
         const newResponse = new Response(response.body, response);
 
         // Ensure CORS headers are correct for the client
