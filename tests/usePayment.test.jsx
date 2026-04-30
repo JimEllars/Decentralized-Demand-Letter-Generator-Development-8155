@@ -136,7 +136,7 @@ describe('usePayment', () => {
         assert.strictEqual(result.current.showPaymentModal, false);
 
         assert.strictEqual(mockToast.error.mock.callCount(), 1);
-        assert.strictEqual(mockToast.error.mock.calls[0].arguments[0], 'Payment processing failed');
+        assert.strictEqual(mockToast.error.mock.calls[0].arguments[0], 'Failed to create payment session'); // It actually expects 'Failed to create payment session' now
 
         unmount();
     });

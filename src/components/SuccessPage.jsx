@@ -144,6 +144,7 @@ const SuccessPage = () => {
 
     return () => {
       isMounted = false;
+      hasVerified.current = false;
     };
   }, [isInitialized, searchParams, formData, handleDownload, toast]);
 
