@@ -178,7 +178,7 @@ export default {
             }
 
             const pdfDoc = await PDFDocument.create();
-            const page = pdfDoc.addPage();
+            let page = pdfDoc.addPage();
 
             // Embed fonts
             const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -188,6 +188,12 @@ export default {
             const fontSize = 12;
 
             let y = height - 50;
+            const checkPageBreak = (neededSpace) => {
+              if (y - neededSpace < 50) {
+                page = pdfDoc.addPage();
+                y = height - 50;
+              }
+            };
 
             const wrapText = (text, maxWidth, font, fontSize) => {
               const words = text.split(' ');
@@ -215,15 +221,18 @@ export default {
                const rawLines = text.split('\n');
                rawLines.forEach(rawLine => {
                  if (rawLine.trim() === '') {
+                   checkPageBreak(size + 4);
                    y -= size + 4;
                    return;
                  }
                  const wrappedLines = wrapText(rawLine, maxWidth, font, size);
                  wrappedLines.forEach(line => {
+                   checkPageBreak(size + 4);
                    page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
                    y -= size + 4;
                  });
-                 y -= 4; // Add a bit of space after paragraph
+                 checkPageBreak(4);
+                 y -= 4;
                });
             };
 

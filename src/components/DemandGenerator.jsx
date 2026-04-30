@@ -374,6 +374,9 @@ const DemandGenerator = () => {
                 <div className="text-center font-mono text-[0.65rem] text-zinc-400 font-bold mt-1 tracking-widest uppercase">
                     Quality and Satisfaction Guaranteed.
                 </div>
+                <div className="text-center text-[0.6rem] text-zinc-500 mt-6 max-w-sm mx-auto leading-relaxed border-t border-white/5 pt-4">
+                    <strong>Disclaimer:</strong> This tool generates formatted documents based on user input. It does not provide legal advice, nor does it create an attorney-client relationship. By proceeding, you agree you are acting on your own behalf.
+                </div>
                 </div>
 
             <UpsellCard total={calculatedValues.total} />
