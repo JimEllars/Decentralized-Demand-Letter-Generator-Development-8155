@@ -256,6 +256,9 @@ export default {
             y -= 30;
             drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 12, timesRomanBoldFont);
 
+            y -= 10;
+            page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
+
             y -= 20;
             drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
 
@@ -286,11 +289,19 @@ export default {
             drawText('__________________________', 12, timesRomanFont);
             drawText(sFormData.creditorName, 12, timesRomanFont);
 
-            // Draw Timestamp and Tracking ID
+            // Draw Multi-Page Footers (Tracking ID, Timestamp, Page Numbers)
             const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
             const timestamp = 'Generated: ' + new Date().toISOString();
-            page.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
-            page.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            const allPages = pdfDoc.getPages();
+
+            allPages.forEach((p, index) => {
+              const { width } = p.getSize();
+              // Left side: Tracking info
+              p.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+              p.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+              // Right side: Page Numbers
+              p.drawText(`Page ${index + 1} of ${allPages.length}`, { x: width - 100, y: 30, size: 10, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            });
 
             const pdfBytes = await pdfDoc.save();
 
