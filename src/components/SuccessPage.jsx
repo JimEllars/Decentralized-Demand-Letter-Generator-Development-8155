@@ -220,7 +220,19 @@ const SuccessPage = () => {
           await deliverOrchestratedDocument('demand_letter_v1', formData, email);
           if (isMounted) {
              toast.success(`Document automatically sent to ${email}`);
+
+             // CRITICAL FIX: Transmit the marketing lead if they opted in
+             const optIn = sessionStorage.getItem('axim_marketing_optin') === 'true';
+             if (optIn) {
+               fetch('/api/v1/telemetry/ingest', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify({ event: 'lead_captured', email, source: 'demand_letter_generator' })
+               }).catch(() => {}); // Fire and forget
+             }
+
              sessionStorage.removeItem('axim_delivery_email');
+             sessionStorage.removeItem('axim_marketing_optin');
           }
         } catch (err) {
           if (isMounted) console.error('Auto-send error:', err);
