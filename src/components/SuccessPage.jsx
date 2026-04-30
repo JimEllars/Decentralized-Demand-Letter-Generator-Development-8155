@@ -108,7 +108,7 @@ const SuccessPage = () => {
             formData.dueDate,
             formData.jurisdiction,
               formData.letterDate,
-              legalStatutes.details
+              legalStatutes?.details || {}
           );
           const toneTemplate = TONE_TEMPLATES[formData.tone];
 
@@ -116,7 +116,7 @@ const SuccessPage = () => {
           setTimeout(async () => {
             if (isMounted) {
               try {
-                const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
+                const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || []);
                 if (hash && isMounted) {
                   setDocumentHash(hash);
                 }
@@ -156,10 +156,10 @@ const SuccessPage = () => {
         formData.dueDate,
         formData.jurisdiction,
         formData.letterDate,
-        legalStatutes.details
+        legalStatutes?.details || {}
       );
       const toneTemplate = TONE_TEMPLATES[formData.tone];
-      const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes.clauses);
+      const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || []);
       if (hash) {
         setDocumentHash(hash);
       }
