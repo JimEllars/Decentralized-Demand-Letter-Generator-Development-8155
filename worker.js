@@ -257,6 +257,7 @@ export default {
             drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 12, timesRomanBoldFont);
 
             y -= 10;
+            checkPageBreak(15);
             page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
 
             y -= 20;
@@ -386,6 +387,9 @@ export default {
       assetResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       assetResponse.headers.set('Pragma', 'no-cache');
       assetResponse.headers.set('Expires', '0');
+      assetResponse.headers.set('X-Content-Type-Options', 'nosniff');
+      assetResponse.headers.set('X-Frame-Options', 'DENY');
+      assetResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
 
     return assetResponse;
