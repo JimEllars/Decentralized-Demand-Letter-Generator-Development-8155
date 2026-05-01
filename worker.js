@@ -188,9 +188,11 @@ export default {
             const fontSize = 12;
 
             let y = height - 50;
-            const checkPageBreak = (neededSpace) => {
-              if (y - neededSpace < 50) {
-                page = pdfDoc.addPage();
+            let currentPage = page;
+
+            const checkPageBreak = (requiredSpace) => {
+              if (y - requiredSpace < 70) {
+                currentPage = pdfDoc.addPage();
                 y = height - 50;
               }
             };
@@ -228,7 +230,7 @@ export default {
                  const wrappedLines = wrapText(rawLine, maxWidth, font, size);
                  wrappedLines.forEach(line => {
                    checkPageBreak(size + 4);
-                   page.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
+                   currentPage.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
                    y -= size + 4;
                  });
                  checkPageBreak(4);
@@ -240,14 +242,14 @@ export default {
             // Right-aligned Date
             const formattedDate = sFormData.letterDate || new Date().toISOString().split('T')[0];
             const dateWidth = timesRomanFont.widthOfTextAtSize(formattedDate, 12);
-            page.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: timesRomanFont, color: rgb(0, 0, 0) });
+            currentPage.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: timesRomanFont, color: rgb(0, 0, 0) });
 
             drawText('VIA CERTIFIED MAIL', 12, timesRomanBoldFont);
             drawText('CONFIDENTIAL LEGAL COMMUNICATION', 10, timesRomanFont, 50, width - 100);
             y -= 15;
 
             // Document Title
-            page.drawText(tone?.title || 'FORMAL DEMAND FOR PAYMENT', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
+            currentPage.drawText(tone?.title || 'FORMAL DEMAND FOR PAYMENT', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
             y -= 30;
 
             drawText('FROM:', 10, timesRomanFont);
@@ -264,7 +266,7 @@ export default {
 
             y -= 10;
             checkPageBreak(15);
-            page.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
+            currentPage.drawLine({ start: { x: 50, y }, end: { x: width - 50, y }, thickness: 1, color: rgb(0.8, 0.8, 0.8) });
 
             y -= 20;
             drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, timesRomanFont);
@@ -275,7 +277,7 @@ export default {
             if (sFormData.items && sFormData.items.length > 0) {
               sFormData.items.forEach(item => {
                 const itemDateStr = item.date ? ` (${item.date})` : '';
-                const amountStr = item.amount ? `${parseFloat(item.amount).toFixed(2)}` : '$0.00';
+                const amountStr = item.amount ? `$${parseFloat(item.amount).toFixed(2)}` : '$0.00';
                 drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
               });
             }
@@ -296,16 +298,17 @@ export default {
             drawText('__________________________', 12, timesRomanFont);
             drawText(sFormData.creditorName, 12, timesRomanFont);
 
-            // Draw Multi-Page Footers (Tracking ID, Timestamp, Page Numbers)
+            checkPageBreak(50);
             const trackingId = 'Document Tracking ID: ' + crypto.randomUUID();
             const timestamp = 'Generated: ' + new Date().toISOString();
+            currentPage.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            currentPage.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+
+            // Draw Multi-Page Footers (Page Numbers)
             const allPages = pdfDoc.getPages();
 
             allPages.forEach((p, index) => {
               const { width } = p.getSize();
-              // Left side: Tracking info
-              p.drawText(trackingId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
-              p.drawText(timestamp, { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
               // Right side: Page Numbers
               p.drawText(`Page ${index + 1} of ${allPages.length}`, { x: width - 100, y: 30, size: 10, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
             });
