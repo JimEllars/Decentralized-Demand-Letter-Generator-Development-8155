@@ -237,11 +237,17 @@ export default {
             };
 
             // Header Polish
-            drawText('Sent via Certified Mail: [ Tracking Number ]', 10, timesRomanBoldFont);
-            y -= 10;
+            // Right-aligned Date
+            const formattedDate = sFormData.letterDate || new Date().toISOString().split('T')[0];
+            const dateWidth = timesRomanFont.widthOfTextAtSize(formattedDate, 12);
+            page.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: timesRomanFont, color: rgb(0, 0, 0) });
 
-            // Very basic layout
-            page.drawText(tone?.title || 'DEMAND LETTER', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
+            drawText('VIA CERTIFIED MAIL', 12, timesRomanBoldFont);
+            drawText('CONFIDENTIAL LEGAL COMMUNICATION', 10, timesRomanFont, 50, width - 100);
+            y -= 15;
+
+            // Document Title
+            page.drawText(tone?.title || 'FORMAL DEMAND FOR PAYMENT', { x: 50, y, size: 16, font: timesRomanBoldFont, color: rgb(0.12, 0.23, 0.54) });
             y -= 30;
 
             drawText('FROM:', 10, timesRomanFont);
