@@ -291,7 +291,7 @@ export default {
             drawText(sFormData.creditorName, 12, timesRomanFont);
 
             // Draw Multi-Page Footers (Tracking ID, Timestamp, Page Numbers)
-            const trackingId = 'AXiM Systems Tracking ID: ' + crypto.randomUUID();
+            const trackingId = 'Document Tracking ID: ' + crypto.randomUUID();
             const timestamp = 'Generated: ' + new Date().toISOString();
             const allPages = pdfDoc.getPages();
 
