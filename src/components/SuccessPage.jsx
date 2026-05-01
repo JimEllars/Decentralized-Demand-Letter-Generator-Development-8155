@@ -96,48 +96,42 @@ const SuccessPage = () => {
       let isPaid = false;
       let verifiedData = null;
 
-      try {
-        // Polling loop: Try up to 4 times (6 seconds total) to allow Stripe webhooks to sync
-        while (attempts < 4 && !isPaid) {
-          try {
-            verifiedData = await verifyPaymentSession(sessionId);
-            if (verifiedData?.isPaid) {
-              isPaid = true;
-              break;
-            }
-          } catch (err) {
-            console.warn('Verification attempt ' + (attempts + 1) + ' failed');
+      // Polling loop: Try up to 4 times (6 seconds) for Stripe Webhooks to sync
+      while (attempts < 4 && !isPaid) {
+        try {
+          verifiedData = await verifyPaymentSession(sessionId);
+          if (verifiedData?.isPaid) {
+            isPaid = true;
+            break;
           }
-          attempts++;
-          if (!isPaid && attempts < 4 && isMounted) {
-            await new Promise(r => setTimeout(r, 1500)); // Wait 1.5s before retry
-          }
+        } catch (err) {
+          console.warn('Verification attempt ' + (attempts + 1) + ' failed');
         }
+        attempts++;
+        if (!isPaid && attempts < 4 && isMounted) {
+          await new Promise(r => setTimeout(r, 1500));
+        }
+      }
 
-        if (!isMounted) return;
+      if (!isMounted) return;
 
+      try {
         if (isPaid) {
-          const data = verifiedData;
           setVerificationStatus('success');
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
           localStorage.removeItem('axim_demand_draft');
-          // Trigger download automatically
+
           const calculatedValues = calculateTotal(
-            formData.items,
-            formData.statutoryInterest,
-            formData.dueDate,
-            formData.jurisdiction,
-            formData.letterDate,
-            legalStatutes?.details || {}
+            formData.items, formData.statutoryInterest, formData.dueDate,
+            formData.jurisdiction, formData.letterDate, legalStatutes?.details || {}
           );
           const toneTemplate = TONE_TEMPLATES[formData.tone];
 
-          // Delay download slightly to ensure UI updates and is perceived as a smooth transition
           setTimeout(async () => {
             if (isMounted) {
               try {
-                await handleDownload(formData, calculatedValues, toneTemplate);
+                await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || [], sessionId);
               } catch (err) {
                 console.error("PDF generation error:", err);
                 if (setIsGenerating) setIsGenerating(false);
@@ -145,7 +139,6 @@ const SuccessPage = () => {
               }
             }
           }, 1000);
-
         } else {
           setVerificationStatus('failed');
           toast.error("Payment verification failed.");
