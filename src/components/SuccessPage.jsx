@@ -143,7 +143,7 @@ const SuccessPage = () => {
       isMounted = false;
       hasVerified.current = false;
     };
-  }, [isInitialized, searchParams, formData, handleDownload, toast]);
+  }, [isInitialized, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDownloadAgain = async () => {
     try {
@@ -229,7 +229,7 @@ const SuccessPage = () => {
              sessionStorage.removeItem('axim_marketing_optin');
           }
         } catch (err) {
-          if (isMounted) console.error('Auto-send error:', err);
+          if (isMounted) { console.error('Auto-send error:', err); toast.info('Email delivery delayed. Please use the Download button below.'); }
         } finally {
           if (isMounted) setIsSendingEmail(false);
         }
@@ -254,7 +254,7 @@ const SuccessPage = () => {
       toast.success(`Document sent to ${email}`);
       setEmail('');
     } catch (err) {
-      toast.error('Failed to send email. Please try again.');
+      toast.info('Email services are currently offline. Please use the Download button to save your document.');
       console.error('Email send error:', err);
     } finally {
       setIsSendingEmail(false);
