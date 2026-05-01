@@ -31,7 +31,7 @@ const SuccessPage = () => {
 
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleDownload = async (isValid, onValidationFail, formData, calculatedValues, toneTemplate, isPaid, clauses, overrideSessionId) => {
+  const handleDownload = async (formData, calculatedValues, toneTemplate, overrideSessionId) => {
      setIsGenerating(true);
      try {
        const response = await fetch('/api/generate-demand-letter', {
@@ -73,7 +73,7 @@ const SuccessPage = () => {
 
   const [verificationStatus, setVerificationStatus] = useState('verifying'); // 'verifying', 'success', 'failed'
   const hasVerified = useRef(false);
-  const [documentHash, setDocumentHash] = useState(null);
+
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -116,10 +116,7 @@ const SuccessPage = () => {
           setTimeout(async () => {
             if (isMounted) {
               try {
-                const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || []);
-                if (hash && isMounted) {
-                  setDocumentHash(hash);
-                }
+                await handleDownload(formData, calculatedValues, toneTemplate);
               } catch (err) {
                 console.error("PDF generation error:", err);
                 if (setIsGenerating) setIsGenerating(false);
@@ -159,10 +156,7 @@ const SuccessPage = () => {
         legalStatutes?.details || {}
       );
       const toneTemplate = TONE_TEMPLATES[formData.tone];
-      const hash = await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || []);
-      if (hash) {
-        setDocumentHash(hash);
-      }
+      await handleDownload(formData, calculatedValues, toneTemplate);
     } catch (err) {
       console.error("Manual PDF generation error:", err);
       if (setIsGenerating) setIsGenerating(false);
