@@ -92,11 +92,32 @@ const SuccessPage = () => {
     }
 
     const verifyAndDownload = async () => {
+      let attempts = 0;
+      let isPaid = false;
+      let verifiedData = null;
+
       try {
-        const data = await verifyPaymentSession(sessionId);
+        // Polling loop: Try up to 4 times (6 seconds total) to allow Stripe webhooks to sync
+        while (attempts < 4 && !isPaid) {
+          try {
+            verifiedData = await verifyPaymentSession(sessionId);
+            if (verifiedData?.isPaid) {
+              isPaid = true;
+              break;
+            }
+          } catch (err) {
+            console.warn('Verification attempt ' + (attempts + 1) + ' failed');
+          }
+          attempts++;
+          if (!isPaid && attempts < 4 && isMounted) {
+            await new Promise(r => setTimeout(r, 1500)); // Wait 1.5s before retry
+          }
+        }
+
         if (!isMounted) return;
 
-        if (data.isPaid) {
+        if (isPaid) {
+          const data = verifiedData;
           setVerificationStatus('success');
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
@@ -107,8 +128,8 @@ const SuccessPage = () => {
             formData.statutoryInterest,
             formData.dueDate,
             formData.jurisdiction,
-              formData.letterDate,
-              legalStatutes?.details || {}
+            formData.letterDate,
+            legalStatutes?.details || {}
           );
           const toneTemplate = TONE_TEMPLATES[formData.tone];
 
