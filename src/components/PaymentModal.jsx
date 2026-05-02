@@ -85,6 +85,9 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
             <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-xs text-zinc-500 hover:text-white hover:bg-glass border border-transparent hover:border-subtle transition-all uppercase tracking-widest rounded-sm">
               Cancel
             </button>
+            <div className="text-center font-mono text-[0.55rem] text-zinc-600 mt-2 leading-relaxed px-4">
+              By proceeding, you acknowledge that QuickDemandLetter is a self-help software tool, not a law firm. This service does not provide legal advice.
+            </div>
           </div>
         </div>
       </motion.div>

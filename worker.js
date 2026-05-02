@@ -60,7 +60,7 @@ export default {
             try {
               const verifyRes = await fetch(verifyReq);
               const verifyData = await verifyRes.json();
-              if (verifyData.isPaid || verifyData.status === 'paid' || verifyData.payment_status === 'paid' || verifyRes.ok) isPaid = true;
+              if (verifyData.isPaid || verifyData.status === 'paid' || verifyData.payment_status === 'paid') isPaid = true;
             } catch(e) { console.error('Session verification failed', e); }
 
             if (!isPaid && session_id !== 'bypass_dev_mode') {
@@ -140,6 +140,7 @@ export default {
 
             checkPageBreak(50);
             currentPage.drawText('Document Tracking ID: ' + crypto.randomUUID(), { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+            currentPage.drawText('Generated via QuickDemandLetter.com. This document is user-generated and does not constitute legal advice.', { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
 
             const pdfBytes = await pdfDoc.save();
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': url.origin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
