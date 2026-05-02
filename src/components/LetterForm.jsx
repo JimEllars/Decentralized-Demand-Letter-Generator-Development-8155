@@ -103,7 +103,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                     <div className="space-y-4">
                     <div>
                         <label htmlFor="creditorName" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Creditor Name</label>
-                        <input
+                        <input maxLength="2000"
                         id="creditorName"
                         name="creditorName"
                         placeholder="Your Name / Company"
@@ -117,7 +117,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                     </div>
                     <div>
                         <label htmlFor="creditorAddress" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Creditor Address</label>
-                        <textarea
+                        <textarea maxLength="2000"
                         id="creditorAddress"
                         name="creditorAddress"
                         placeholder="Your Mailing Address"
@@ -132,7 +132,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                     </div>
                     <div>
                         <label htmlFor="debtorName" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Debtor Name</label>
-                        <input
+                        <input maxLength="2000"
                         id="debtorName"
                         name="debtorName"
                         placeholder="Debtor Full Name"
@@ -146,7 +146,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                     </div>
                     <div>
                         <label htmlFor="debtorAddress" className="font-inter text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2 block">Debtor Address</label>
-                        <textarea
+                        <textarea maxLength="2000"
                         id="debtorAddress"
                         name="debtorAddress"
                         placeholder="Debtor Mailing Address"
@@ -215,7 +215,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             Set to 30 Days Ago
                         </button>
                     </div>
-                    <input
+                    <input maxLength="2000"
                         id="dueDate"
                         name="dueDate"
                         type="date"
@@ -257,7 +257,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             Custom Interest Rate Override <span className="text-zinc-500 font-normal normal-case">(Optional)</span>
                             </label>
                             <div className="relative">
-                                <input
+                                <input maxLength="2000"
                                 id="statutoryInterest"
                                 type="number"
                                 name="statutoryInterest"
@@ -313,7 +313,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                                 Set to Today
                                 </button>
                             </div>
-                            <input
+                            <input maxLength="2000"
                             id="letterDate"
                             type="date"
                             name="letterDate"

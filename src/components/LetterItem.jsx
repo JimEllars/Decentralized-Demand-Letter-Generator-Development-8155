@@ -18,7 +18,7 @@ const LetterItem = memo(({ item, index, onChange, onRemove, showRemove, itemErro
           <input
             aria-label={`Description for item ${index + 1}`}
             placeholder="Description (e.g. Invoice #101)"
-            maxLength={500}
+            maxLength="2000"
             value={item.description}
             onChange={(e) => onChange(index, 'description', e.target.value)}
             className={getInputClass(!!itemErrors.description)}
