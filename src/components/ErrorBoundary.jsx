@@ -12,29 +12,21 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
-    this.setState({ errorInfo });
+    console.error("Caught by ErrorBoundary:", error, errorInfo);
 
+    // Silent Telemetry Ping
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-      fetch('https://api.axim.us.com/v1/telemetry/errors', {
+      fetch('/api/v1/telemetry/ingest', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          app: 'demand_letter_generator',
-          message: error.message,
-          stack: errorInfo.componentStack,
-          timestamp: new Date().toISOString()
-        }),
-        signal: controller.signal
-      }).catch(err => console.error("Telemetry failed:", err))
-        .finally(() => clearTimeout(timeoutId));
-    } catch (e) {
-      console.error("Failed to send telemetry:", e);
-    }
+          event: 'frontend_crash',
+          error_message: error.message,
+          component_stack: errorInfo.componentStack,
+          url: window.location.href
+        })
+      }).catch(() => {}); // Fire and forget
+    } catch(e) { /* Ignore */ }
   }
 
   handleReset() {

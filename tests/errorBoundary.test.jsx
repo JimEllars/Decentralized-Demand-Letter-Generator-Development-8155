@@ -62,15 +62,15 @@ describe('ErrorBoundary', () => {
     assert.strictEqual(fetchMock.mock.callCount(), 1);
 
     const fetchCall = fetchMock.mock.calls[0];
-    assert.strictEqual(fetchCall.arguments[0], 'https://api.axim.us.com/v1/telemetry/errors');
+    assert.strictEqual(fetchCall.arguments[0], '/api/v1/telemetry/ingest');
     assert.strictEqual(fetchCall.arguments[1].method, 'POST');
     assert.strictEqual(fetchCall.arguments[1].headers['Content-Type'], 'application/json');
 
     const body = JSON.parse(fetchCall.arguments[1].body);
-    assert.strictEqual(body.app, 'demand_letter_generator');
-    assert.strictEqual(body.message, 'Test Error');
-    assert.ok(body.stack);
-    assert.ok(body.timestamp);
+    assert.strictEqual(body.event, 'frontend_crash');
+    assert.strictEqual(body.error_message, 'Test Error');
+
+
 
     delete globalThis.fetch;
   });

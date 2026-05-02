@@ -67,6 +67,16 @@ export default {
               return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
 
+            const formatFriendlyDate = (dateStr) => {
+              if (!dateStr) return '';
+              const [year, month, day] = dateStr.split('-');
+              if (year && month && day) {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+              }
+              return dateStr;
+            };
+
             // PDF Generation Engine
             const pdfDoc = await PDFDocument.create();
             let currentPage = pdfDoc.addPage();
@@ -109,7 +119,7 @@ export default {
             };
 
             // Professional Headers
-            const formattedDate = sFormData.letterDate || new Date().toISOString().split('T')[0];
+            const formattedDate = formatFriendlyDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
             const dateWidth = timesRomanFont.widthOfTextAtSize(formattedDate, 12);
             currentPage.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: timesRomanFont, color: rgb(0, 0, 0) });
             drawText('VIA CERTIFIED MAIL', 12, timesRomanBoldFont);
@@ -132,7 +142,7 @@ export default {
             y -= 10;
 
             drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont); y -= 20;
-            drawText(`Payment must be received by ${sFormData.dueDate}. ${tone?.closing || ''}`, 12, timesRomanFont); y -= 20;
+            drawText(`Payment must be received by ${formatFriendlyDate(sFormData.dueDate)}. ${tone?.closing || ''}`, 12, timesRomanFont); y -= 20;
             drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
             drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, timesRomanFont); y -= 40;
             drawText('Sincerely,', 12, timesRomanFont); y -= 30;
