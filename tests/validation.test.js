@@ -206,3 +206,37 @@ describe('getFirstErrorFieldId', () => {
     assert.strictEqual(getFirstErrorFieldId(errors), null);
   });
 });
+
+describe('Checkout Email Regex Validation', () => {
+  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+  it('should validate standard email addresses', () => {
+    assert.strictEqual(emailRegex.test('test@example.com'), true);
+    assert.strictEqual(emailRegex.test('john.doe@company.co.uk'), true);
+    assert.strictEqual(emailRegex.test('user1234@mail.org'), true);
+  });
+
+  it('should validate complex email addresses', () => {
+    assert.strictEqual(emailRegex.test('first.last+tag@sub.domain.net'), true);
+    assert.strictEqual(emailRegex.test('user%name@example.com'), true);
+    assert.strictEqual(emailRegex.test('a@b.cc'), true); // Minimal length domain and TLD
+  });
+
+  it('should invalidate emails missing the @ symbol', () => {
+    assert.strictEqual(emailRegex.test('testexample.com'), false);
+    assert.strictEqual(emailRegex.test('userdomain.com'), false);
+  });
+
+  it('should invalidate emails missing the domain', () => {
+    assert.strictEqual(emailRegex.test('test@.com'), false);
+    assert.strictEqual(emailRegex.test('test@'), false);
+  });
+
+  it('should invalidate emails with an invalid TLD length', () => {
+    assert.strictEqual(emailRegex.test('test@example.c'), false); // TLD too short
+  });
+
+  it('should invalidate empty strings', () => {
+    assert.strictEqual(emailRegex.test(''), false);
+  });
+});
