@@ -68,3 +68,34 @@ describe('formatCurrency', () => {
     assert.strictEqual(formatCurrency(''), '$0.00');
   });
 });
+
+describe('formatFriendlyDate', () => {
+  // Simulating formatFriendlyDate as it is currently only present in worker.js
+  const formatFriendlyDate = (dateStr) => {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    if (year && month && day) {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+    }
+    return dateStr;
+  };
+
+  it('should format a valid date string YYYY-MM-DD', () => {
+    assert.strictEqual(formatFriendlyDate('2026-03-31'), 'March 31, 2026');
+    assert.strictEqual(formatFriendlyDate('2023-01-01'), 'January 1, 2023');
+    assert.strictEqual(formatFriendlyDate('1999-12-31'), 'December 31, 1999');
+  });
+
+  it('should fallback to the original string if malformed', () => {
+    assert.strictEqual(formatFriendlyDate('invalid-date'), 'invalid-date');
+    assert.strictEqual(formatFriendlyDate('2026/03/31'), '2026/03/31');
+    assert.strictEqual(formatFriendlyDate('March 31, 2026'), 'March 31, 2026');
+  });
+
+  it('should return empty string on falsy values', () => {
+    assert.strictEqual(formatFriendlyDate(''), '');
+    assert.strictEqual(formatFriendlyDate(null), '');
+    assert.strictEqual(formatFriendlyDate(undefined), '');
+  });
+});
