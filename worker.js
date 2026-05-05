@@ -51,31 +51,22 @@ export default {
                letterDate: sanitize(formData.letterDate), items: Array.isArray(formData.items) ? formData.items : []
             };
 
-            // Session Verification via GET
-            const verifyReqUrl = new URL('/v1/verify-session', backendUrl.origin);
+            // CRITICAL FIX 1: Corrected path from /v1/verify-session to /verify-session
+            const verifyReqUrl = new URL('/verify-session', backendUrl.origin);
             verifyReqUrl.searchParams.set('session_id', session_id);
             const verifyReq = new Request(verifyReqUrl.toString(), { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let isPaid = false;
             try {
-              const verifyRes = await fetch(verifyReq);
+              // Bypass CF Cache entirely for this internal check
+              const verifyRes = await fetch(verifyReq, { cf: { cacheTtl: -1 } });
               const verifyData = await verifyRes.json();
               if (verifyData.isPaid || verifyData.status === 'paid' || verifyData.payment_status === 'paid') isPaid = true;
             } catch(e) { console.error('Session verification failed', e); }
 
             if (!isPaid && session_id !== 'bypass_dev_mode') {
-              return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+              return new Response(JSON.stringify({ error: 'Payment Required: Valid Stripe session missing' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
-
-            const formatFriendlyDate = (dateStr) => {
-              if (!dateStr) return '';
-              const [year, month, day] = dateStr.split('-');
-              if (year && month && day) {
-                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-                return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
-              }
-              return dateStr;
-            };
 
             // PDF Generation Engine
             const pdfDoc = await PDFDocument.create();
@@ -85,7 +76,6 @@ export default {
             const { width, height } = currentPage.getSize();
             let y = height - 50;
 
-            // Pagination Tracker
             const checkPageBreak = (requiredSpace) => {
               if (y - requiredSpace < 70) {
                 currentPage = pdfDoc.addPage();
@@ -118,7 +108,16 @@ export default {
                });
             };
 
-            // Professional Headers
+            const formatFriendlyDate = (dateStr) => {
+              if (!dateStr) return '';
+              const [year, month, day] = dateStr.split('-');
+              if (year && month && day) {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+              }
+              return dateStr;
+            };
+
             const formattedDate = formatFriendlyDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
             const dateWidth = timesRomanFont.widthOfTextAtSize(formattedDate, 12);
             currentPage.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: timesRomanFont, color: rgb(0, 0, 0) });
@@ -158,8 +157,13 @@ export default {
         } else { fetchOptions.body = request.clone().body; }
       }
 
-      // Edge Caching for GET Proxy Requests
-      const fetchConfig = request.method === 'GET' ? { cf: { cacheTtl: 3600, cacheEverything: true } } : {};
+      // CRITICAL FIX 2: Targeted Edge Caching
+      // ONLY cache legal-statutes to protect Stripe polling requests
+      let fetchConfig = {};
+      if (request.method === 'GET' && url.pathname.includes('legal-statutes')) {
+        fetchConfig = { cf: { cacheTtl: 3600, cacheEverything: true } };
+      }
+
       try {
         const response = await fetch(new Request(backendUrl.toString(), fetchOptions), fetchConfig);
         const newResponse = new Response(response.body, response);
@@ -168,7 +172,6 @@ export default {
       } catch (err) { return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': url.origin } }); }
     }
 
-    // Asset Routing and Security Headers
     let assetResponse = await env.ASSETS.fetch(request);
     if (assetResponse.status === 404 && request.method === 'GET') {
       if (!url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/i)) {
