@@ -64,16 +64,20 @@ const USE_CASES = [
 
 const FAQS = [
   {
-    question: "Is my data used for training?",
-    answer: "Absolute Zero Retention. We use a Zero-Knowledge Architecture. All data resides securely in your browser and is destroyed upon session close. We don't possess your data, so it cannot be used for training or exposure."
+    question: "Is this a legally binding document?",
+    answer: "Yes. Our generator produces a formally structured demand letter designed to meet standard legal requirements for debt collection and small claims prerequisites. However, we are a software tool, not a law firm, and this does not constitute legal advice."
   },
   {
-    question: "Will it work in my state?",
-    answer: "Yes. The AXiM engine cross-references procedural formatting bounds to generate structurally compliant letters across all 50 U.S. states and jurisdictions."
+    question: "Is my personal data secure?",
+    answer: "Absolutely. We use a Zero-Knowledge Architecture. Your data is processed entirely in your local browser and our edge network to generate the PDF. We never save your personal details or debt information to a central database."
   },
   {
-    question: "Are there hidden subscriptions?",
-    answer: "No. Flat $4.00 per final rendered draft. We removed human operational overhead and pass the compute savings directly to you. No recurring fees, retainers, or hidden charges."
+    question: "How quickly do I get my document?",
+    answer: "Instantly. As soon as your secure $4.00 Stripe payment clears, your finalized, professional PDF is immediately available for download directly to your device."
+  },
+  {
+    question: "Will it calculate my state's interest rates?",
+    answer: "Yes. Our system automatically references maximum statutory interest rates based on the specific state jurisdiction you select during the drafting process."
   }
 ];
 
@@ -414,43 +418,25 @@ const DemandLanding = () => {
         </div>
       </section>
 
-      {/* 7. FAQ */}
-      <section className="py-24 px-4 bg-white/[0.01] border-t border-white/5 relative z-10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold uppercase tracking-tight text-center mb-12">Protocol Queries</h2>
-          <div className="space-y-4">
+        {/* FAQ Section */}
+        <section className="relative z-10 max-w-4xl mx-auto py-20 px-4 border-t border-white/5">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Frequently Asked Questions</h2>
+            <p className="text-zinc-400 text-sm tracking-wide">Everything you need to know about the product.</p>
+          </div>
+          <div className="grid gap-4 md:gap-6">
             {FAQS.map((faq, idx) => (
-              <div
-                key={idx}
-                className={`bg-black/40 border border-white/10 rounded-lg overflow-hidden transition-all duration-300 ${faqOpen === idx ? 'border-l-2 border-l-axim-gold' : ''}`}
-              >
-                <button
-                  onClick={() => toggleFaq(idx)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left font-semibold text-zinc-200 hover:bg-white/5 transition-colors focus:outline-none"
-                >
-                  {faq.question}
-                  <ChevronDown
-                    size={20}
-                    className={`text-zinc-500 transition-transform duration-300 ${faqOpen === idx ? 'rotate-180 text-axim-gold' : ''}`}
-                  />
-                </button>
-                <AnimatePresence>
-                  {faqOpen === idx && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="px-6 pb-5 text-zinc-400 text-sm leading-relaxed"
-                    >
-                      {faq.answer}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <div key={idx} className="bg-black/40 border border-white/5 p-6 rounded-xl hover:border-axim-teal/30 transition-colors">
+                <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                  <span className="text-axim-teal text-sm">Q.</span> {faq.question}
+                </h3>
+                <p className="text-zinc-400 text-sm leading-relaxed pl-6 border-l-2 border-white/5">
+                  {faq.answer}
+                </p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* 8. Final Revenue Trigger */}
       <section className="py-32 px-4 relative z-10 flex flex-col items-center justify-center text-center min-h-[60vh] border-t border-white/5">
