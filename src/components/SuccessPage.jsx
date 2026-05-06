@@ -120,7 +120,6 @@ const SuccessPage = () => {
           setVerificationStatus('success');
           window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
-          localStorage.removeItem('axim_demand_draft');
 
           const calculatedValues = calculateTotal(
             formData.items, formData.statutoryInterest, formData.dueDate,
@@ -181,6 +180,7 @@ const SuccessPage = () => {
   const handleCreateAnother = () => {
     resetForm();
     localStorage.removeItem('axim_demand_letter_paid_status');
+    localStorage.removeItem('axim_demand_draft');
     sessionStorage.removeItem('axim_delivery_email');
     navigate('/start');
   };
@@ -217,6 +217,7 @@ const SuccessPage = () => {
   };
 
   // Auto-send email if user provided one during checkout
+  /*
   useEffect(() => {
     let isMounted = true;
     if (verificationStatus === 'success' && email && !hasSentInitialEmail.current) {
@@ -254,6 +255,7 @@ const SuccessPage = () => {
        isMounted = false;
     };
   }, [verificationStatus, email, toast, formData]);
+  */
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -320,7 +322,9 @@ const SuccessPage = () => {
             <h2 className="text-2xl font-bold tracking-tight text-white mb-2">Payment Successful</h2>
             <p className="text-zinc-400 text-sm leading-relaxed mb-8">
               Your compliant Demand Letter is generating.
-              <span className="text-amber-400 block mt-2 font-semibold">iOS / Safari Users: Auto-downloads are often blocked. Please click the manual 'Download Again' button below if your file does not appear.</span>
+              <span className="text-red-400 block mt-4 font-bold uppercase tracking-widest text-[0.7rem]">⚠️ Save This Document Immediately</span>
+              <span className="text-zinc-400 block mt-1 mb-4 text-xs font-medium">For your privacy, we do not store your data. If you close this tab before saving, your document will be permanently deleted.</span>
+              <span className="text-amber-400 block mt-2 font-semibold text-xs">iOS / Safari Users: Auto-downloads are often blocked. Please click 'Download Again' below.</span>
               {isGenerating && <span className="block mt-2 text-axim-teal animate-pulse">Generating PDF...</span>}
             </p>
 
