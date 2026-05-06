@@ -217,29 +217,29 @@ const SuccessPage = () => {
   };
 
   // Auto-send email if user provided one during checkout
-  /*
   useEffect(() => {
     let isMounted = true;
-    if (verificationStatus === 'success' && email && !hasSentInitialEmail.current) {
+    if (verificationStatus === 'success' && email && !hasSentInitialEmail.current && legalStatutes) {
       hasSentInitialEmail.current = true;
       const sendInitialEmail = async () => {
         if (!isMounted) return;
         setIsSendingEmail(true);
         try {
-          await deliverOrchestratedDocument('demand_letter_v1', formData, email);
+          const sessionId = searchParams.get('session_id');
+          const calculatedValues = calculateTotal(
+            formData.items, formData.statutoryInterest, formData.dueDate,
+            formData.jurisdiction, formData.letterDate, legalStatutes?.details || {}
+          );
+          await deliverOrchestratedDocument(sessionId, formData, email, calculatedValues, TONE_TEMPLATES[formData.tone]);
           if (isMounted) {
              toast.success(`Document automatically sent to ${email}`);
-
-             // CRITICAL FIX: Transmit the marketing lead if they opted in
              const optIn = sessionStorage.getItem('axim_marketing_optin') === 'true';
              if (optIn) {
                fetch('/api/v1/telemetry/ingest', {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/json' },
+                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                  body: JSON.stringify({ event: 'lead_captured', email, source: 'demand_letter_generator' })
-               }).catch(() => {}); // Fire and forget
+               }).catch(() => {});
              }
-
              sessionStorage.removeItem('axim_delivery_email');
              sessionStorage.removeItem('axim_marketing_optin');
           }
@@ -251,11 +251,8 @@ const SuccessPage = () => {
       };
       sendInitialEmail();
     }
-    return () => {
-       isMounted = false;
-    };
-  }, [verificationStatus, email, toast, formData]);
-  */
+    return () => { isMounted = false; };
+  }, [verificationStatus, email, toast, formData, searchParams, legalStatutes]);
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
@@ -338,7 +335,7 @@ const SuccessPage = () => {
                 Download Again
               </button>
 
-              {/*
+              {
 <form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
                 <label htmlFor="email" className="text-sm font-medium text-zinc-300 text-left mb-1 flex items-center gap-2">
                   <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Document
@@ -365,7 +362,7 @@ const SuccessPage = () => {
                   </button>
                 </div>
               </form>
-*/}
+}
 
               <button
                 onClick={handleCreateAnother}

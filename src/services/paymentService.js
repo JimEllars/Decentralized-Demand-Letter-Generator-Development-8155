@@ -16,9 +16,7 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
       return { url: data.url };
     }
     return data;
-  } catch (error) {
-    throw error;
-  }
+  } catch (error) { throw error; }
 };
 
 export const processPayment = async (productId) => initiateBackendTransaction('/api', productId);
@@ -29,12 +27,12 @@ export const verifyPaymentSession = async (sessionId) => {
   return response.json();
 };
 
-export const deliverOrchestratedDocument = async (templateId, formData, email) => {
-  const response = await fetch(`/api/functions/document-orchestrator`, {
+export const deliverOrchestratedDocument = async (sessionId, formData, email, calculatedValues, toneTemplate) => {
+  const response = await fetch(`/api/deliver-document`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ templateId, formData, email })
+    body: JSON.stringify({ session_id: sessionId, formData, email, calculatedValues, tone: toneTemplate })
   });
-  if (!response.ok) throw new Error('Failed to deliver orchestrated document');
+  if (!response.ok) throw new Error('Failed to deliver document');
   return response.json();
 };
