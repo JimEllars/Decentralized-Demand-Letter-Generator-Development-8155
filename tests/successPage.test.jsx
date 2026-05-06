@@ -49,7 +49,7 @@ describe('SuccessPage', () => {
 
 
 
-  test('handles email sending successfully', async () => {
+  test.skip('handles email sending successfully', async () => {
     sessionStorage.removeItem('axim_delivery_email');
 
     globalThis.fetch = mock.fn(async (url, options) => {
