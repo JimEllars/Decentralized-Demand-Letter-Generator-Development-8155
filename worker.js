@@ -41,10 +41,28 @@ export default {
         const wrapText = (text, maxWidth, font, size) => {
           const words = text.split(' ');
           let lines = [], currentLine = '';
-          for (const word of words) {
+          for (let word of words) {
+            // Edge Case: Force-break words that are longer than the max width (e.g., massive URLs)
+            if (font.widthOfTextAtSize(word, size) > maxWidth) {
+               let tempWord = '';
+               for(let char of word) {
+                 if(font.widthOfTextAtSize(tempWord + char + '-', size) > maxWidth) {
+                   lines.push(tempWord + '-');
+                   tempWord = char;
+                 } else {
+                   tempWord += char;
+                 }
+               }
+               word = tempWord;
+            }
+
             const testLine = currentLine ? `${currentLine} ${word}` : word;
-            if (font.widthOfTextAtSize(testLine, size) > maxWidth && currentLine) { lines.push(currentLine); currentLine = word; }
-            else { currentLine = testLine; }
+            if (font.widthOfTextAtSize(testLine, size) > maxWidth && currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
           }
           if (currentLine) lines.push(currentLine);
           return lines;
@@ -149,7 +167,14 @@ export default {
 
             if (url.pathname === '/api/deliver-document') {
               if (env.RESEND_API_KEY && email) {
-                const base64Pdf = btoa(new Uint8Array(pdfBytes).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+                // Optimized Base64 encoding to prevent Cloudflare CPU Timeouts
+                let binary = '';
+                const bytes = new Uint8Array(pdfBytes);
+                const len = bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                const base64Pdf = btoa(binary);
                 await fetch('https://api.resend.com/emails', {
                   method: 'POST',
                   headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
