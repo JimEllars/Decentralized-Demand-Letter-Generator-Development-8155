@@ -167,25 +167,37 @@ export default {
 
             if (url.pathname === '/api/deliver-document') {
               if (env.RESEND_API_KEY && email) {
-                // Optimized Base64 encoding to prevent Cloudflare CPU Timeouts
                 let binary = '';
                 const bytes = new Uint8Array(pdfBytes);
                 const len = bytes.byteLength;
-                for (let i = 0; i < len; i++) {
-                    binary += String.fromCharCode(bytes[i]);
-                }
+                for (let i = 0; i < len; i++) { binary += String.fromCharCode(bytes[i]); }
                 const base64Pdf = btoa(binary);
-                await fetch('https://api.resend.com/emails', {
+
+                const resendRes = await fetch('https://api.resend.com/emails', {
                   method: 'POST',
                   headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
                     to: email,
                     subject: 'Your Finalized Demand Letter',
-                    html: '<p>Thank you for using QuickDemandLetter.</p><p>Your finalized, legally-formatted document is attached as a PDF.</p><p><strong>Important:</strong> Please download and save this file for your records as we do not store your data.</p>',
+                    html: `
+                      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                        <h2 style="color: #333;">Your Document is Ready</h2>
+                        <p style="color: #555; line-height: 1.5;">Thank you for using QuickDemandLetter. Your finalized, legally-formatted document is attached as a PDF.</p>
+                        <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                          <strong style="color: #856404;">Important:</strong> <span style="color: #856404;">Please download and save this file for your records immediately. As part of our Zero-Knowledge Privacy Policy, we do not store your data or copies of this document.</span>
+                        </div>
+                        <p style="color: #777; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">This is an automated message. Please do not reply.</p>
+                      </div>
+                    `,
                     attachments: [{ filename: 'Demand_Letter.pdf', content: base64Pdf }]
                   })
                 });
+
+                if (!resendRes.ok) {
+                   console.error("Resend Error:", await resendRes.text());
+                   throw new Error("Failed to dispatch email via Resend.");
+                }
               }
               return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
