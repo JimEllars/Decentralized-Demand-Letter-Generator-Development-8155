@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { FiShield, FiClock, FiFileText } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
+import { useToast } from '../contexts/ToastContext';
 import {
   Terminal, ShieldCheck, Database, Map,
   ChevronDown, FileText, Briefcase, Home,
@@ -101,6 +102,16 @@ const STEPS = [
 
 const DemandLanding = () => {
   const [faqOpen, setFaqOpen] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const toast = useToast();
+
+  useEffect(() => {
+    if (searchParams.get('canceled') === 'true') {
+      toast.info('Checkout canceled. Your drafted document has been securely saved on your device.');
+      searchParams.delete('canceled');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, toast]);
 
   const toggleFaq = (index) => {
     setFaqOpen(faqOpen === index ? null : index);

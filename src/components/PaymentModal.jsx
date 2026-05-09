@@ -8,7 +8,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
   const [marketingOptIn, setMarketingOptIn] = useState(false);
 
   const handleConfirm = async () => {
-    onConfirm(email, marketingOptIn);
+    onConfirm(email.trim(), marketingOptIn);
   };
 
   return (
@@ -73,7 +73,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
             </div>
             <button
               onClick={handleConfirm}
-              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)}
+              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email.trim())}
               className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
             >
               {isProcessing ? (

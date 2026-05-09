@@ -214,6 +214,11 @@ const DemandGenerator = () => {
   };
 
   const onCheckoutClick = () => {
+    // Prevent users from buying a blank PDF
+    if (!formData.creditorName?.trim() || !formData.debtorName?.trim()) {
+      toast.error("Validation Error: Please provide both the Creditor and Debtor names before generating the document.");
+      return;
+    }
     fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_checkout_initiated" }) }).catch(() => {});
     if (!isValid || !formData.creditorName || !formData.debtorName || !formData.jurisdiction || !formData.items || formData.items.length === 0) {
       setHasAttemptedSubmit(true);
