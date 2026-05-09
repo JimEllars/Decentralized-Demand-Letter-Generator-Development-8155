@@ -30,6 +30,8 @@ export const useLegalStatutes = () => {
     queryKey: ['legalStatutes'],
     queryFn: fetchLegalStatutes,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     initialData: {
       details: STATE_LEGAL_DETAILS,
       clauses: STATE_SPECIFIC_CLAUSES
