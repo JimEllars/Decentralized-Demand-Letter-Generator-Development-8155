@@ -335,8 +335,7 @@ const SuccessPage = () => {
                 Download Again
               </button>
 
-              {
-<form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
+              <form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
                 <label htmlFor="email" className="text-sm font-medium text-zinc-300 text-left mb-1 flex items-center gap-2">
                   <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Document
                 </label>
@@ -362,7 +361,6 @@ const SuccessPage = () => {
                   </button>
                 </div>
               </form>
-}
 
               <button
                 onClick={handleCreateAnother}
