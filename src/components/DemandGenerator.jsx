@@ -214,20 +214,31 @@ const DemandGenerator = () => {
     toast.error("Please complete all required fields (marked in red).");
   };
 
-  const onCheckoutClick = () => {
-    // Prevent users from buying a blank PDF
-    if (!formData.creditorName?.trim() || !formData.debtorName?.trim()) {
-      toast.error("Validation Error: Please provide both the Creditor and Debtor names before generating the document.");
+  const handleGenerate = (e) => {
+    e?.preventDefault();
+
+    // Pre-Checkout Guardrails
+    if (!formData.creditorName || !formData.creditorAddress) {
+      toast.error("Please provide your complete Name and Address in Step 1.");
       return;
     }
-    fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_checkout_initiated" }) }).catch(() => {});
-    if (!isValid || !formData.creditorName || !formData.debtorName || !formData.jurisdiction || !formData.items || formData.items.length === 0) {
-      setHasAttemptedSubmit(true);
-      onValidationFail();
+    if (!formData.debtorName || !formData.debtorAddress) {
+      toast.error("Please provide the Debtor's complete Name and Address in Step 1.");
       return;
     }
-    handleProceedToCheckout(true, onValidationFail);
+    if (!formData.items || formData.items.length === 0) {
+      toast.error("Please add at least one debt item to the ledger in Step 2.");
+      return;
+    }
+    if (!formData.jurisdiction) {
+      toast.error("Please select a governing State Jurisdiction.");
+      return;
+    }
+
+    // If all checks pass, open the Stripe modal
+    setShowPaymentModal(true);
   };
+
   const onPaymentConfirm = async (deliveryEmail, marketingOptIn) => {
     setIsProcessing(true);
     try {
@@ -381,7 +392,7 @@ const DemandGenerator = () => {
             </button>
             <button
               type="button"
-              onClick={onCheckoutClick}
+              onClick={handleGenerate}
               disabled={isProcessing || !isValid}
               className="w-full sm:w-auto px-8 py-4 bg-axim-teal text-black font-bold uppercase tracking-wide text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all duration-300 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >

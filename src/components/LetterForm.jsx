@@ -5,6 +5,7 @@ import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { generateId, getLocalDateString } from '../utils/helpers';
+import { toTitleCase, formatAddress } from '../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calculatedValues }) => {
@@ -109,6 +110,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         placeholder="Your Name / Company"
                         value={formData.creditorName}
                         onChange={handleChange}
+                        onBlur={(e) => {
+                          const fieldName = e.target.name;
+                          const isAddress = fieldName.toLowerCase().includes('address');
+                          const cleanedValue = isAddress ? formatAddress(e.target.value) : toTitleCase(e.target.value);
+                          onUpdate(fieldName, cleanedValue);
+                        }}
+
                         className={getInputClass('creditorName', formData.creditorName, true)}
                         aria-invalid={!!errors.creditorName}
                         aria-describedby={errors.creditorName ? "creditorName-error" : undefined}
@@ -124,6 +132,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         rows="2"
                         value={formData.creditorAddress}
                         onChange={handleChange}
+                        onBlur={(e) => {
+                          const fieldName = e.target.name;
+                          const isAddress = fieldName.toLowerCase().includes('address');
+                          const cleanedValue = isAddress ? formatAddress(e.target.value) : toTitleCase(e.target.value);
+                          onUpdate(fieldName, cleanedValue);
+                        }}
+
                         className={`${getInputClass('creditorAddress', formData.creditorAddress, true)} resize-none`}
                         aria-invalid={!!errors.creditorAddress}
                         aria-describedby={errors.creditorAddress ? "creditorAddress-error" : undefined}
@@ -138,6 +153,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         placeholder="Debtor Full Name"
                         value={formData.debtorName}
                         onChange={handleChange}
+                        onBlur={(e) => {
+                          const fieldName = e.target.name;
+                          const isAddress = fieldName.toLowerCase().includes('address');
+                          const cleanedValue = isAddress ? formatAddress(e.target.value) : toTitleCase(e.target.value);
+                          onUpdate(fieldName, cleanedValue);
+                        }}
+
                         className={getInputClass('debtorName', formData.debtorName, true)}
                         aria-invalid={!!errors.debtorName}
                         aria-describedby={errors.debtorName ? "debtorName-error" : undefined}
@@ -153,6 +175,13 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         rows="2"
                         value={formData.debtorAddress}
                         onChange={handleChange}
+                        onBlur={(e) => {
+                          const fieldName = e.target.name;
+                          const isAddress = fieldName.toLowerCase().includes('address');
+                          const cleanedValue = isAddress ? formatAddress(e.target.value) : toTitleCase(e.target.value);
+                          onUpdate(fieldName, cleanedValue);
+                        }}
+
                         className={`${getInputClass('debtorAddress', formData.debtorAddress, true)} resize-none`}
                         aria-invalid={!!errors.debtorAddress}
                         aria-describedby={errors.debtorAddress ? "debtorAddress-error" : undefined}
