@@ -168,7 +168,7 @@ export default {
               if (verifyData.isPaid || verifyData.status === 'paid' || verifyData.payment_status === 'paid') isPaid = true;
             } catch(e) { console.error('Session verification failed', e); }
 
-            if (!isPaid && session_id !== 'bypass_dev_mode') {
+            if (!isPaid) {
               return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
 
