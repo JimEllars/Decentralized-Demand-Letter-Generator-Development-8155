@@ -366,22 +366,29 @@ const DemandGenerator = () => {
                     </div>
                 )}
 
-                <button
-                        onClick={onCheckoutClick}
-                        disabled={isProcessing}
-                        className={getActionButtonStyles(isValid && !isProcessing)}
-                    >
-                        {isProcessing ? (
-                        <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            PROCESSING...
-                        </>
-                        ) : (
-                        <>
-                            <SafeIcon name="FiCreditCard" /> PROCEED TO CHECKOUT ($4.00)
-                        </>
-                        )}
-                    </button>
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-12 pt-8 border-t border-white/10 gap-6">
+          <div className="flex items-center gap-2 text-zinc-500 text-xs font-medium px-4 py-2 bg-black/20 rounded-full border border-white/5">
+            <span className="text-axim-teal">✓</span> Draft auto-saved securely to your device
+          </div>
+
+          <div className="flex w-full sm:w-auto gap-4">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="px-6 py-3 font-mono text-xs text-zinc-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent transition-all uppercase tracking-widest rounded-sm"
+            >
+              Clear Form
+            </button>
+            <button
+              type="button"
+              onClick={onCheckoutClick}
+              disabled={isProcessing || !isValid}
+              className="w-full sm:w-auto px-8 py-4 bg-axim-teal text-black font-bold uppercase tracking-wide text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all duration-300 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? "PROCESSING..." : "Generate Document"}
+            </button>
+          </div>
+        </div>
 
                 <div className="text-center font-mono text-[0.65rem] text-zinc-500 tracking-widest mt-4 uppercase">
                     Secure 256-bit SSL Encrypted Payment via Stripe
