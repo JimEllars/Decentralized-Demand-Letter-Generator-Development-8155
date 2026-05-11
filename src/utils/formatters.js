@@ -17,3 +17,18 @@ export const formatCurrency = (amount) => {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
   return currencyFormatter.format(isNaN(num) ? 0 : num);
 };
+
+// Capitalizes the first letter of every word (e.g., 'john doe' -> 'John Doe')
+export const toTitleCase = (str) => {
+  if (!str) return '';
+  return str.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+  );
+};
+
+// Standardizes basic address strings
+export const formatAddress = (str) => {
+  if (!str) return '';
+  return toTitleCase(str).replace(/\s+/g, ' ').trim();
+};
