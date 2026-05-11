@@ -12,7 +12,7 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
-import { calculateTotal, getToneTemplate } from '../utils/calculations';
+import { calculateTotal, getToneTemplate, parseCurrency } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
 import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
@@ -170,7 +170,7 @@ const DemandGenerator = () => {
        if (!formData.dueDate) stepErrors.dueDate = true;
        if (!formData.items || formData.items.length === 0) stepErrors.items = true;
        formData.items?.forEach(item => {
-           if (!item.description?.trim() || !item.amount || parseFloat(item.amount) <= 0) {
+           if (!item.description?.trim() || !item.amount || (!item.amount || parseCurrency(item.amount) <= 0)) {
                stepErrors.items = true;
            }
        });

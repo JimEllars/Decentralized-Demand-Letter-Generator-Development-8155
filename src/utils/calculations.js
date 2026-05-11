@@ -2,6 +2,13 @@ import { differenceInCalendarDays, parseISO, startOfToday } from 'date-fns';
 import { STATE_LEGAL_DETAILS, TONE_TEMPLATES } from './constants.js';
 import { formatCurrency } from './formatters.js';
 
+export const parseCurrency = (val) => {
+  if (!val) return 0;
+  const cleanVal = String(val).replace(/[^0-9.-]+/g, "");
+  const parsed = parseFloat(cleanVal);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 /**
  * AXiM Statutory Interest & Calculation Engine
  *
@@ -16,7 +23,7 @@ export const calculateTotal = (items = [], interestRate, dueDate, jurisdiction =
   const safeItems = Array.isArray(items) ? items : [];
 
   // Calculate Principal from itemized list
-  const principal = safeItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  const principal = safeItems.reduce((sum, item) => sum + parseCurrency(item.amount), 0);
   
   // Resolve jurisdiction safely
   const safeJurisdiction = (legalStatutesDetails && legalStatutesDetails[jurisdiction])
