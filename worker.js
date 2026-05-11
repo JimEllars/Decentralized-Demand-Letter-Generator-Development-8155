@@ -107,7 +107,9 @@ export default {
         drawText('ITEMIZED DEBTS:', 12, timesRomanBoldFont);
         sFormData.items?.forEach(item => {
           const itemDateStr = item.date ? ` (${item.date})` : '';
-          const amountStr = item.amount ? `$${parseFloat(item.amount).toFixed(2)}` : '$0.00';
+          const rawAmount = String(item.amount || '0').replace(/[^0-9.-]+/g, '');
+          const parsedAmount = parseFloat(rawAmount);
+          const amountStr = !isNaN(parsedAmount) ? `$${parsedAmount.toFixed(2)}` : '$0.00';
           drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, timesRomanFont, 70);
         });
         y -= 10;

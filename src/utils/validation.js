@@ -82,7 +82,7 @@ export const validateForm = (formData) => {
         itemError.description = "Description must be 500 characters or less.";
         hasError = true;
       }
-      if (!item.amount || parseFloat(item.amount) <= 0) {
+      if (!item.amount || Number(String(item.amount || "0").replace(/[^0-9.-]+/g, "")) <= 0) {
         itemError.amount = "Amount must be greater than 0.";
         hasError = true;
       }

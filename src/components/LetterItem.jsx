@@ -31,15 +31,13 @@ const LetterItem = memo(({ item, index, onChange, onRemove, showRemove, itemErro
           </div>
           <input
             aria-label={`Amount for item ${index + 1}`}
-            type="number"
+            type="text"
+            inputMode="decimal"
             placeholder="0.00"
             value={item.amount}
-            min="0"
-            step="0.01"
             onChange={(e) => {
               // Strip negative signs and prevent negative values
-              const val = e.target.value.replace(/-/g, '');
-              onChange(index, 'amount', val);
+              onChange(index, 'amount', e.target.value);
             }}
             className={`${getInputClass(!!itemErrors.amount)} pl-8`}
             aria-invalid={!!itemErrors.amount}
