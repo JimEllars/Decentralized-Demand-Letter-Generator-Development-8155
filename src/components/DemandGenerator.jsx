@@ -83,6 +83,7 @@ const DemandGenerator = () => {
 
   const {
     isProcessing,
+    setIsProcessing,
     showPaymentModal,
     setShowPaymentModal,
     handleProceedToCheckout,
@@ -228,12 +229,21 @@ const DemandGenerator = () => {
     handleProceedToCheckout(true, onValidationFail);
   };
   const onPaymentConfirm = async (deliveryEmail, marketingOptIn) => {
-    sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
-    if (deliveryEmail) {
-      sessionStorage.setItem('axim_delivery_email', deliveryEmail);
-      sessionStorage.setItem('axim_marketing_optin', marketingOptIn ? 'true' : 'false');
+    setIsProcessing(true);
+    try {
+      sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
+      if (deliveryEmail) {
+        sessionStorage.setItem('axim_delivery_email', deliveryEmail);
+        sessionStorage.setItem('axim_marketing_optin', marketingOptIn ? 'true' : 'false');
+      }
+      await handlePayment(isValid, onValidationFail);
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Payment gateway unavailable. Please try again.");
+    } finally {
+      // CRITICAL: Always release the UI lock
+      setIsProcessing(false);
     }
-    handlePayment(isValid, onValidationFail);
   };
 
   if (!isInitialized) {

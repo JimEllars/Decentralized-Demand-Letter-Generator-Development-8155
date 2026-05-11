@@ -34,7 +34,13 @@ const LetterItem = memo(({ item, index, onChange, onRemove, showRemove, itemErro
             type="number"
             placeholder="0.00"
             value={item.amount}
-            onChange={(e) => onChange(index, 'amount', e.target.value)}
+            min="0"
+            step="0.01"
+            onChange={(e) => {
+              // Strip negative signs and prevent negative values
+              const val = e.target.value.replace(/-/g, '');
+              onChange(index, 'amount', val);
+            }}
             className={`${getInputClass(!!itemErrors.amount)} pl-8`}
             aria-invalid={!!itemErrors.amount}
           />

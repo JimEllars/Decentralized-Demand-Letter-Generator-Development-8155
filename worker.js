@@ -212,7 +212,22 @@ export default {
             }
 
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': url.origin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
-          } catch(e) { return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } }); }
+                    } catch(e) {
+            // Ping telemetry so admins are alerted to invisible PDF crashes
+            const coreUrl = env.BACKEND_URL || 'https://api.axim.us.com';
+            ctx.waitUntil(
+              fetch(new URL('/api/v1/telemetry/ingest', coreUrl).toString(), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  event: 'pdf_edge_crash',
+                  error_message: e.message || 'Unknown error',
+                  session_id: session_id || 'unknown'
+                })
+              }).catch(() => {})
+            );
+            return new Response(JSON.stringify({ error: 'Generation failed', details: e.message }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
+          }
         } else { fetchOptions.body = request.clone().body; }
       }
 
