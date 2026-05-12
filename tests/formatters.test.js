@@ -99,3 +99,44 @@ describe('formatFriendlyDate', () => {
     assert.strictEqual(formatFriendlyDate(undefined), '');
   });
 });
+
+import { stripUnsupportedChars, toTitleCase, formatAddress } from '../src/utils/formatters.js';
+
+describe('formatters', () => {
+  describe('stripUnsupportedChars', () => {
+    it('should strip emojis', () => {
+      assert.strictEqual(stripUnsupportedChars('Hello 👋 World'), 'Hello  World');
+    });
+
+    it('should strip non-latin chars', () => {
+      assert.strictEqual(stripUnsupportedChars('こんにちは World'), 'World');
+    });
+
+    it('should allow valid chars', () => {
+      assert.strictEqual(stripUnsupportedChars('Hello World! 123'), 'Hello World! 123');
+    });
+  });
+
+  describe('toTitleCase', () => {
+    it('should convert lower case to title case', () => {
+      assert.strictEqual(toTitleCase('john doe'), 'John Doe');
+    });
+
+    it('should convert upper case to title case', () => {
+      assert.strictEqual(toTitleCase('JOHN DOE'), 'John Doe');
+    });
+
+    it('should strip unsupported characters', () => {
+       assert.strictEqual(toTitleCase('jöhn döe 👋'), 'Jöhn Döe');
+    });
+  });
+
+  describe('formatAddress', () => {
+     it('should format simple addresses correctly', () => {
+        assert.strictEqual(formatAddress('123 main st'), '123 Main St');
+     });
+     it('should strip unsupported chars and format address', () => {
+        assert.strictEqual(formatAddress('123 main st 🏠'), '123 Main St');
+     });
+  });
+});

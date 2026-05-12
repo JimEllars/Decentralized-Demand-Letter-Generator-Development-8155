@@ -1,3 +1,10 @@
+// Strips emojis and non-Latin characters that cause pdf-lib to crash
+export const stripUnsupportedChars = (str) => {
+  if (!str) return '';
+  // Keep standard ASCII and Latin-1 characters
+  return str.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
+};
+
 /**
  * Shared formatter instance for currency (USD)
  * Instantiating Intl.NumberFormat is expensive, so we create it once and reuse it.
@@ -21,7 +28,8 @@ export const formatCurrency = (amount) => {
 // Capitalizes the first letter of every word (e.g., 'john doe' -> 'John Doe')
 export const toTitleCase = (str) => {
   if (!str) return '';
-  return str.replace(
+  const safeStr = stripUnsupportedChars(str);
+  return safeStr.replace(
     /\w\S*/g,
     (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
   );
@@ -30,5 +38,6 @@ export const toTitleCase = (str) => {
 // Standardizes basic address strings
 export const formatAddress = (str) => {
   if (!str) return '';
-  return toTitleCase(str).replace(/\s+/g, ' ').trim();
+  const safeStr = stripUnsupportedChars(str);
+  return toTitleCase(safeStr).replace(/\s+/g, ' ').trim();
 };
