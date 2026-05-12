@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
-import { verifyPaymentSession, deliverOrchestratedDocument } from '../services/paymentService';
+import { verifyPaymentSession, deliverDocumentViaEmail } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
@@ -30,6 +30,7 @@ const SuccessPage = () => {
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [pdfBase64, setPdfBase64] = useState(null);
 
   const handleDownload = async (formData, calculatedValues, toneTemplate, overrideSessionId) => {
      setIsGenerating(true);
@@ -50,6 +51,11 @@ const SuccessPage = () => {
        if (!response.ok) throw new Error('Failed to generate PDF');
 
        const blob = await response.blob();
+       const reader = new FileReader();
+       reader.readAsDataURL(blob);
+       reader.onloadend = () => {
+         setPdfBase64(reader.result.split(',')[1]);
+       };
        const url = window.URL.createObjectURL(blob);
        try {
          const a = document.createElement('a');
@@ -256,22 +262,17 @@ const SuccessPage = () => {
 
   const handleSendEmail = async (e) => {
     e.preventDefault();
-    if (!email) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
+    if (!email) { toast.error("Please enter a valid email address."); return; }
+    if (!pdfBase64) { toast.error("Document is still encrypting, please wait a moment."); return; }
 
     setIsSendingEmail(true);
     try {
-      await deliverOrchestratedDocument('demand_letter_v1', formData, email);
-      toast.success(`Document sent to ${email}`);
+      await deliverDocumentViaEmail(email, pdfBase64);
+      toast.success(`Document securely sent to ${email}`);
       setEmail('');
     } catch (err) {
-      toast.info('Email services are currently offline. Please use the Download button to save your document.');
-      console.error('Email send error:', err);
-    } finally {
-      setIsSendingEmail(false);
-    }
+      toast.error('Email services offline. Please try downloading instead.');
+    } finally { setIsSendingEmail(false); }
   };
 
   return (
