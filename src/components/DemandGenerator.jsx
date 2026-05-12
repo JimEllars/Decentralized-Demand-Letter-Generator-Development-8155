@@ -407,6 +407,11 @@ const DemandGenerator = () => {
               {isProcessing ? "PROCESSING..." : "Generate Document"}
             </button>
           </div>
+        <div className="w-full text-center sm:text-right mt-3">
+          <p className="text-[0.6rem] text-zinc-600 font-medium">
+            By clicking Generate Document, you agree to our <a href="/terms" target="_blank" rel="noreferrer" className="underline hover:text-zinc-400">Terms of Service</a>.
+          </p>
+        </div>
         </div>
 
                 <div className="text-center font-mono text-[0.65rem] text-zinc-500 tracking-widest mt-4 uppercase">

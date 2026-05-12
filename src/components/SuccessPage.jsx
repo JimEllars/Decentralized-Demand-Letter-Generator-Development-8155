@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
-import { verifyPaymentSession, deliverDocumentViaEmail } from '../services/paymentService';
+import { verifyPaymentSession, deliverDocumentViaEmail, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
 import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
@@ -28,6 +28,7 @@ const SuccessPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
+  const [emailSentSuccessfully, setEmailSentSuccessfully] = useState(false);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [pdfBase64, setPdfBase64] = useState(null);
@@ -269,6 +270,7 @@ const SuccessPage = () => {
     try {
       await deliverDocumentViaEmail(email, pdfBase64);
       toast.success(`Document securely sent to ${email}`);
+      setEmailSentSuccessfully(true);
       setEmail('');
     } catch (err) {
       toast.error('Email services offline. Please try downloading instead.');
@@ -336,7 +338,12 @@ const SuccessPage = () => {
                 Download Again
               </button>
 
-              <form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
+              {emailSentSuccessfully ? (
+                <div className="w-full mt-4 bg-axim-teal/10 p-4 rounded-lg border border-axim-teal/20 text-center text-sm text-axim-teal font-medium flex items-center justify-center gap-2">
+                  <SafeIcon icon={FiCheckCircle} /> Document sent to your inbox!
+                </div>
+              ) : (
+                <form onSubmit={handleSendEmail} className="flex flex-col gap-2 w-full mt-4 bg-black/20 p-4 rounded-lg border border-white/5">
                 <label htmlFor="email" className="text-sm font-medium text-zinc-300 text-left mb-1 flex items-center gap-2">
                   <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Document
                 </label>
@@ -362,6 +369,7 @@ const SuccessPage = () => {
                   </button>
                 </div>
               </form>
+              )}
 
               <button
                 onClick={handleCreateAnother}
