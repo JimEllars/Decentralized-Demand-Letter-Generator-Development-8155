@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { FiShield, FiClock, FiFileText } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
@@ -101,6 +101,9 @@ const STEPS = [
 ];
 
 const DemandLanding = () => {
+  const { stateId } = useParams();
+  const navigate = useNavigate();
+  const displayState = stateId ? stateId.toUpperCase() : '';
   const [faqOpen, setFaqOpen] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const toast = useToast();
@@ -156,7 +159,7 @@ const DemandLanding = () => {
             transition={{ delay: 0.1 }}
             className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 relative z-10"
           >
-            Demand Letter PDF in <span className="text-transparent bg-clip-text bg-gradient-to-r from-axim-teal to-cyan-300">3 Easy Steps.</span>
+            {displayState ? `${displayState} ` : ''}Demand Letter PDF in <span className="text-transparent bg-clip-text bg-gradient-to-r from-axim-teal to-cyan-300">3 Easy Steps.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -173,14 +176,16 @@ const DemandLanding = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col items-center w-full sm:w-auto"
           >
-            <Link
-              onClick={() => { fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {}); }}
-              to="/app/demand-generator"
+            <button
+              onClick={() => {
+                fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {});
+                navigate(displayState ? `/app/demand-generator?state=${displayState}` : '/app/demand-generator');
+              }}
               className="w-full sm:w-auto px-10 py-5 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group"
             >
               START MY DEMAND LETTER
               <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </Link>
+            </button>
             <div className="mt-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest flex items-center gap-2">
               No Login Required <span className="w-1 h-1 bg-zinc-600 rounded-full"></span> Instant PDF Export
             </div>
@@ -459,14 +464,16 @@ const DemandLanding = () => {
             <span className="text-zinc-500 text-3xl md:text-5xl mt-2 block">For $4.00</span>
           </h2>
 
-          <Link
-            onClick={() => { fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {}); }}
-            to="/app/demand-generator"
+          <button
+            onClick={() => {
+              fetch("/api/v1/telemetry/ingest", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event: "demand_funnel_started" }) }).catch(() => {});
+              navigate(displayState ? `/app/demand-generator?state=${displayState}` : '/app/demand-generator');
+            }}
             className="w-full sm:w-auto px-12 py-6 bg-axim-gold text-black font-bold uppercase tracking-[2px] text-sm hover:bg-white hover:shadow-[0_0_40px_rgba(255,234,0,0.5)] transition-all duration-300 rounded-sm flex items-center justify-center gap-3 group mx-auto"
           >
             START MY DEMAND LETTER
             <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
+          </button>
         </div>
       </section>
 

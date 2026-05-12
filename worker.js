@@ -233,6 +233,26 @@ export default {
         } else { fetchOptions.body = request.clone().body; }
       }
 
+
+      // --- EDGE DICTIONARY FALLBACK ---
+      // Decentralizes the app so it doesn't rely on a central backend for statutory rates
+      if (request.method === 'GET' && url.pathname === '/api/v1/legal-statutes') {
+          const state = url.searchParams.get('state') || 'default';
+          const statutes = {
+              'TX': { details: { maxInterestRate: 18.0, standardInterestRate: 6.0 }, clauses: [] },
+              'CA': { details: { maxInterestRate: 10.0, standardInterestRate: 7.0 }, clauses: [] },
+              'NY': { details: { maxInterestRate: 16.0, standardInterestRate: 9.0 }, clauses: [] },
+              'FL': { details: { maxInterestRate: 11.0, standardInterestRate: 6.0 }, clauses: [] },
+              'IL': { details: { maxInterestRate: 9.0, standardInterestRate: 5.0 }, clauses: [] },
+              'default': { details: { maxInterestRate: 8.0, standardInterestRate: 5.0 }, clauses: [] }
+          };
+          return new Response(JSON.stringify(statutes[state] || statutes['default']), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin }
+          });
+      }
+      // --------------------------------
+
       let fetchConfig = {};
       if (request.method === 'GET' && url.pathname.includes('legal-statutes')) {
         fetchConfig = { cf: { cacheTtl: 3600, cacheEverything: true } };
