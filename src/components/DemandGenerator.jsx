@@ -47,6 +47,14 @@ const STEPS = [
 const DemandGenerator = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
+  const urlState = searchParams.get('state');
+
+  useEffect(() => {
+    if (urlState && !formData.jurisdiction) {
+      updateField({ jurisdiction: urlState.toUpperCase() });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlState]);
   const toast = useToast();
   const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();
