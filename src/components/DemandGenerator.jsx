@@ -422,7 +422,7 @@ const DemandGenerator = () => {
 
 
       <AnimatePresence>
-        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} />}
+        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} formData={formData} />}
       </AnimatePresence>
     </div>
   );

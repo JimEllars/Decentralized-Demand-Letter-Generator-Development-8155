@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
-const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
+const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
   const [email, setEmail] = useState('');
   const [marketingOptIn, setMarketingOptIn] = useState(false);
 
@@ -28,6 +28,22 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel }) => {
           <div className="flex justify-between items-center bg-black/50 p-4 border border-subtle rounded-sm">
             <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Document Access</span>
             <span className="font-mono font-bold text-2xl text-white">$4.00</span>
+          </div>
+
+          <div className="bg-black/30 border border-white/5 p-4 rounded-sm mt-4 text-left space-y-2">
+            <h4 className="font-mono text-[0.65rem] text-zinc-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Document Summary Verification</h4>
+            <div className="flex justify-between text-sm">
+              <span className="text-zinc-400">From:</span>
+              <span className="text-white truncate max-w-[200px]">{formData?.creditorName || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-zinc-400">To:</span>
+              <span className="text-white truncate max-w-[200px]">{formData?.debtorName || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-zinc-400">State:</span>
+              <span className="text-white uppercase">{formData?.jurisdiction || 'N/A'}</span>
+            </div>
           </div>
 
           <div className="flex flex-col gap-3">
