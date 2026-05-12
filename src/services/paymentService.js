@@ -36,3 +36,13 @@ export const deliverOrchestratedDocument = async (sessionId, formData, email, ca
   if (!response.ok) throw new Error('Failed to deliver document');
   return response.json();
 };
+
+export const deliverDocumentViaEmail = async (email, base64Pdf) => {
+  const response = await fetch('/api/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, pdfData: base64Pdf })
+  });
+  if (!response.ok) throw new Error('Failed to send email');
+  return response.json();
+};

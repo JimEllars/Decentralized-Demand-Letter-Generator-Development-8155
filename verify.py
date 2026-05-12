@@ -40,7 +40,7 @@ def run_cuj(page):
     # Tone and Jurisdiction are prefilled or optional
 
     # Click proceed to checkout
-    page.get_by_role("button", name="PROCEED TO CHECKOUT ($4.00)").click()
+    page.get_by_role("button", name="Generate Document").click()
     page.wait_for_timeout(3000)
     page.screenshot(path="verification_modal.png")
 
@@ -49,7 +49,7 @@ def run_cuj(page):
     page.wait_for_timeout(500)
 
     # Fill email
-    page.get_by_placeholder("Enter email address").fill("test@example.com")
+    page.get_by_placeholder("Enter email for document delivery").fill("test@example.com")
     page.wait_for_timeout(500)
 
     # Click pay
