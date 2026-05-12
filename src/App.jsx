@@ -5,6 +5,7 @@ import SuccessPage from './components/SuccessPage';
 import Terms from './components/Terms';
 import Privacy from './components/Privacy';
 import Footer from './components/Footer';
+import CookieBanner from './components/CookieBanner';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           </Routes>
         </main>
         <Footer />
+        <CookieBanner />
       </div>
     </Router>
   );
