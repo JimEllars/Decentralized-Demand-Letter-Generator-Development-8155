@@ -248,6 +248,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         id="dueDate"
                         name="dueDate"
                         type="date"
+                        min={new Date().toISOString().split('T')[0]}
                         value={formData.dueDate}
                         onChange={handleChange}
                         className={getInputClass('dueDate', formData.dueDate, true)}
@@ -345,6 +346,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             <input maxLength="2000"
                             id="letterDate"
                             type="date"
+                            min={new Date().toISOString().split('T')[0]}
                             name="letterDate"
                             value={formData.letterDate || ''}
                             onChange={handleChange}
