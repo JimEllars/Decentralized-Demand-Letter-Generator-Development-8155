@@ -104,6 +104,15 @@ const DemandLanding = () => {
   const { stateId } = useParams();
   const navigate = useNavigate();
   const displayState = stateId ? stateId.toUpperCase() : '';
+
+  useEffect(() => {
+    const baseTitle = "Quick Demand Letter | Create a Legal PDF Instantly";
+    if (stateId) {
+      document.title = `${stateId.toUpperCase()} Demand Letter Generator | Quick Demand Letter`;
+    } else {
+      document.title = baseTitle;
+    }
+  }, [stateId]);
   const [faqOpen, setFaqOpen] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const toast = useToast();
@@ -123,7 +132,7 @@ const DemandLanding = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-white font-inter selection:bg-axim-gold selection:text-black overflow-x-hidden">
       <Helmet>
-        <title>AXiM Demand Letter Generator | AI-Powered Legal Drafting</title>
+        <title>{document.title || "Quick Demand Letter | Create a Legal PDF Instantly"}</title>
         <meta property="og:title" content="AXiM Demand Letter Generator | AI-Powered Legal Drafting" />
         <meta property="og:description" content="Generate professional, jurisdiction-specific demand letters securely within your browser using AXiM's Zero-Knowledge architecture." />
         <meta property="og:type" content="website" />
