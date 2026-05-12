@@ -107,10 +107,22 @@ const DemandLanding = () => {
 
   useEffect(() => {
     const baseTitle = "Quick Demand Letter | Create a Legal PDF Instantly";
+    const baseDesc = "A quick, affordable solution when you need a professional demand letter fast. Skip the expensive attorney fees and generate a legally formatted PDF instantly.";
+
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = "description";
+      document.head.appendChild(metaDescription);
+    }
+
     if (stateId) {
-      document.title = `${stateId.toUpperCase()} Demand Letter Generator | Quick Demand Letter`;
+      const stateName = stateId.toUpperCase();
+      document.title = `${stateName} Demand Letter Generator | Quick Demand Letter`;
+      metaDescription.content = `Generate a highly professional, ${stateName}-compliant demand letter instantly. Skip the lawyer fees and recover your revenue today.`;
     } else {
       document.title = baseTitle;
+      metaDescription.content = baseDesc;
     }
   }, [stateId]);
   const [faqOpen, setFaqOpen] = useState(null);

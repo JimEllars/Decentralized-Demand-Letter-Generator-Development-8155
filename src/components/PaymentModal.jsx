@@ -6,6 +6,7 @@ import SafeIcon from '../common/SafeIcon';
 const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
   const [email, setEmail] = useState('');
   const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [dataVerified, setDataVerified] = useState(false);
 
   const handleConfirm = async () => {
     onConfirm(email.trim(), marketingOptIn);
@@ -45,6 +46,25 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
               <span className="text-white uppercase">{formData?.jurisdiction || 'N/A'}</span>
             </div>
           </div>
+          <label className="flex items-start gap-3 cursor-pointer group mt-4 bg-red-500/5 border border-red-500/20 p-3 rounded-sm">
+            <div className="relative flex items-center justify-center mt-0.5">
+              <input
+                type="checkbox"
+                className="appearance-none w-5 h-5 border border-red-500/50 rounded-sm bg-black/50 checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer"
+                checked={dataVerified}
+                onChange={(e) => setDataVerified(e.target.checked)}
+                disabled={isProcessing}
+              />
+              {dataVerified && (
+                <svg className="absolute w-3 h-3 text-white pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span className="text-xs font-medium text-zinc-300">
+              I verify that all names, addresses, and amounts above are spelled correctly. I understand this document is generated instantly and <strong className="text-red-400">all sales are final</strong>.
+            </span>
+          </label>
 
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
@@ -89,7 +109,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
             </div>
             <button
               onClick={handleConfirm}
-              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email.trim())}
+              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email.trim()) || !dataVerified}
               className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
             >
               {isProcessing ? (
