@@ -7,6 +7,8 @@ import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { useToast } from '../contexts/ToastContext';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { toTitleCase, formatAddress } from '../utils/formatters';
+import { checkStatuteOfLimitations } from '../utils/validation';
+
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calculatedValues }) => {
@@ -253,6 +255,11 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         min={new Date().toISOString().split('T')[0]}
                         value={formData.dueDate}
                         onChange={handleChange}
+                        onBlur={(e) => {
+                          if (checkStatuteOfLimitations(e.target.value)) {
+                            toast.warning("Warning: Debts older than 6 years may exceed the legal Statute of Limitations for collection in many states. Proceed with caution.");
+                          }
+                        }}
                         className={getInputClass('dueDate', formData.dueDate, true)}
                         aria-invalid={!!errors.dueDate}
                         aria-describedby={errors.dueDate ? "dueDate-error" : undefined}
