@@ -39,23 +39,11 @@ export default {
         };
 
         const wrapText = (text, maxWidth, font, size) => {
-          const words = text.split(' ');
+          // Forcefully break any contiguous string longer than 40 characters to prevent PDF edge bleed
+          const safeText = text.replace(/([^\s]{40})/g, '$1 ');
+          const words = safeText.split(' ');
           let lines = [], currentLine = '';
-          for (let word of words) {
-            // Edge Case: Force-break words that are longer than the max width (e.g., massive URLs)
-            if (font.widthOfTextAtSize(word, size) > maxWidth) {
-               let tempWord = '';
-               for(let char of word) {
-                 if(font.widthOfTextAtSize(tempWord + char + '-', size) > maxWidth) {
-                   lines.push(tempWord + '-');
-                   tempWord = char;
-                 } else {
-                   tempWord += char;
-                 }
-               }
-               word = tempWord;
-            }
-
+          for (const word of words) {
             const testLine = currentLine ? `${currentLine} ${word}` : word;
             if (font.widthOfTextAtSize(testLine, size) > maxWidth && currentLine) {
               lines.push(currentLine);
@@ -227,7 +215,8 @@ export default {
           }
         } else if (url.pathname === '/api/send-email') {
           try {
-            const { email, pdfData } = await request.clone().json();
+            const { email, pdfData, filename } = await request.clone().json();
+            const safeFilename = filename || 'Demand_Letter_Final.pdf';
             if (!email || !pdfData) return new Response(JSON.stringify({ error: 'Missing payload' }), { status: 400, headers: { 'Access-Control-Allow-Origin': url.origin } });
 
             // Dispatch via Resend Email API
@@ -257,7 +246,7 @@ export default {
                     </div>
                   </div>
                 `,
-                attachments: [{ filename: 'Demand_Letter_Final.pdf', content: pdfData }]
+                attachments: [{ filename: safeFilename, content: pdfData }]
               })
             });
 

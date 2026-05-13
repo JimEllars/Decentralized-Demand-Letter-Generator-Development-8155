@@ -270,7 +270,8 @@ const SuccessPage = () => {
 
     setIsSendingEmail(true);
     try {
-      await deliverDocumentViaEmail(email, pdfBase64);
+      const dynamicFilename = `Demand_Letter_${(formData.debtorName || 'Final').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      await deliverDocumentViaEmail(email, pdfBase64, dynamicFilename);
       toast.success(`Document securely sent to ${email}`);
       setEmailSentSuccessfully(true);
       setEmail('');
