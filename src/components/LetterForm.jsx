@@ -107,7 +107,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         <input maxLength="2000"
                         id="creditorName"
                         name="creditorName"
-                        placeholder="Your Name / Company"
+                        placeholder="e.g., John Doe LLC"
                         value={formData.creditorName}
                         onChange={handleChange}
                         onBlur={(e) => {
@@ -128,7 +128,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         <textarea maxLength="2000"
                         id="creditorAddress"
                         name="creditorAddress"
-                        placeholder="Your Mailing Address"
+                        placeholder="e.g., 123 Main St, Suite 100, Austin, TX 78701"
                         rows="2"
                         value={formData.creditorAddress}
                         onChange={handleChange}
@@ -150,7 +150,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         <input maxLength="2000"
                         id="debtorName"
                         name="debtorName"
-                        placeholder="Debtor Full Name"
+                        placeholder="e.g., John Doe LLC"
                         value={formData.debtorName}
                         onChange={handleChange}
                         onBlur={(e) => {
@@ -171,7 +171,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         <textarea maxLength="2000"
                         id="debtorAddress"
                         name="debtorAddress"
-                        placeholder="Debtor Mailing Address"
+                        placeholder="e.g., 123 Main St, Suite 100, Austin, TX 78701"
                         rows="2"
                         value={formData.debtorAddress}
                         onChange={handleChange}
