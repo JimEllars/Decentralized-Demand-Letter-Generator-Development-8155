@@ -116,13 +116,22 @@ const DemandLanding = () => {
       document.head.appendChild(metaDescription);
     }
 
+    let canonicalLink = document.querySelector('link[rel="canonical"]');
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.rel = "canonical";
+      document.head.appendChild(canonicalLink);
+    }
+
     if (stateId) {
       const stateName = stateId.toUpperCase();
       document.title = `${stateName} Demand Letter Generator | Quick Demand Letter`;
       metaDescription.content = `Generate a highly professional, ${stateName}-compliant demand letter instantly. Skip the lawyer fees and recover your revenue today.`;
+      canonicalLink.href = `https://quickdemandletter.com/state/${stateId.toLowerCase()}`;
     } else {
       document.title = baseTitle;
       metaDescription.content = baseDesc;
+      canonicalLink.href = "https://quickdemandletter.com/";
     }
   }, [stateId]);
   const [faqOpen, setFaqOpen] = useState(null);
