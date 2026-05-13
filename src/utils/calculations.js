@@ -4,7 +4,7 @@ import { formatCurrency } from './formatters.js';
 
 export const parseCurrency = (val) => {
   if (!val) return 0;
-  const cleanVal = String(val).replace(/[^0-9.-]+/g, "");
+  const cleanVal = String(val).replace(/[^0-9.]+/g, "");
   const parsed = parseFloat(cleanVal);
   return isNaN(parsed) ? 0 : parsed;
 };
