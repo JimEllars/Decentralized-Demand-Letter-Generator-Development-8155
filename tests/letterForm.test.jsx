@@ -4,6 +4,7 @@ import React from 'react';
 import { render, cleanup, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LetterForm from '../src/components/LetterForm.jsx';
+import { ToastProvider } from '../src/contexts/ToastContext.jsx';
 import { STATE_OPTIONS } from '../src/utils/constants.js';
 
 const queryClient = new QueryClient({
@@ -40,15 +41,15 @@ describe('LetterForm', () => {
   };
 
   test('renders FormSections for all 3 steps based on currentStep', async () => {
-    const { rerender } = render(<LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={1} />, { wrapper: Wrapper });
+    const { rerender } = render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={1} /></ToastProvider>, { wrapper: Wrapper });
     assert.ok(screen.getByText('Parties'));
 
-    rerender(<LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={2} />, { wrapper: Wrapper });
+    rerender(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={2} /></ToastProvider>, { wrapper: Wrapper });
     await waitFor(() => {
         assert.ok(screen.getByText('Itemized Debt Specifics'));
     });
 
-    rerender(<LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={3} />, { wrapper: Wrapper });
+    rerender(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={() => {}} currentStep={3} /></ToastProvider>, { wrapper: Wrapper });
     await waitFor(() => {
         assert.ok(screen.getByText('Tone & Configuration'));
     });
@@ -56,7 +57,7 @@ describe('LetterForm', () => {
 
   test('handles input changes in Step 1', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={1} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={1}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const creditorNameInput = screen.getAllByPlaceholderText('e.g., John Doe LLC')[0];
@@ -70,7 +71,7 @@ describe('LetterForm', () => {
 
   test('handles jurisdiction and tone changes in Step 2/3', async () => {
     const onUpdateMock = mock.fn();
-    const { rerender } = render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} />, { wrapper: Wrapper });
+    const { rerender } = render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const jurisdictionSelect = screen.getByLabelText(/Governing Law/);
@@ -79,7 +80,7 @@ describe('LetterForm', () => {
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[0], 'jurisdiction');
     assert.strictEqual(onUpdateMock.mock.calls[0].arguments[1], 'NY');
 
-    rerender(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={3} />, { wrapper: Wrapper });
+    rerender(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={3}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const toneSelect = screen.getByLabelText('Document Tone');
@@ -91,7 +92,7 @@ describe('LetterForm', () => {
 
   test('handles "Set to Today" button in Step 3', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={3} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={3}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const setTodayBtn = screen.getByText('Set to Today');
@@ -105,7 +106,7 @@ describe('LetterForm', () => {
 
   test('handles "Set to 30 Days Ago" button in Step 2', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const set30DaysBtn = screen.getByText('Set to 30 Days Ago');
@@ -119,7 +120,7 @@ describe('LetterForm', () => {
 
   test('handles "ADD LINE ITEM" button in Step 2', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const addItemBtn = screen.getByText('ADD LINE ITEM');
@@ -137,7 +138,7 @@ describe('LetterForm', () => {
 
   test('handles "+5% FEE" button in Step 2', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} calculatedValues={{ principal: 100 }} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} calculatedValues={{ principal: 100 }}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const addFeeBtn = screen.getByText('+5% FEE');
@@ -155,7 +156,7 @@ describe('LetterForm', () => {
 
   test('handles child LetterItem onChange in Step 2', async () => {
     const onUpdateMock = mock.fn();
-    render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={2}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const descInput = screen.getByLabelText('Description for item 1');
@@ -178,7 +179,7 @@ describe('LetterForm', () => {
         { id: '2', description: 'Item 2', amount: '50.00' }
       ]
     };
-    render(<LetterForm formData={dataWithTwoItems} onUpdate={onUpdateMock} currentStep={2} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={dataWithTwoItems} onUpdate={onUpdateMock} currentStep={2}  /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         const removeBtns = screen.getAllByLabelText('Remove item');
@@ -197,7 +198,7 @@ describe('LetterForm', () => {
     const errors = {
       creditorName: 'Creditor Name is required',
     };
-    render(<LetterForm formData={defaultFormData} onUpdate={() => {}} errors={errors} currentStep={1} />, { wrapper: Wrapper });
+    render(<ToastProvider><LetterForm formData={defaultFormData} onUpdate={() => {}} errors={errors} currentStep={1} /></ToastProvider>, { wrapper: Wrapper });
 
     await waitFor(() => {
         assert.ok(screen.getByText('Creditor Name is required'));

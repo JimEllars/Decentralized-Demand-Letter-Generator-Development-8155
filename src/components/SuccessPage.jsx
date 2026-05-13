@@ -29,6 +29,7 @@ const SuccessPage = () => {
   const toast = useToast();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
   const [emailSentSuccessfully, setEmailSentSuccessfully] = useState(false);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [pdfBase64, setPdfBase64] = useState(null);
@@ -58,6 +59,7 @@ const SuccessPage = () => {
          setPdfBase64(reader.result.split(',')[1]);
        };
        const url = window.URL.createObjectURL(blob);
+      setPdfBlobUrl(url);
        try {
          const a = document.createElement('a');
          a.style.display = 'none';
@@ -336,6 +338,14 @@ const SuccessPage = () => {
               >
                 <SafeIcon icon={FiDownload} />
                 Download Again
+              </button>
+
+              <button
+                onClick={() => window.open(pdfBlobUrl, '_blank')}
+                disabled={!pdfBlobUrl || isGenerating}
+                className="w-full px-6 py-4 bg-transparent border border-axim-teal text-axim-teal font-bold uppercase tracking-wide text-sm hover:bg-axim-teal hover:text-black transition-all duration-300 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+              >
+                <SafeIcon icon={FiFileText} /> View / Print Document (Mobile Safe)
               </button>
 
               {emailSentSuccessfully ? (

@@ -4,12 +4,14 @@ import FormSection from './FormSection';
 import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
+import { useToast } from '../contexts/ToastContext';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { toTitleCase, formatAddress } from '../utils/formatters';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calculatedValues }) => {
   const { data: legalStatutes } = useLegalStatutes();
+  const toast = useToast();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -294,6 +296,19 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                                 placeholder={`Current Default: ${legalStatutes.details[formData.jurisdiction]?.rate || 6}%`}
                                 value={formData.statutoryInterest}
                                 onChange={handleChange}
+                                onBlur={(e) => {
+                                  if (e.target.name === 'statutoryInterest') {
+                                    const enteredRate = parseFloat(e.target.value || 0);
+                                    const stateKey = formData.jurisdiction || 'DEFAULT';
+                                    const stateDetails = legalStatutes?.details?.[stateKey] || legalStatutes?.details?.['DEFAULT'];
+                                    const stateMax = stateDetails?.maxInterestRate || stateDetails?.rate || 100;
+
+                                    if (enteredRate > stateMax) {
+                                      onUpdate('statutoryInterest', stateMax.toString());
+                                      toast.info(`Interest rate adjusted to ${stateMax}%, the statutory maximum for ${stateDetails?.name || stateKey}.`);
+                                    }
+                                  }
+                                }}
                                 className="bg-black/50 border border-subtle text-white font-mono text-sm p-3 w-full rounded-sm focus:border-axim-gold focus:outline-none transition-colors placeholder:text-zinc-600 pr-8"
                                 />
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-zinc-500 pointer-events-none font-mono">
