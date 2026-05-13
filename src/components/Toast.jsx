@@ -6,6 +6,7 @@ const icons = {
   success: <FiCheckCircle className="w-5 h-5 text-emerald-500" />,
   error: <FiAlertCircle className="w-5 h-5 text-red-500" />,
   info: <FiInfo className="w-5 h-5 text-blue-500" />,
+  warning: <FiAlertCircle className="w-5 h-5 text-amber-500" />,
 };
 
 const Toast = ({ id, message, type = 'info', onClose }) => {

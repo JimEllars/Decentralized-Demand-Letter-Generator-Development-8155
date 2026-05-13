@@ -113,3 +113,14 @@ export const getFirstErrorFieldId = (errors) => {
   if (errors.items || errors.itemErrors) return 'items-section';
   return null;
 };
+
+export const checkStatuteOfLimitations = (dateString) => {
+  if (!dateString) return false;
+  try {
+    const debtDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = Math.abs(today - debtDate);
+    const diffYears = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 365));
+    return diffYears >= 6; // 6 years is the standard threshold warning
+  } catch (e) { return false; }
+};
