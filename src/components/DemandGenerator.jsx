@@ -243,6 +243,13 @@ const DemandGenerator = () => {
       return;
     }
 
+    // Trigger Checkout Analytics
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'begin_checkout',
+      ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter', price: 4.00 }] }
+    });
+
     // If all checks pass, open the Stripe modal
     setShowPaymentModal(true);
   };

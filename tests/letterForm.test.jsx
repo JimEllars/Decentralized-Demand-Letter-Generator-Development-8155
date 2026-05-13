@@ -59,7 +59,7 @@ describe('LetterForm', () => {
     render(<LetterForm formData={defaultFormData} onUpdate={onUpdateMock} currentStep={1} />, { wrapper: Wrapper });
 
     await waitFor(() => {
-        const creditorNameInput = screen.getByPlaceholderText('Your Name / Company');
+        const creditorNameInput = screen.getAllByPlaceholderText('e.g., John Doe LLC')[0];
         fireEvent.change(creditorNameInput, { target: { name: 'creditorName', value: 'John Doe' } });
     });
 

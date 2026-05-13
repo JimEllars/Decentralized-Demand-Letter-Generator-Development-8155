@@ -143,14 +143,9 @@ export default {
             const { session_id, formData, calculatedValues, tone, email } = body;
 
             const sanitize = (str, maxLen = 2000) => {
-              if (!str) return '';
-              const normalized = String(str)
-                .replace(/[‘’]/g, "'") // Smart single quotes
-                .replace(/[“”]/g, '"') // Smart double quotes
-                .replace(/[–—]/g, '-') // En and em dashes
-                .replace(/[…]/g, '...') // Ellipsis
-                .replace(/[^ -]/g, ''); // Strip remaining non-ASCII to prevent pdf-lib crash
-              return normalized.substring(0, maxLen);
+              const safeStr = typeof str === 'string' ? str : String(str || '');
+              // Strip non-Latin characters to prevent pdf-lib encoding crashes
+              return safeStr.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim().substring(0, maxLen);
             };
             const sFormData = {
                creditorName: sanitize(formData.creditorName), creditorAddress: sanitize(formData.creditorAddress),
