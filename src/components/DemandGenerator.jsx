@@ -12,6 +12,8 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
+import { createCheckoutSession } from '../services/paymentService';
+
 import { calculateTotal, getToneTemplate, parseCurrency } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
@@ -254,20 +256,33 @@ const DemandGenerator = () => {
     setShowPaymentModal(true);
   };
 
-  const onPaymentConfirm = async (deliveryEmail, marketingOptIn) => {
+    const handlePaymentConfirm = async (email, marketingOptIn) => {
+    // 🚨 CRITICAL FIX: e.preventDefault() removed. The first arg is now the email string.
     setIsProcessing(true);
     try {
-      sessionStorage.setItem('axim_calculated_values', JSON.stringify(calculatedValues));
-      if (deliveryEmail) {
-        sessionStorage.setItem('axim_delivery_email', deliveryEmail);
-        sessionStorage.setItem('axim_marketing_optin', marketingOptIn ? 'true' : 'false');
+      sessionStorage.setItem('axim_delivery_email', email);
+      if (marketingOptIn) sessionStorage.setItem('axim_marketing_optin', 'true');
+
+      const calculatedValues = calculateTotal(
+        formData.items,
+        formData.statutoryInterest,
+        formData.dueDate,
+        formData.jurisdiction,
+        formData.letterDate,
+        legalStatutes?.details || {}
+      );
+
+      const session = await createCheckoutSession(formData, calculatedValues);
+
+      if (session?.url) {
+        window.location.href = session.url;
+      } else {
+        toast.error("Failed to initialize checkout. Please try again.");
       }
-      await handlePayment(isValid, onValidationFail);
-    } catch (error) {
-      console.error("Checkout error:", error);
-      toast.error("Payment gateway unavailable. Please try again.");
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      toast.error("A network error occurred. Please try again.");
     } finally {
-      // CRITICAL: Always release the UI lock
       setIsProcessing(false);
     }
   };
@@ -442,7 +457,7 @@ const DemandGenerator = () => {
 
 
       <AnimatePresence>
-        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={onPaymentConfirm} onCancel={() => setShowPaymentModal(false)} formData={formData} />}
+        {showPaymentModal && <PaymentModal isProcessing={isProcessing} onConfirm={handlePaymentConfirm} onCancel={() => setShowPaymentModal(false)} formData={formData} />}
       </AnimatePresence>
     </div>
   );
