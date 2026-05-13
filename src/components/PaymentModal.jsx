@@ -12,105 +12,85 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
     onConfirm(email.trim(), marketingOptIn);
   };
 
-  return (
+      return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 bg-grid" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-bg-void border border-subtle rounded-sm max-w-sm w-full overflow-hidden shadow-2xl relative">
-        <div className="bg-black/40 border-b border-subtle p-8 text-white text-center relative overflow-hidden">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-black border border-white/10 rounded-sm max-w-sm w-full max-h-[90vh] overflow-y-auto shadow-2xl relative scrollbar-hide">
+        <div className="bg-black/40 border-b border-white/5 p-6 text-white text-center relative overflow-hidden shrink-0">
           <div className="absolute top-0 right-0 p-4 opacity-5">
              <SafeIcon icon={FiShield} className="w-32 h-32" />
           </div>
-          <div className="w-16 h-16 bg-black border border-subtle text-axim-teal rounded-sm flex items-center justify-center mx-auto mb-4 relative z-10">
-            <SafeIcon icon={FiLock} className="w-8 h-8" />
+          <div className="w-12 h-12 bg-black border border-white/10 text-axim-teal rounded-sm flex items-center justify-center mx-auto mb-3 relative z-10">
+            <SafeIcon icon={FiLock} className="w-6 h-6" />
           </div>
-          <h3 id="modal-title" className="font-mono text-axim-gold text-lg uppercase tracking-widest relative z-10">Secure Checkout</h3>
-          <p className="font-mono text-[0.65rem] text-zinc-500 mt-2 uppercase tracking-widest relative z-10">AXiM Encryption Active</p>
+          <h3 id="modal-title" className="font-mono text-axim-gold text-base uppercase tracking-widest relative z-10">Secure Checkout</h3>
+          <p className="font-mono text-[0.6rem] text-zinc-500 mt-1 uppercase tracking-widest relative z-10">AXiM Encryption Active</p>
         </div>
-        <div className="p-8 space-y-6">
-          <div className="flex justify-between items-center bg-black/50 p-4 border border-subtle rounded-sm">
+
+        <div className="p-6 space-y-5">
+          <div className="flex justify-between items-center bg-black/50 p-4 border border-white/5 rounded-sm">
             <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Document Access</span>
-            <span className="font-mono font-bold text-2xl text-white">$4.00</span>
+            <span className="font-mono font-bold text-xl text-white">$4.00</span>
           </div>
 
-          <div className="bg-black/30 border border-white/5 p-4 rounded-sm mt-4 text-left space-y-2">
-            <h4 className="font-mono text-[0.65rem] text-zinc-500 uppercase tracking-widest mb-3 border-b border-white/5 pb-2">Document Summary Verification</h4>
-            <div className="flex justify-between text-sm">
+          <div className="bg-black/30 border border-white/5 p-4 rounded-sm text-left space-y-2">
+            <h4 className="font-mono text-[0.6rem] text-zinc-500 uppercase tracking-widest mb-2 border-b border-white/5 pb-2">Document Summary Verification</h4>
+            <div className="flex justify-between text-xs">
               <span className="text-zinc-400">From:</span>
-              <span className="text-white truncate max-w-[200px]">{formData?.creditorName || 'N/A'}</span>
+              <span className="text-white truncate max-w-[180px]">{formData?.creditorName || 'N/A'}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs">
               <span className="text-zinc-400">To:</span>
-              <span className="text-white truncate max-w-[200px]">{formData?.debtorName || 'N/A'}</span>
+              <span className="text-white truncate max-w-[180px]">{formData?.debtorName || 'N/A'}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs">
               <span className="text-zinc-400">State:</span>
               <span className="text-white uppercase">{formData?.jurisdiction || 'N/A'}</span>
             </div>
           </div>
-          <label className="flex items-start gap-3 cursor-pointer group mt-4 bg-red-500/5 border border-red-500/20 p-3 rounded-sm">
-            <div className="relative flex items-center justify-center mt-0.5">
+
+          <label className="flex items-start gap-3 cursor-pointer group bg-red-500/5 border border-red-500/20 p-3 rounded-sm shrink-0">
+            <div className="relative flex items-center justify-center mt-0.5 shrink-0">
               <input
                 type="checkbox"
-                className="appearance-none w-5 h-5 border border-red-500/50 rounded-sm bg-black/50 checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer"
+                className="appearance-none w-4 h-4 border border-red-500/50 rounded-sm bg-black/50 checked:bg-red-500 checked:border-red-500 transition-colors cursor-pointer"
                 checked={dataVerified}
                 onChange={(e) => setDataVerified(e.target.checked)}
                 disabled={isProcessing}
               />
               {dataVerified && (
-                <svg className="absolute w-3 h-3 text-white pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="absolute w-2.5 h-2.5 text-white pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
             </div>
-            <span className="text-xs font-medium text-zinc-300">
-              I verify that all names, addresses, and amounts above are spelled correctly. I understand this document is generated instantly and <strong className="text-red-400">all sales are final</strong>.
+            <span className="text-[0.65rem] leading-snug font-medium text-zinc-300">
+              I verify all names, addresses, and amounts are spelled correctly. I understand this document is generated instantly and <strong className="text-red-400">all sales are final</strong>.
             </span>
           </label>
 
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
-              <SafeIcon icon={FiMail} className="text-axim-teal" /> Email Address (Required)
+          <div className="flex flex-col gap-2 shrink-0">
+            <label className="text-xs font-medium text-zinc-300 flex items-center gap-2">
+              <SafeIcon icon={FiMail} className="text-axim-teal" /> Delivery Email (Required)
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter email for document delivery"
-              className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
+              className="w-full bg-black/50 border border-white/10 rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
               disabled={isProcessing}
               required
             />
-            <label className="flex items-center gap-3 cursor-pointer group mt-2">
-              <div className="relative flex items-center justify-center">
-                <input
-                  type="checkbox"
-                  className="appearance-none w-5 h-5 border border-zinc-600 rounded bg-black/50 checked:bg-axim-teal checked:border-axim-teal transition-colors cursor-pointer"
-                  checked={marketingOptIn}
-                  onChange={(e) => setMarketingOptIn(e.target.checked)}
-                  disabled={isProcessing}
-                />
-                {marketingOptIn && (
-                  <svg className="absolute w-3 h-3 text-black pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </div>
-              <span className="text-xs font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
-                Send me legal updates & templates from AXiM (Optional)
-              </span>
-            </label>
           </div>
 
-          <div className="space-y-4 pt-2 border-t border-white/5">
+          <div className="space-y-3 pt-2 border-t border-white/5 shrink-0">
             <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-1 uppercase tracking-widest">
               Quality and Satisfaction Guaranteed.
             </div>
-            <div className="text-center font-mono text-[0.65rem] text-amber-500 font-bold mb-4 uppercase tracking-widest">
-              ⚠️ DO NOT CLOSE THIS TAB DURING PAYMENT.
-            </div>
             <button
               onClick={handleConfirm}
-              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email.trim()) || !dataVerified}
-              className={`w-full text-black border px-8 py-4 font-bold uppercase tracking-[1.5px] text-[0.85rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(255,234,0,0.5)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
+              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) || !dataVerified}
+              className={`w-full text-black border px-6 py-4 font-bold uppercase tracking-[1.5px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(255,234,0,0.4)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
             >
               {isProcessing ? (
                 <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Processing...</>
@@ -118,12 +98,9 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
                 <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
               )}
             </button>
-            <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-xs text-zinc-500 hover:text-white hover:bg-glass border border-transparent hover:border-subtle transition-all uppercase tracking-widest rounded-sm">
+            <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-[0.65rem] text-zinc-500 hover:text-white hover:bg-white/5 border border-transparent transition-all uppercase tracking-widest rounded-sm">
               Cancel
             </button>
-            <div className="text-center font-mono text-[0.55rem] text-zinc-600 mt-2 leading-relaxed px-4">
-              By proceeding, you acknowledge that QuickDemandLetter is a self-help software tool, not a law firm. This service does not provide legal advice.
-            </div>
           </div>
         </div>
       </motion.div>

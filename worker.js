@@ -278,6 +278,15 @@ export default {
       }
       // --------------------------------
 
+            // --- TELEMETRY MOCK ---
+      // Intercepts telemetry events so the browser doesn't throw 404 console errors
+      if (request.method === 'POST' && url.pathname.includes('/api/v1/telemetry')) {
+          return new Response(JSON.stringify({ success: true }), {
+              status: 200,
+              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin }
+          });
+      }
+
       let fetchConfig = {};
       if (request.method === 'GET' && url.pathname.includes('legal-statutes')) {
         fetchConfig = { cf: { cacheTtl: 3600, cacheEverything: true } };
