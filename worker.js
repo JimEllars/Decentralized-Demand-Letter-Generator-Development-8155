@@ -159,7 +159,7 @@ export default {
                creditorName: sanitize(formData.creditorName), creditorAddress: sanitize(formData.creditorAddress),
                debtorName: sanitize(formData.debtorName), debtorAddress: sanitize(formData.debtorAddress),
                jurisdiction: sanitize(formData.jurisdiction), dueDate: sanitize(formData.dueDate),
-               letterDate: sanitize(formData.letterDate), items: Array.isArray(formData.items) ? formData.items : []
+               letterDate: sanitize(formData.letterDate), items: Array.isArray(formData.items) ? formData.items.slice(0, 15) : []
             };
 
             const verifyReqUrl = new URL('/verify-session', backendUrl.origin);

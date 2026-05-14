@@ -106,20 +106,15 @@ const SuccessPage = () => {
       let isPaid = false;
       let verifiedData = null;
 
-      // Polling loop: Try up to 4 times (6 seconds) for Stripe Webhooks to sync
-      while (attempts < 4 && !isPaid) {
+      // 24-Second Polling Loop to handle Stripe Webhook edge cases
+      while (attempts < 12 && !isPaid) {
         try {
-          await verifyPaymentSession(sessionId);
-          if (verifiedData?.isPaid) {
-            isPaid = true;
-            break;
-          }
-        } catch (err) {
-          console.warn('Verification attempt ' + (attempts + 1) + ' failed');
-        }
+          verifiedData = await verifyPaymentSession(sessionId);
+          if (verifiedData?.isPaid) { isPaid = true; break; }
+        } catch (err) { console.warn('Verification attempt ' + (attempts + 1) + ' failed'); }
         attempts++;
-        if (!isPaid && attempts < 4 && isMounted) {
-          await new Promise(r => setTimeout(r, 1500));
+        if (!isPaid && attempts < 12 && isMounted) {
+          await new Promise(r => setTimeout(r, 2000));
         }
       }
 
