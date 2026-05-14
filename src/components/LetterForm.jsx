@@ -33,7 +33,12 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
     onUpdate(field, dateString);
   };
 
-  const handleAddItem = () => {
+  const handleAddItem = (e) => {
+    e?.preventDefault();
+    if (formData.items && formData.items.length >= 15) {
+      toast.error("For formatting purposes, ledgers are limited to 15 items. Please consolidate your debts.");
+      return;
+    }
     onUpdate('items', (prevItems) => [
       ...(Array.isArray(prevItems) ? prevItems : []),
       { id: generateId(), description: '', amount: '' }
