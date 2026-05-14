@@ -20,3 +20,8 @@ export const getLocalDateString = (date = new Date()) => {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+export const getLocalIsoDate = () => {
+  const d = new Date();
+  return new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+};

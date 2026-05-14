@@ -5,7 +5,7 @@ import LetterItem from './LetterItem';
 import SafeIcon from '../common/SafeIcon';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { useToast } from '../contexts/ToastContext';
-import { generateId, getLocalDateString } from '../utils/helpers';
+import { generateId, getLocalDateString, getLocalIsoDate } from '../utils/helpers';
 import { toTitleCase, formatAddress } from '../utils/formatters';
 import { checkStatuteOfLimitations } from '../utils/validation';
 
@@ -252,7 +252,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         id="dueDate"
                         name="dueDate"
                         type="date"
-                        min={new Date().toISOString().split('T')[0]}
+                        min={getLocalIsoDate()}
                         value={formData.dueDate}
                         onChange={handleChange}
                         onBlur={(e) => {
@@ -368,7 +368,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             <input maxLength="2000"
                             id="letterDate"
                             type="date"
-                            min={new Date().toISOString().split('T')[0]}
+                            min={getLocalIsoDate()}
                             name="letterDate"
                             value={formData.letterDate || ''}
                             onChange={handleChange}
