@@ -1,3 +1,4 @@
+import { logSystemEvent } from '../utils/telemetry';
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLetterStore } from '../hooks/useLetterStore';
@@ -141,13 +142,15 @@ const SuccessPage = () => {
               try {
                 await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || [], sessionId);
               } catch (err) {
-                console.error("PDF generation error:", err);
-                if (setIsGenerating) setIsGenerating(false);
-                toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
-              }
+        logSystemEvent('pdf_generation_failed', 'critical', { session_id: sessionId, error: err.message });
+        console.error("PDF generation error:", err);
+        if (setIsGenerating) setIsGenerating(false);
+        toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
+      }
             }
           }, 1000);
         } else {
+          logSystemEvent('payment_verification_timeout', 'warning', { session_id: sessionId });
           setVerificationStatus('failed');
           toast.error("Payment verification failed.");
         }
@@ -276,6 +279,7 @@ const SuccessPage = () => {
       setEmailSentSuccessfully(true);
       setEmail('');
     } catch (err) {
+      logSystemEvent('email_delivery_failed', 'error', { email_target: email });
       toast.error('Email services offline. Please try downloading instead.');
     } finally { setIsSendingEmail(false); }
   };

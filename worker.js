@@ -1,5 +1,25 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
+const reportToCore = async (eventName, details) => {
+  try {
+    // If AXIM_TELEMETRY_URL is set in CF variables, report directly to Onyx/Core
+    if (env.AXIM_TELEMETRY_URL) {
+      await fetch(env.AXIM_TELEMETRY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${env.AXIM_TELEMETRY_KEY || ''}`
+        },
+        body: JSON.stringify({
+          system: 'edge_worker',
+          event: eventName,
+          details
+        })
+      });
+    }
+  } catch(e) {}
+};
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -198,20 +218,8 @@ export default {
 
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': url.origin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
                     } catch(e) {
-            // Ping telemetry so admins are alerted to invisible PDF crashes
-            const coreUrl = env.BACKEND_URL || 'https://api.axim.us.com';
-            ctx.waitUntil(
-              fetch(new URL('/api/v1/telemetry/ingest', coreUrl).toString(), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  event: 'pdf_edge_crash',
-                  error_message: e.message || 'Unknown error',
-                  session_id: session_id || 'unknown'
-                })
-              }).catch(() => {})
-            );
-            return new Response(JSON.stringify({ error: 'Generation failed', details: e.message }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
+            ctx.waitUntil(reportToCore('pdf_engine_crash', { error: e.message, stack: e.stack }));
+            return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
           }
         } else if (url.pathname === '/api/send-email') {
           try {
@@ -253,6 +261,7 @@ export default {
             if (!resendRes.ok) throw new Error('Email provider failed to dispatch');
             return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
           } catch (err) {
+            ctx.waitUntil(reportToCore('resend_api_failure', { error: err.message }));
             return new Response(JSON.stringify({ error: 'Email dispatch failed' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
           }
         } else { fetchOptions.body = request.clone().body; }
