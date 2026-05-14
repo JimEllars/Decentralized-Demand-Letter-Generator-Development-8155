@@ -49,6 +49,18 @@ const STEPS = [
 const DemandGenerator = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // Only warn if they have started typing data and aren't in the payment modal
+      if ((formData.creditorName || formData.debtorName) && !showPaymentModal) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, showPaymentModal]);
+
   const urlState = searchParams.get('state');
 
   useEffect(() => {
@@ -240,6 +252,23 @@ const DemandGenerator = () => {
       toast.error("Please add at least one debt item to the ledger in Step 2.");
       return;
     }
+
+    // Ensure they aren't generating a $0 letter
+    const calculatedValues = calculateTotal(
+      formData.items,
+      formData.statutoryInterest,
+      formData.dueDate,
+      formData.jurisdiction,
+      formData.letterDate,
+      legalStatutes?.details || {}
+    );
+
+    const totalRaw = parseFloat(calculatedValues.formattedTotal.replace(/[^0-9.-]+/g, ""));
+    if (totalRaw <= 0) {
+      toast.error("Total Due must be greater than $0.00 to generate a formal demand.");
+      return;
+    }
+
     if (!formData.jurisdiction) {
       toast.error("Please select a governing State Jurisdiction.");
       return;
