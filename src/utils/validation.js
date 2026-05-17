@@ -124,3 +124,11 @@ export const checkStatuteOfLimitations = (dateString) => {
     return diffYears >= 6; // 6 years is the standard threshold warning
   } catch (e) { return false; }
 };
+
+export const checkReasonableDeadline = (dueDate, letterDate) => {
+  if (!dueDate) return false;
+  const start = letterDate ? new Date(letterDate) : new Date();
+  const end = new Date(dueDate);
+  const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+  return diffDays > 0 && diffDays < 10; // Warn if deadline is under 10 days
+};

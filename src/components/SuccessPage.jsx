@@ -301,17 +301,26 @@ const SuccessPage = () => {
 
         {verificationStatus === 'failed' && (
           <div className="flex flex-col items-center py-8">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
               <span className="text-red-500 text-3xl">✕</span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-red-500">Verification Failed</h2>
-            <p className="text-zinc-400 mt-2 text-sm mb-8">We could not verify your payment session.</p>
-            <button
-              onClick={() => navigate('/start')}
-              className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-lg font-medium w-full"
-            >
-              Return Home
-            </button>
+            <h2 className="text-xl font-bold tracking-tight text-red-500">Verification Timeout</h2>
+            <p className="text-zinc-400 mt-2 text-sm mb-6 px-4">We could not confirm your payment session within the expected window due to network latency. If your card was charged, your document is still safe.</p>
+
+            <div className="bg-black/40 border border-white/5 p-4 rounded-sm w-full mb-6 text-left">
+              <p className="text-[0.65rem] text-zinc-500 font-mono uppercase tracking-widest mb-1">Transaction ID Reference</p>
+              <p className="text-xs text-zinc-300 font-mono break-all">{searchParams.get('session_id') || 'Unknown'}</p>
+            </div>
+
+            <div className="flex w-full gap-3">
+              <button onClick={() => window.location.reload()} className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-sm font-medium text-sm">Retry</button>
+              <a
+                href={`mailto:support@quickdemandletter.com?subject=Payment Timeout - Session: ${searchParams.get('session_id')}`}
+                className="flex-1 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors rounded-sm font-medium text-sm flex items-center justify-center"
+              >
+                Contact Support
+              </a>
+            </div>
           </div>
         )}
 

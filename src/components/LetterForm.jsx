@@ -7,7 +7,7 @@ import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { useToast } from '../contexts/ToastContext';
 import { generateId, getLocalDateString, getLocalIsoDate } from '../utils/helpers';
 import { toTitleCase, formatAddress } from '../utils/formatters';
-import { checkStatuteOfLimitations } from '../utils/validation';
+import { checkStatuteOfLimitations, checkReasonableDeadline } from '../utils/validation';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -263,6 +263,11 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                         onBlur={(e) => {
                           if (checkStatuteOfLimitations(e.target.value)) {
                             toast.warning("Warning: Debts older than 6 years may exceed the legal Statute of Limitations for collection in many states. Proceed with caution.");
+                          }
+                          if (e.target.name === 'dueDate') {
+                            if (checkReasonableDeadline(e.target.value, formData.letterDate)) {
+                              toast.warning("Legal Warning: Courts generally require giving the debtor a 'reasonable' time to pay (usually 10-30 days). A shorter deadline may harm your claim in court.");
+                            }
                           }
                         }}
                         className={getInputClass('dueDate', formData.dueDate, true)}
