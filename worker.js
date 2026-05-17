@@ -46,7 +46,7 @@ export default {
       let fetchOptions = { method: request.method, headers: new Headers(request.headers) };
 
       // Shared PDF Generator Helper
-      const generatePdfBytes = async (sFormData, calculatedValues, tone) => {
+      const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) => {
         const pdfDoc = await PDFDocument.create();
         let currentPage = pdfDoc.addPage();
         const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -129,7 +129,8 @@ export default {
         drawText('__________________________', 12, timesRomanFont); drawText(sFormData.creditorName, 12, timesRomanFont);
 
         checkPageBreak(50);
-        currentPage.drawText('Document Tracking ID: ' + crypto.randomUUID(), { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
+        const referenceId = session_id === 'bypass_dev_mode' ? crypto.randomUUID() : session_id;
+        currentPage.drawText('Document Tracking Reference: ' + referenceId, { x: 50, y: 30, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
         currentPage.drawText('Generated via QuickDemandLetter.com. This document is user-generated and does not constitute legal advice.', { x: 50, y: 20, size: 8, font: timesRomanFont, color: rgb(0.5, 0.5, 0.5) });
 
         return await pdfDoc.save();
@@ -177,7 +178,7 @@ export default {
               return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
 
-            const pdfBytes = await generatePdfBytes(sFormData, calculatedValues, tone);
+            const pdfBytes = await generatePdfBytes(sFormData, calculatedValues, tone, session_id);
 
             if (url.pathname === '/api/deliver-document') {
               if (env.RESEND_API_KEY && email) {
