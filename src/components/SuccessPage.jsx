@@ -29,7 +29,10 @@ const SuccessPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
-  const [emailSentSuccessfully, setEmailSentSuccessfully] = useState(false);
+  const [emailSentSuccessfully, setEmailSentSuccessfully] = useState(() => {
+    const sessionId = searchParams.get('session_id');
+    return sessionStorage.getItem(`axim_email_sent_${sessionId}`) === 'true';
+  });
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -123,7 +126,13 @@ const SuccessPage = () => {
       try {
         if (isPaid) {
           setVerificationStatus('success');
-          window.dataLayer = window.dataLayer || []; window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter' }] } });
+          // Prevent duplicate Analytics events on page refresh
+          const analyticsLockKey = `axim_tracked_${sessionId}`;
+          if (!sessionStorage.getItem(analyticsLockKey)) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: 'purchase', ecommerce: { items: [{ item_id: 'demand_letter', item_name: 'Demand Letter', price: 4.00 }] } });
+            sessionStorage.setItem(analyticsLockKey, 'true');
+          }
           localStorage.setItem('axim_demand_letter_paid_status', sessionId);
 
           const calculatedValues = calculateTotal(
@@ -272,6 +281,7 @@ const SuccessPage = () => {
       await deliverDocumentViaEmail(email, pdfBase64, dynamicFilename);
       toast.success(`Document securely sent to ${email}`);
       setEmailSentSuccessfully(true);
+      sessionStorage.setItem(`axim_email_sent_${searchParams.get('session_id')}`, 'true');
       setEmail('');
     } catch (err) {
       logSystemEvent('email_delivery_failed', 'error', { email_target: email });
