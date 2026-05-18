@@ -1,3 +1,5 @@
+import { calculateTotal } from '../utils/calculations';
+import { createCheckoutSession } from '../services/paymentService';
 import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -12,9 +14,7 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { usePayment } from '../hooks/usePayment';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
-import { createCheckoutSession } from '../services/paymentService';
-
-import { calculateTotal, getToneTemplate, parseCurrency } from '../utils/calculations';
+import { getToneTemplate, parseCurrency } from '../utils/calculations';
 import { generateId, getLocalDateString } from '../utils/helpers';
 import { validateForm, getFirstErrorFieldId } from '../utils/validation';
 import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
@@ -49,26 +49,6 @@ const STEPS = [
 const DemandGenerator = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      // Only warn if they have started typing data and aren't in the payment modal
-      if ((formData.creditorName || formData.debtorName) && !showPaymentModal) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [formData, showPaymentModal]);
-
-  const urlState = searchParams.get('state');
-
-  useEffect(() => {
-    if (urlState && !formData.jurisdiction) {
-      updateField({ jurisdiction: urlState.toUpperCase() });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlState]);
   const toast = useToast();
   const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();
@@ -112,6 +92,27 @@ const DemandGenerator = () => {
     handlePayment,
     resetPayment
   } = usePayment();
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // Only warn if they have started typing data and aren't in the payment modal
+      if ((formData.creditorName || formData.debtorName) && !showPaymentModal) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [formData, showPaymentModal]);
+
+  const urlState = searchParams.get('state');
+
+  useEffect(() => {
+    if (urlState && !formData.jurisdiction) {
+      updateField('jurisdiction', urlState.toUpperCase());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlState]);
 
 
 
