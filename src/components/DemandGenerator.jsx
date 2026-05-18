@@ -47,6 +47,7 @@ const STEPS = [
 ];
 
 const DemandGenerator = () => {
+  const [isGeneratingModal, setIsGeneratingModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
   const toast = useToast();
@@ -239,6 +240,8 @@ const DemandGenerator = () => {
 
   const handleGenerate = (e) => {
     e?.preventDefault();
+    if (isGeneratingModal) return;
+    setIsGeneratingModal(true);
 
     // Pre-Checkout Guardrails
     if (!formData.creditorName || !formData.creditorAddress) {
@@ -283,7 +286,10 @@ const DemandGenerator = () => {
     });
 
     // If all checks pass, open the Stripe modal
-    setShowPaymentModal(true);
+    setTimeout(() => {
+      setShowPaymentModal(true);
+      setIsGeneratingModal(false);
+    }, 100);
   };
 
     const handlePaymentConfirm = async (email, marketingOptIn) => {
@@ -453,7 +459,7 @@ const DemandGenerator = () => {
             <button
               type="button"
               onClick={handleGenerate}
-              disabled={isProcessing || !isValid}
+              disabled={isProcessing || !isValid || isGeneratingModal}
               className="w-full sm:w-auto px-8 py-4 bg-axim-teal text-black font-bold uppercase tracking-wide text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all duration-300 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? "PROCESSING..." : "Generate Document"}
