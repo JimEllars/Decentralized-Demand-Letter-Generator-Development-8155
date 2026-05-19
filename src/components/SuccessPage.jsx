@@ -144,7 +144,7 @@ const SuccessPage = () => {
           setTimeout(async () => {
             if (isMounted) {
               try {
-                await handleDownload(true, () => {}, formData, calculatedValues, toneTemplate, true, legalStatutes?.clauses || [], sessionId);
+                await handleDownload(formData, calculatedValues, toneTemplate, sessionId);
               } catch (err) {
         logSystemEvent('pdf_generation_failed', 'critical', { session_id: sessionId, error: err.message });
         console.error("PDF generation error:", err);
@@ -235,27 +235,18 @@ const SuccessPage = () => {
   // Auto-send email if user provided one during checkout
   useEffect(() => {
     let isMounted = true;
-    if (verificationStatus === 'success' && email && !hasSentInitialEmail.current && legalStatutes) {
+    if (verificationStatus === 'success' && email && !hasSentInitialEmail.current && pdfBase64) {
       hasSentInitialEmail.current = true;
       const sendInitialEmail = async () => {
         if (!isMounted) return;
         setIsSendingEmail(true);
         try {
-          const sessionId = searchParams.get('session_id');
-          const calculatedValues = calculateTotal(
-            formData.items, formData.statutoryInterest, formData.dueDate,
-            formData.jurisdiction, formData.letterDate, legalStatutes?.details || {}
-          );
-          await deliverOrchestratedDocument(sessionId, formData, email, calculatedValues, TONE_TEMPLATES[formData.tone]);
+          const dynamicFilename = `Demand_Letter_${(formData.debtorName || 'Final').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+          await deliverDocumentViaEmail(email, pdfBase64, dynamicFilename);
           if (isMounted) {
              toast.success(`Document automatically sent to ${email}`);
              const optIn = sessionStorage.getItem('axim_marketing_optin') === 'true';
-             if (optIn) {
-               fetch('/api/v1/telemetry/ingest', {
-                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                 body: JSON.stringify({ event: 'lead_captured', email, source: 'demand_letter_generator' })
-               }).catch(() => {});
-             }
+             if (optIn) fetch('/api/v1/telemetry/ingest', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'lead_captured', email, source: 'demand_letter_generator' }) }).catch(() => {});
              sessionStorage.removeItem('axim_delivery_email');
              sessionStorage.removeItem('axim_marketing_optin');
           }
@@ -268,7 +259,7 @@ const SuccessPage = () => {
       sendInitialEmail();
     }
     return () => { isMounted = false; };
-  }, [verificationStatus, email, toast, formData, searchParams, legalStatutes]);
+  }, [verificationStatus, email, toast, formData, searchParams, pdfBase64]);
 
   const handleSendEmail = async (e) => {
     e.preventDefault();

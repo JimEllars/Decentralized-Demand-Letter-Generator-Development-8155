@@ -1,9 +1,9 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-const reportToCore = async (eventName, details) => {
+const reportToCore = async (eventName, details, env) => {
   try {
     // If AXIM_TELEMETRY_URL is set in CF variables, report directly to Onyx/Core
-    if (env.AXIM_TELEMETRY_URL) {
+    if (env && env.AXIM_TELEMETRY_URL) {
       await fetch(env.AXIM_TELEMETRY_URL, {
         method: 'POST',
         headers: {
@@ -17,7 +17,9 @@ const reportToCore = async (eventName, details) => {
         })
       });
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('Telemetry reporting failed', e);
+  }
 };
 
 export default {
@@ -27,7 +29,7 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       const allowedRoutes = [
         '/api/create-checkout-session', '/api/verify-session', '/api/generate-demand-letter',
-        '/api/deliver-document', '/api/webhooks/stripe', '/api/ledger/stamp',
+        '/api/deliver-document', '/api/send-email', '/api/webhooks/stripe', '/api/ledger/stamp',
         '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback'
       ];
 
@@ -223,47 +225,27 @@ export default {
             return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
           }
         } else if (url.pathname === '/api/send-email') {
+          let corsHeaders = { 'Access-Control-Allow-Origin': url.origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
+          if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
           try {
             const { email, pdfData, filename } = await request.clone().json();
+            if (!email || !pdfData) return new Response(JSON.stringify({ error: 'Missing payload' }), { status: 400, headers: corsHeaders });
             const safeFilename = filename || 'Demand_Letter_Final.pdf';
-            if (!email || !pdfData) return new Response(JSON.stringify({ error: 'Missing payload' }), { status: 400, headers: { 'Access-Control-Allow-Origin': url.origin } });
-
-            // Dispatch via Resend Email API
             const resendRes = await fetch('https://api.resend.com/emails', {
               method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-              },
+              headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
                 to: [email],
                 subject: 'Your Demand Letter PDF is Ready',
-                html: `
-                  <div style="font-family: 'Courier New', monospace; max-width: 600px; margin: 0 auto; background-color: #000000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;">
-                    <div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;">
-                      <h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">QuickDemandLetter</h1>
-                    </div>
-                    <div style="padding: 32px;">
-                      <h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2>
-                      <p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p>
-                      <div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;">
-                        <p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data, debts, or generated documents on our central servers. <strong>Please save the attached PDF to your local device permanently.</strong></p>
-                      </div>
-                      <p style="font-size: 12px; color: #71717a; text-align: center; margin-top: 32px;">If you have any questions, please contact support@quickdemandletter.com</p>
-                    </div>
-                  </div>
-                `,
+                html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">QuickDemandLetter</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
                 attachments: [{ filename: safeFilename, content: pdfData }]
               })
             });
-
             if (!resendRes.ok) throw new Error('Email provider failed to dispatch');
-            return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
           } catch (err) {
-            ctx.waitUntil(reportToCore('resend_api_failure', { error: err.message }));
-            return new Response(JSON.stringify({ error: 'Email dispatch failed' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+            return new Response(JSON.stringify({ error: 'Email dispatch failed' }), { status: 500, headers: corsHeaders });
           }
         } else { fetchOptions.body = request.clone().body; }
       }
