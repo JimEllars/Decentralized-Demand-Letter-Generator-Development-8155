@@ -11,7 +11,6 @@ import SummaryCard from './SummaryCard';
 import UpsellCard from './UpsellCard';
 import PaymentModal from './PaymentModal';
 import { useLetterStore } from '../hooks/useLetterStore';
-import { usePayment } from '../hooks/usePayment';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { getToneTemplate, parseCurrency } from '../utils/calculations';
@@ -84,15 +83,8 @@ const DemandGenerator = () => {
 
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  const {
-    isProcessing,
-    setIsProcessing,
-    showPaymentModal,
-    setShowPaymentModal,
-    handleProceedToCheckout,
-    handlePayment,
-    resetPayment
-  } = usePayment();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -149,7 +141,6 @@ const DemandGenerator = () => {
 
   const resetForm = () => {
     resetStore();
-    resetPayment();
     setHasAttemptedSubmit(false);
     sessionStorage.removeItem('axim_delivery_email');
     toast.success("Form reset successfully.");
