@@ -1,9 +1,5 @@
 // Strips emojis and non-Latin characters that cause pdf-lib to crash
-export const stripUnsupportedChars = (str) => {
-  if (!str) return '';
-  // Keep standard ASCII and Latin-1 characters
-  return str.replace(/[^\x20-\x7E\xA0-\xFF]/g, '').trim();
-};
+export const stripUnsupportedChars = (str) => str ? str.replace(/[^\s\x20-\x7E\xA0-\xFF]/g, '').trim() : '';
 
 /**
  * Shared formatter instance for currency (USD)
@@ -38,6 +34,8 @@ export const toTitleCase = (str) => {
 // Standardizes basic address strings
 export const formatAddress = (str) => {
   if (!str) return '';
-  const safeStr = stripUnsupportedChars(str);
-  return toTitleCase(safeStr).replace(/\s+/g, ' ').trim();
+  // Convert line breaks to commas so "123 St\nCity" becomes "123 St, City"
+  let formatted = str.replace(/[\r\n]+/g, ', ');
+  const safeStr = stripUnsupportedChars(formatted);
+  return toTitleCase(safeStr).replace(/\s+/g, ' ');
 };
