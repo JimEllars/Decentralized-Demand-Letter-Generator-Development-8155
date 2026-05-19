@@ -5,7 +5,7 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { verifyPaymentSession, deliverDocumentViaEmail, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
-import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
+import { FiCheckCircle, FiDownload, FiPlusCircle, FiMail, FiThumbsUp, FiThumbsDown, FiFileText } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
@@ -71,8 +71,9 @@ const SuccessPage = () => {
          a.download = `Demand_Letter_${(formData.debtorName || 'Final').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
          document.body.appendChild(a);
          a.click();
-       } finally {
-         window.URL.revokeObjectURL(url);
+         // We intentionally DO NOT revoke the ObjectURL here so the 'View' button remains active.
+       } catch (e) {
+         console.warn("Auto-download prevented by browser", e);
        }
      } catch (err) {
        console.error("PDF download failed", err);
@@ -107,12 +108,11 @@ const SuccessPage = () => {
     const verifyAndDownload = async () => {
       let attempts = 0;
       let isPaid = false;
-      let verifiedData = null;
 
       // 24-Second Polling Loop to handle Stripe Webhook edge cases
       while (attempts < 12 && !isPaid) {
         try {
-          verifiedData = await verifyPaymentSession(sessionId);
+          const verifiedData = await verifyPaymentSession(sessionId);
           if (verifiedData?.isPaid) { isPaid = true; break; }
         } catch (err) { console.warn('Verification attempt ' + (attempts + 1) + ' failed'); }
         attempts++;
@@ -172,7 +172,7 @@ const SuccessPage = () => {
       isMounted = false;
       hasVerified.current = false;
     };
-  }, [isInitialized, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isInitialized, searchParams]);
 
   const handleDownloadAgain = async () => {
     try {

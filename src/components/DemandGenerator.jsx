@@ -104,7 +104,7 @@ const DemandGenerator = () => {
     if (urlState && !formData.jurisdiction) {
       updateField('jurisdiction', urlState.toUpperCase());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [urlState]);
 
 
