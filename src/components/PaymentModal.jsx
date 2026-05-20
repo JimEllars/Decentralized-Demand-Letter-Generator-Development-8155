@@ -68,40 +68,42 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
             </span>
           </label>
 
-          <div className="flex flex-col gap-2 shrink-0">
-            <label className="text-xs font-medium text-zinc-300 flex items-center gap-2">
-              <SafeIcon icon={FiMail} className="text-axim-teal" /> Delivery Email (Required)
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email for document delivery"
-              className="w-full bg-black/50 border border-white/10 rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
-              disabled={isProcessing}
-              required
-            />
-          </div>
-
-          <div className="space-y-3 pt-2 border-t border-white/5 shrink-0">
-            <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-1 uppercase tracking-widest">
-              Quality and Satisfaction Guaranteed.
+          <form onSubmit={(e) => { e.preventDefault(); handleConfirm(); }} className="w-full space-y-5">
+            <div className="flex flex-col gap-2 shrink-0">
+              <label className="text-xs font-medium text-zinc-300 flex items-center gap-2">
+                <SafeIcon icon={FiMail} className="text-axim-teal" /> Delivery Email (Required)
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email for document delivery"
+                className="w-full bg-black/50 border border-white/10 rounded-sm px-4 py-3 text-sm focus:outline-none focus:border-axim-teal transition-colors"
+                disabled={isProcessing}
+                required
+              />
             </div>
-            <button
-              onClick={handleConfirm}
-              disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) || !dataVerified}
-              className={`w-full text-black border px-6 py-4 font-bold uppercase tracking-[1.5px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(255,234,0,0.4)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
-            >
-              {isProcessing ? (
-                <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Processing...</>
-              ) : (
-                <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
-              )}
-            </button>
-            <button onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-[0.65rem] text-zinc-500 hover:text-white hover:bg-white/5 border border-transparent transition-all uppercase tracking-widest rounded-sm">
-              Cancel
-            </button>
-          </div>
+
+            <div className="space-y-3 pt-2 border-t border-white/5 shrink-0">
+              <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-1 uppercase tracking-widest">
+                Quality and Satisfaction Guaranteed.
+              </div>
+              <button
+                type="submit"
+                disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) || !dataVerified}
+                className={`w-full text-black border px-6 py-4 font-bold uppercase tracking-[1.5px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(255,234,0,0.4)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
+              >
+                {isProcessing ? (
+                  <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Processing...</>
+                ) : (
+                  <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
+                )}
+              </button>
+              <button type="button" onClick={onCancel} disabled={isProcessing} className="w-full py-3 font-mono text-[0.65rem] text-zinc-500 hover:text-white hover:bg-white/5 border border-transparent transition-all uppercase tracking-widest rounded-sm">
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </motion.div>
     </div>
