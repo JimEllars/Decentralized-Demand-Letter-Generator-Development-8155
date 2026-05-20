@@ -35,6 +35,15 @@ const SuccessPage = () => {
   });
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
 
+  // Cleanup Blob URL on unmount to prevent mobile browser memory leaks
+  useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) {
+        window.URL.revokeObjectURL(pdfBlobUrl);
+      }
+    };
+  }, [pdfBlobUrl]);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [pdfBase64, setPdfBase64] = useState(null);
 
