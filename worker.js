@@ -231,19 +231,44 @@ export default {
             const { email, pdfData, filename } = await request.clone().json();
             if (!email || !pdfData) return new Response(JSON.stringify({ error: 'Missing payload' }), { status: 400, headers: corsHeaders });
             const safeFilename = filename || 'Demand_Letter_Final.pdf';
-            const resendRes = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
-                reply_to: 'support@quickdemandletter.com',
-                to: [email],
-                subject: 'Your Demand Letter PDF is Ready',
-                html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">QuickDemandLetter</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
-                attachments: [{ filename: safeFilename, content: pdfData }]
-              })
-            });
-            if (!resendRes.ok) throw new Error('Email provider failed to dispatch');
+
+            let emailSuccess = false;
+
+            // PRIMARY ROUTE: EmailIt API (axim.us.com)
+            try {
+              const emailItRes = await fetch('https://api.emailit.com/v2/emails', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  from: 'AXiM Legal Engine <deliveries@axim.us.com>',
+                  reply_to: 'support@axim.us.com',
+                  to: [email],
+                  subject: 'Your Demand Letter PDF is Ready',
+                  html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">AXiM Documents</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
+                  attachments: [{ filename: safeFilename, content: pdfData, content_type: 'application/pdf' }]
+                })
+              });
+              if (emailItRes.ok) emailSuccess = true;
+            } catch (e) { console.error('EmailIt Route Failed:', e); }
+
+            // FALLBACK ROUTE: Resend API
+            if (!emailSuccess && env.RESEND_API_KEY) {
+              const resendRes = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
+                  reply_to: 'support@quickdemandletter.com',
+                  to: [email],
+                  subject: 'Your Demand Letter PDF is Ready',
+                  html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">QuickDemandLetter</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready (Fallback Delivery)</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p></div></div>',
+                  attachments: [{ filename: safeFilename, content: pdfData }]
+                })
+              });
+              if (resendRes.ok) emailSuccess = true;
+            }
+
+            if (!emailSuccess) throw new Error('All delivery routes failed');
             return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
           } catch (err) {
             return new Response(JSON.stringify({ error: 'Email dispatch failed' }), { status: 500, headers: corsHeaders });

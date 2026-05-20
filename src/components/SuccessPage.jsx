@@ -325,7 +325,7 @@ const SuccessPage = () => {
             <div className="flex w-full gap-3">
               <button onClick={() => window.location.reload()} className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 transition-colors rounded-sm font-medium text-sm">Retry</button>
               <a
-                href={`mailto:support@quickdemandletter.com?subject=Payment Timeout - Session: ${searchParams.get('session_id')}`}
+                href={`mailto:support@axim.us.com?subject=Payment Timeout - Session: ${searchParams.get('session_id')}`}
                 className="flex-1 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors rounded-sm font-medium text-sm flex items-center justify-center"
               >
                 Contact Support
