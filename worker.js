@@ -183,45 +183,57 @@ export default {
             const pdfBytes = await generatePdfBytes(sFormData, calculatedValues, tone, session_id);
 
             if (url.pathname === '/api/deliver-document') {
-              if (env.RESEND_API_KEY && email) {
+              if (email) {
                 let binary = '';
                 const bytes = new Uint8Array(pdfBytes);
                 const len = bytes.byteLength;
                 for (let i = 0; i < len; i++) { binary += String.fromCharCode(bytes[i]); }
                 const base64Pdf = btoa(binary);
 
-                const resendRes = await fetch('https://api.resend.com/emails', {
-                  method: 'POST',
-                  headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
-                    to: email,
-                    subject: 'Your Finalized Demand Letter',
-                    html: `
-                      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-                        <h2 style="color: #333;">Your Document is Ready</h2>
-                        <p style="color: #555; line-height: 1.5;">Thank you for using QuickDemandLetter. Your finalized, legally-formatted document is attached as a PDF.</p>
-                        <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
-                          <strong style="color: #856404;">Important:</strong> <span style="color: #856404;">Please download and save this file for your records immediately. As part of our Zero-Knowledge Privacy Policy, we do not store your data or copies of this document.</span>
-                        </div>
-                        <p style="color: #777; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">This is an automated message. Please do not reply.</p>
-                      </div>
-                    `,
-                    attachments: [{ filename: 'Demand_Letter.pdf', content: base64Pdf }]
-                  })
-                });
+                let emailSuccess = false;
 
-                if (!resendRes.ok) {
-                   console.error("Resend Error:", await resendRes.text());
-                   throw new Error("Failed to dispatch email via Resend.");
+                // PRIMARY: EmailIt API
+                try {
+                  const emailItRes = await fetch('https://api.emailit.com/v2/emails', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      from: 'AXiM Legal Engine <deliveries@axim.us.com>',
+                      reply_to: 'support@axim.us.com',
+                      to: [email],
+                      subject: 'Your Demand Letter PDF is Ready',
+                      html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">AXiM Documents</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
+                      attachments: [{ filename: 'Demand_Letter.pdf', content: base64Pdf, content_type: 'application/pdf' }]
+                    })
+                  });
+                  if (emailItRes.ok) emailSuccess = true;
+                } catch (e) { console.error('EmailIt Route Failed:', e); }
+
+                // FALLBACK: Resend API
+                if (!emailSuccess && env.RESEND_API_KEY) {
+                  const resendRes = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      from: 'QuickDemandLetter <deliveries@quickdemandletter.com>',
+                      reply_to: 'support@quickdemandletter.com',
+                      to: [email],
+                      subject: 'Your Demand Letter PDF is Ready',
+                      html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">QuickDemandLetter</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready (Fallback)</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p></div></div>',
+                      attachments: [{ filename: 'Demand_Letter.pdf', content: base64Pdf }]
+                    })
+                  });
+                  if (resendRes.ok) emailSuccess = true;
                 }
+
+                if (!emailSuccess) throw new Error("All automated delivery routes failed.");
               }
               return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
             }
 
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': url.origin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
                     } catch(e) {
-            ctx.waitUntil(reportToCore('pdf_engine_crash', { error: e.message, stack: e.stack }));
+            ctx.waitUntil(reportToCore('pdf_engine_crash', { error: e.message, stack: e.stack }, env));
             return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
           }
         } else if (url.pathname === '/api/send-email') {
@@ -271,6 +283,7 @@ export default {
             if (!emailSuccess) throw new Error('All delivery routes failed');
             return new Response(JSON.stringify({ success: true }), { status: 200, headers: corsHeaders });
           } catch (err) {
+            ctx.waitUntil(reportToCore('email_delivery_failed', { error: err.message, route: '/api/send-email' }, env));
             return new Response(JSON.stringify({ error: 'Email dispatch failed' }), { status: 500, headers: corsHeaders });
           }
         } else { fetchOptions.body = request.clone().body; }
