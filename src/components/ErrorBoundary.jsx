@@ -57,6 +57,12 @@ class ErrorBoundary extends Component {
             >
               Refresh Page
             </button>
+            <a
+              href="mailto:support@axim.us.com"
+              className="px-6 py-3 text-zinc-500 hover:text-white transition-colors text-sm font-medium flex items-center justify-center"
+            >
+              Contact Support
+            </a>
           </div>
         </div>
       );
