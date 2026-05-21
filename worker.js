@@ -211,6 +211,7 @@ export default {
 
                 // FALLBACK: Resend API
                 if (!emailSuccess && env.RESEND_API_KEY) {
+                  ctx.waitUntil(reportToCore('email_fallback_triggered', { route: '/api/deliver-document', email }, env));
                   const resendRes = await fetch('https://api.resend.com/emails', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -265,6 +266,7 @@ export default {
 
             // FALLBACK ROUTE: Resend API
             if (!emailSuccess && env.RESEND_API_KEY) {
+              ctx.waitUntil(reportToCore('email_fallback_triggered', { route: '/api/send-email', email }, env));
               const resendRes = await fetch('https://api.resend.com/emails', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },

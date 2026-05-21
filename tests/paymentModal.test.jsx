@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import React from 'react';
 import { render, cleanup, screen, fireEvent } from '@testing-library/react';
 import PaymentModal from '../src/components/PaymentModal.jsx';
+import { ToastProvider } from '../src/contexts/ToastContext.jsx';
 
 describe('PaymentModal', () => {
   afterEach(() => {
@@ -11,7 +12,7 @@ describe('PaymentModal', () => {
   });
 
   test('should render standard modal elements correctly', () => {
-    render(<PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={() => {}} />);
+    render(<ToastProvider><PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={() => {}} /></ToastProvider>);
 
     // Renders headings and static text
     assert.ok(screen.getByText('Secure Checkout'));
@@ -37,7 +38,7 @@ describe('PaymentModal', () => {
 
   test('should trigger onConfirm when the pay button is clicked', () => {
     const onConfirmMock = mock.fn();
-    render(<PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} />);
+    render(<ToastProvider><PaymentModal isProcessing={false} onConfirm={onConfirmMock} onCancel={() => {}} /></ToastProvider>);
 
     // Fill in the email
     const emailInput = screen.getByPlaceholderText('Enter email for document delivery');
@@ -54,7 +55,7 @@ describe('PaymentModal', () => {
 
   test('should trigger onCancel when the cancel button is clicked', () => {
     const onCancelMock = mock.fn();
-    render(<PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={onCancelMock} />);
+    render(<ToastProvider><PaymentModal isProcessing={false} onConfirm={() => {}} onCancel={onCancelMock} /></ToastProvider>);
 
     const cancelButton = screen.getByText('Cancel').closest('button');
     fireEvent.click(cancelButton);
@@ -62,7 +63,7 @@ describe('PaymentModal', () => {
   });
 
   test('should disable buttons and show verifying text when isProcessing is true', () => {
-    render(<PaymentModal isProcessing={true} onConfirm={() => {}} onCancel={() => {}} />);
+    render(<ToastProvider><PaymentModal isProcessing={true} onConfirm={() => {}} onCancel={() => {}} /></ToastProvider>);
 
     // Verifying text should be present, standard Pay text shouldn't
     assert.ok(screen.getByText(/Processing\.\.\./));

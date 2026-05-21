@@ -98,6 +98,15 @@ const DemandGenerator = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [formData, showPaymentModal]);
 
+  // Catch Stripe Cancellations
+  useEffect(() => {
+    if (searchParams.get('canceled') === 'true') {
+      toast.info('Checkout canceled. Your drafted document has been securely saved on your device.');
+      searchParams.delete('canceled');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, toast]);
+
   const urlState = searchParams.get('state');
 
   useEffect(() => {
@@ -129,15 +138,6 @@ const DemandGenerator = () => {
     };
   }, [isInitialized, navigate]);
 
-  useEffect(() => {
-    if (searchParams.get('canceled') === 'true') {
-      toast.info("Checkout was canceled. Your draft has been saved.");
-      setSearchParams(params => {
-        params.delete('canceled');
-        return params;
-      });
-    }
-  }, [searchParams, setSearchParams, toast]);
 
   const resetForm = () => {
     resetStore();
