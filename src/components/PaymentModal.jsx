@@ -1,15 +1,25 @@
 import { useState } from 'react';
+import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
 import SafeIcon from '../common/SafeIcon';
 
 const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [dataVerified, setDataVerified] = useState(false);
 
-  const handleConfirm = async () => {
-    onConfirm(email.trim(), marketingOptIn);
+  const handleConfirm = () => {
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+      toast.error("Please enter a valid delivery email address.");
+      return;
+    }
+    if (!dataVerified) {
+      toast.error("Please verify your document summary.");
+      return;
+    }
+    onConfirm(email, marketingOptIn);
   };
 
       return (
