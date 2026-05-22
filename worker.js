@@ -22,33 +22,7 @@ const reportToCore = async (eventName, details, env) => {
   }
 };
 
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-
-    if (url.pathname.startsWith('/api/')) {
-      const allowedRoutes = [
-        '/api/create-checkout-session', '/api/verify-session', '/api/generate-demand-letter',
-        '/api/deliver-document', '/api/send-email', '/api/webhooks/stripe', '/api/ledger/stamp',
-        '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback'
-      ];
-
-      if (!allowedRoutes.some(route => url.pathname.startsWith(route))) {
-        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
-      }
-
-      if (request.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': url.origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
-      }
-
-      const subPath = url.pathname.replace(/^\/api\//, '');
-      const baseUrl = env.BACKEND_URL.endsWith('/') ? env.BACKEND_URL : `${env.BACKEND_URL}/`;
-      const backendUrl = new URL(subPath, baseUrl);
-      backendUrl.search = url.search;
-      let fetchOptions = { method: request.method, headers: new Headers(request.headers) };
-
-      // Shared PDF Generator Helper
-      const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) => {
+const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) => {
         const pdfDoc = await PDFDocument.create();
         let currentPage = pdfDoc.addPage();
         const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -138,6 +112,35 @@ export default {
         return await pdfDoc.save();
       };
 
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const corsOrigin = url.origin.includes('localhost') ? url.origin : 'https://quickdemandletter.com';
+
+    if (url.pathname.startsWith('/api/')) {
+      const allowedRoutes = [
+        '/api/create-checkout-session', '/api/verify-session', '/api/generate-demand-letter',
+        '/api/deliver-document', '/api/send-email', '/api/webhooks/stripe', '/api/ledger/stamp',
+        '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback'
+      ];
+
+      if (!allowedRoutes.some(route => url.pathname.startsWith(route))) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin } });
+      }
+
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': corsOrigin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
+      }
+
+      const subPath = url.pathname.replace(/^\/api\//, '');
+      const baseUrl = env.BACKEND_URL.endsWith('/') ? env.BACKEND_URL : `${env.BACKEND_URL}/`;
+      const backendUrl = new URL(subPath, baseUrl);
+      backendUrl.search = url.search;
+      let fetchOptions = { method: request.method, headers: new Headers(request.headers) };
+
+      // Shared PDF Generator Helper
+
+
       if (request.method === 'POST') {
         if (url.pathname === '/api/create-checkout-session') {
           try {
@@ -177,7 +180,7 @@ export default {
             } catch(e) { console.error('Session verification failed', e); }
 
             if (!isPaid) {
-              return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+              return new Response(JSON.stringify({ error: 'Payment Required' }), { status: 402, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin } });
             }
 
             const pdfBytes = await generatePdfBytes(sFormData, calculatedValues, tone, session_id);
@@ -231,16 +234,16 @@ export default {
 
                 if (!emailSuccess) throw new Error("All automated delivery routes failed.");
               }
-              return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin } });
+              return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin } });
             }
 
-            return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': url.origin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
+            return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': corsOrigin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
                     } catch(e) {
             ctx.waitUntil(reportToCore('pdf_engine_crash', { error: e.message, stack: e.stack }, env));
-            return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': url.origin } });
+            return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': corsOrigin } });
           }
         } else if (url.pathname === '/api/send-email') {
-          let corsHeaders = { 'Access-Control-Allow-Origin': url.origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
+          let corsHeaders = { 'Access-Control-Allow-Origin': corsOrigin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
           if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
           try {
             const { email, pdfData, filename } = await request.clone().json();
@@ -299,16 +302,62 @@ export default {
       if (request.method === 'GET' && url.pathname === '/api/v1/legal-statutes') {
           const state = url.searchParams.get('state') || 'default';
           const statutes = {
-              'TX': { details: { maxInterestRate: 18.0, standardInterestRate: 6.0 }, clauses: [] },
-              'CA': { details: { maxInterestRate: 10.0, standardInterestRate: 7.0 }, clauses: [] },
-              'NY': { details: { maxInterestRate: 16.0, standardInterestRate: 9.0 }, clauses: [] },
-              'FL': { details: { maxInterestRate: 11.0, standardInterestRate: 6.0 }, clauses: [] },
-              'IL': { details: { maxInterestRate: 9.0, standardInterestRate: 5.0 }, clauses: [] },
-              'default': { details: { maxInterestRate: 8.0, standardInterestRate: 5.0 }, clauses: [] }
+              'AL': { details: { maxInterestRate: 17.5, standardInterestRate: 7.5 }, clauses: [] },
+              'AK': { details: { maxInterestRate: 20.5, standardInterestRate: 10.5 }, clauses: [] },
+              'AZ': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'AR': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'CA': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'CO': { details: { maxInterestRate: 18, standardInterestRate: 8 }, clauses: [] },
+              'CT': { details: { maxInterestRate: 18, standardInterestRate: 8 }, clauses: [] },
+              'DE': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'DC': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'FL': { details: { maxInterestRate: 14.75, standardInterestRate: 4.75 }, clauses: [] },
+              'GA': { details: { maxInterestRate: 17, standardInterestRate: 7 }, clauses: [] },
+              'HI': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'ID': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'IL': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'IN': { details: { maxInterestRate: 18, standardInterestRate: 8 }, clauses: [] },
+              'IA': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'KS': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'KY': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'LA': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'ME': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'MD': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'MA': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'MI': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'MN': { details: { maxInterestRate: 14, standardInterestRate: 4 }, clauses: [] },
+              'MS': { details: { maxInterestRate: 18, standardInterestRate: 8 }, clauses: [] },
+              'MO': { details: { maxInterestRate: 19, standardInterestRate: 9 }, clauses: [] },
+              'MT': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'NE': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'NV': { details: { maxInterestRate: 15.25, standardInterestRate: 5.25 }, clauses: [] },
+              'NH': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'NJ': { details: { maxInterestRate: 12.5, standardInterestRate: 2.5 }, clauses: [] },
+              'NM': { details: { maxInterestRate: 18.75, standardInterestRate: 8.75 }, clauses: [] },
+              'NY': { details: { maxInterestRate: 19, standardInterestRate: 9 }, clauses: [] },
+              'NC': { details: { maxInterestRate: 18, standardInterestRate: 8 }, clauses: [] },
+              'ND': { details: { maxInterestRate: 16.5, standardInterestRate: 6.5 }, clauses: [] },
+              'OH': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'OK': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'OR': { details: { maxInterestRate: 19, standardInterestRate: 9 }, clauses: [] },
+              'PA': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'RI': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'SC': { details: { maxInterestRate: 17.25, standardInterestRate: 7.25 }, clauses: [] },
+              'SD': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'TN': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'TX': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'UT': { details: { maxInterestRate: 20, standardInterestRate: 10 }, clauses: [] },
+              'VT': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'VA': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] },
+              'WA': { details: { maxInterestRate: 22, standardInterestRate: 12 }, clauses: [] },
+              'WV': { details: { maxInterestRate: 17, standardInterestRate: 7 }, clauses: [] },
+              'WI': { details: { maxInterestRate: 15, standardInterestRate: 5 }, clauses: [] },
+              'WY': { details: { maxInterestRate: 17, standardInterestRate: 7 }, clauses: [] },
+              'default': { details: { maxInterestRate: 16, standardInterestRate: 6 }, clauses: [] }
           };
           return new Response(JSON.stringify(statutes[state] || statutes['default']), {
               status: 200,
-              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin }
+              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
           });
       }
       // --------------------------------
@@ -318,7 +367,7 @@ export default {
       if (request.method === 'POST' && url.pathname.includes('/api/v1/telemetry')) {
           return new Response(JSON.stringify({ success: true }), {
               status: 200,
-              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': url.origin }
+              headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
           });
       }
 
@@ -330,9 +379,9 @@ export default {
       try {
         const response = await fetch(new Request(backendUrl.toString(), fetchOptions), fetchConfig);
         const newResponse = new Response(response.body, response);
-        newResponse.headers.set('Access-Control-Allow-Origin', url.origin);
+        newResponse.headers.set('Access-Control-Allow-Origin', corsOrigin);
         return newResponse;
-      } catch (err) { return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': url.origin } }); }
+      } catch (err) { return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': corsOrigin } }); }
     }
 
     let assetResponse = await env.ASSETS.fetch(request);
