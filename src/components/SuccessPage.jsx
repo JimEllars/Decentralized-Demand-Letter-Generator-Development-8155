@@ -134,6 +134,12 @@ const SuccessPage = () => {
 
       try {
         if (isPaid) {
+          // Cross-Device Privacy Guard
+          if (!formData.creditorName && !formData.debtorName) {
+            setVerificationStatus('mismatch');
+            return; // Halt generation
+          }
+
           setVerificationStatus('success');
           // Prevent duplicate Analytics events on page refresh
           const analyticsLockKey = `axim_tracked_${sessionId}`;
@@ -150,16 +156,16 @@ const SuccessPage = () => {
           );
           const toneTemplate = TONE_TEMPLATES[formData.tone];
 
-          setTimeout(async () => {
+                    setTimeout(async () => {
             if (isMounted) {
               try {
                 await handleDownload(formData, calculatedValues, toneTemplate, sessionId);
               } catch (err) {
-        logSystemEvent('pdf_generation_failed', 'critical', { session_id: sessionId, error: err.message });
-        console.error("PDF generation error:", err);
-        if (setIsGenerating) setIsGenerating(false);
-        toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
-      }
+                logSystemEvent('pdf_generation_failed', 'critical', { session_id: sessionId, error: err.message });
+                console.error("PDF generation error:", err);
+                if (setIsGenerating) setIsGenerating(false);
+                toast.error('Failed to generate PDF automatically. Please try the manual download button or email delivery.');
+              }
             }
           }, 1000);
         } else {
@@ -330,6 +336,20 @@ const SuccessPage = () => {
               >
                 Contact Support
               </a>
+            </div>
+          </div>
+        )}
+
+        {verificationStatus === 'mismatch' && (
+          <div className="flex flex-col items-center py-8">
+            <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20">
+              <span className="text-amber-500 text-3xl">🔒</span>
+            </div>
+            <h2 className="text-xl font-bold tracking-tight text-amber-500">Privacy Lock Activated</h2>
+            <p className="text-zinc-400 mt-2 text-sm mb-6 px-4">You are accessing this receipt from a different device or browser than the one used to draft the document. Because we use a strict Zero-Knowledge architecture, your data is never stored on our servers.</p>
+            <div className="bg-black/40 border border-white/5 p-4 rounded-sm w-full mb-6 text-left">
+              <p className="text-[0.65rem] text-zinc-500 font-mono uppercase tracking-widest mb-1">How to access your document</p>
+              <p className="text-xs text-zinc-300">Please open this exact link on the original device you used to complete the checkout.</p>
             </div>
           </div>
         )}
