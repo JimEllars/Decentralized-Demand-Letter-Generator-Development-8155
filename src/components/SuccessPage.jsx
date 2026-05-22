@@ -99,7 +99,7 @@ const SuccessPage = () => {
 
 
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized || !legalStatutes) return;
     if (hasVerified.current) return;
     hasVerified.current = true;
 
@@ -185,9 +185,9 @@ const SuccessPage = () => {
 
     return () => {
       isMounted = false;
-      hasVerified.current = false;
+
     };
-  }, [isInitialized, searchParams]);
+  }, [isInitialized, legalStatutes, searchParams]);
 
   const handleDownloadAgain = async () => {
     try {
