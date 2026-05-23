@@ -47,6 +47,17 @@ const SuccessPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [pdfBase64, setPdfBase64] = useState(null);
 
+  // Prevent accidental tab closure before downloading
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "Your document is not saved on our servers. If you leave before saving, it will be permanently lost.";
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+
   const handleDownload = async (formData, calculatedValues, toneTemplate, overrideSessionId) => {
      setIsGenerating(true);
      try {
@@ -190,21 +201,23 @@ const SuccessPage = () => {
   }, [isInitialized, legalStatutes, searchParams]);
 
   const handleDownloadAgain = async () => {
-    try {
-      const calculatedValues = calculateTotal(
-        formData.items,
-        formData.statutoryInterest,
-        formData.dueDate,
-        formData.jurisdiction,
-        formData.letterDate,
-        legalStatutes?.details || {}
-      );
-      const toneTemplate = TONE_TEMPLATES[formData.tone];
-      await handleDownload(formData, calculatedValues, toneTemplate);
-    } catch (err) {
-      console.error("Manual PDF generation error:", err);
-      if (setIsGenerating) setIsGenerating(false);
-      toast.error('Failed to generate PDF. Try the email delivery option instead.');
+    if (pdfBlobUrl) {
+      // Trigger local download using existing Blob in memory (Zero API Cost)
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = pdfBlobUrl;
+      a.download = `Demand_Letter_${(formData.debtorName || 'Final').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 100);
+    } else {
+      // Fallback to API fetch if local memory was cleared
+      try {
+        const calculatedValues = calculateTotal(formData.items, formData.statutoryInterest, formData.dueDate, formData.jurisdiction, formData.letterDate, legalStatutes?.details || {});
+        await handleDownload(formData, calculatedValues, TONE_TEMPLATES[formData.tone], searchParams.get('session_id'));
+      } catch (err) {
+        toast.error('Failed to regenerate PDF. Try the email delivery option instead.');
+      }
     }
   };
 
