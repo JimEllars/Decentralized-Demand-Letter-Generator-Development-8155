@@ -22,8 +22,22 @@ const reportToCore = async (eventName, details, env) => {
   }
 };
 
+/**
+ * Generates the legal document PDF entirely in Cloudflare's RAM.
+ *
+ * Utilizes pdf-lib to construct the document dynamically based on user input,
+ * state statutes, and mathematical calculations. It does not write to disk,
+ * strictly adhering to our Zero-Knowledge security architecture.
+ *
+ * @param {Object} sFormData Sanitized user input form data.
+ * @param {Object} calculatedValues Pre-calculated debt totals and interest.
+ * @param {Object} tone The selected tone object (formal, aggressive, etc).
+ * @param {string} session_id The secure session token used for tracking.
+ * @returns {Promise<Uint8Array>} The byte array of the generated PDF.
+ */
 const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) => {
         const pdfDoc = await PDFDocument.create();
+        pdfDoc.setCreator('AXiM Document Engine');
         let currentPage = pdfDoc.addPage();
         const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
         const timesRomanBoldFont = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
@@ -112,6 +126,14 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         return await pdfDoc.save();
       };
 
+/**
+ * Main Edge Router for AXiM Document Engine.
+ *
+ * This Cloudflare Worker handles:
+ * 1. Secure proxying of Stripe Checkout sessions (avoiding frontend CORS issues).
+ * 2. Zero-Knowledge PDF Generation in RAM (via pdf-lib), ensuring no PII is saved to disk.
+ * 3. Secure document delivery and telemetry integration.
+ */
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -197,13 +219,25 @@ export default {
 
                 let emailSuccess = false;
 
+                /**
+ * The Dual-Router Delivery System.
+ *
+ * We employ a "Dual-Router Pattern" for document delivery to ensure 100% reliability.
+ *
+ * Router 1 (Primary): The EmailIt API. We use this primarily to take advantage
+ * of our lifetime license and eliminate recurring delivery costs.
+ *
+ * Router 2 (Fail-safe): The Resend API. If EmailIt is down or unreachable,
+ * the catch block automatically fails over to Resend to guarantee the user
+ * receives their purchased document instantly.
+ */
                 // PRIMARY: EmailIt API
                 try {
                   const emailItRes = await fetch('https://api.emailit.com/v2/emails', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      from: 'AXiM Legal Engine <deliveries@axim.us.com>',
+                      from: 'AXiM Document Engine <deliveries@axim.us.com>',
                       reply_to: 'support@axim.us.com',
                       to: [email],
                       subject: 'Your Demand Letter PDF is Ready',
@@ -258,7 +292,7 @@ export default {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  from: 'AXiM Legal Engine <deliveries@axim.us.com>',
+                  from: 'AXiM Document Engine <deliveries@axim.us.com>',
                   reply_to: 'support@axim.us.com',
                   to: [email],
                   subject: 'Your Demand Letter PDF is Ready',
