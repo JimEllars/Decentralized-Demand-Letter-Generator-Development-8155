@@ -82,6 +82,46 @@ const DemandLanding = () => {
         <meta property="og:title" content="AXiM Demand Letter Generator | AI-Powered Legal Drafting" />
         <meta property="og:description" content="Generate professional, jurisdiction-specific demand letters securely within your browser using AXiM's Zero-Knowledge architecture." />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="AXiM Documents" />
+        <meta property="og:price:amount" content="4.00" />
+        <meta property="og:price:currency" content="USD" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={document.title || "AXiM Demand Letter Generator"} />
+        <meta name="twitter:description" content="Generate a professional demand letter instantly for $4.00. Skip the lawyer fees." />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "SoftwareApplication",
+                "name": displayState ? `AXiM ${displayState} Demand Letter Generator` : "AXiM Demand Letter Generator",
+                "applicationCategory": "LegalApplication",
+                "operatingSystem": "WebBrowser",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "4.00",
+                  "priceCurrency": "USD"
+                },
+                "description": "Generate a professional, state-specific demand letter instantly for $4.00. Zero-knowledge privacy architecture.",
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "AXiM Documents"
+                }
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": FAQS.map(faq => ({
+                  "@type": "Question",
+                  "name": faq.question,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq.answer
+                  }
+                }))
+              }
+            ]
+          })}
+        </script>
       </Helmet>
 
       {/* AXiM Documents Logo Anchor */}
