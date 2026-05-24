@@ -265,8 +265,9 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
                             toast.warning("Warning: Debts older than 6 years may exceed the legal Statute of Limitations for collection in many states. Proceed with caution.");
                           }
                           if (e.target.name === 'dueDate') {
-                            if (checkReasonableDeadline(e.target.value, formData.letterDate)) {
-                              toast.warning("Legal Warning: Courts generally require giving the debtor a 'reasonable' time to pay (usually 10-30 days). A shorter deadline may harm your claim in court.");
+                            const warningMsg = checkReasonableDeadline(e.target.value, formData.letterDate);
+                            if (warningMsg) {
+                              toast.warning(warningMsg);
                             }
                           }
                         }}

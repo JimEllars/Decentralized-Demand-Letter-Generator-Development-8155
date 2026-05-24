@@ -126,9 +126,12 @@ export const checkStatuteOfLimitations = (dateString) => {
 };
 
 export const checkReasonableDeadline = (dueDate, letterDate) => {
-  if (!dueDate) return false;
+  if (!dueDate) return null;
   const start = letterDate ? new Date(letterDate) : new Date();
   const end = new Date(dueDate);
   const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-  return diffDays > 0 && diffDays < 10; // Warn if deadline is under 10 days
+
+  if (diffDays < 0) return "Logic Error: Your payment deadline is in the past. Please select a future date.";
+  if (diffDays > 0 && diffDays < 10) return "Legal Warning: Courts generally require giving the debtor a 'reasonable' time to pay (usually 10-30 days). A shorter deadline may harm your claim.";
+  return null;
 };
