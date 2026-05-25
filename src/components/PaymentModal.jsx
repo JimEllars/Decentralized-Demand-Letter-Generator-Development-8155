@@ -37,9 +37,18 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
         </div>
 
         <div className="p-6 space-y-5">
-          <div className="flex justify-between items-center bg-black/50 p-4 border border-white/5 rounded-sm">
-            <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Document Access</span>
-            <span className="font-mono font-bold text-xl text-white">$4.00</span>
+          <div className="flex justify-between items-center bg-black/50 p-4 border border-axim-teal/30 rounded-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-axim-teal text-black text-[0.55rem] font-bold px-2 py-0.5 uppercase tracking-wider rounded-bl-sm">
+              Limited Time Promo
+            </div>
+            <div className="flex flex-col">
+              <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Document Access</span>
+              <span className="text-[0.65rem] text-axim-teal font-medium mt-0.5">Instant Download + Email Copy</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="font-mono text-sm line-through text-zinc-500 decoration-red-500/70">$8.00</span>
+              <span className="font-mono font-bold text-xl text-white">$4.00</span>
+            </div>
           </div>
 
           <div className="bg-black/30 border border-white/5 p-4 rounded-sm text-left space-y-2">
