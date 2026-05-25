@@ -14,8 +14,8 @@ import { useLetterStore } from '../hooks/useLetterStore';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { getToneTemplate, parseCurrency } from '../utils/calculations';
-import { generateId, getLocalDateString } from '../utils/helpers';
-import { validateForm, getFirstErrorFieldId } from '../utils/validation';
+import { generateId, getLocalDateString, getLocalIsoDate } from '../utils/helpers';
+import { validateForm, getFirstErrorFieldId, checkReasonableDeadline } from '../utils/validation';
 import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
 
 const getInitialState = () => ({
@@ -234,6 +234,21 @@ const DemandGenerator = () => {
     if (isGeneratingModal) return;
     setIsGeneratingModal(true);
 
+    const today = getLocalIsoDate();
+
+    // Force refresh the letter date so stale saved drafts don't print old dates
+    if (formData.letterDate !== today) {
+      updateField('letterDate', today);
+    }
+
+    // Hard block for Past Due Dates
+    const dateWarning = checkReasonableDeadline(formData.dueDate, today);
+    if (dateWarning && dateWarning.includes("Logic Error")) {
+      toast.error("Invalid Due Date: Your payment deadline cannot be in the past.");
+      setIsGeneratingModal(false);
+      return; // Halt checkout
+    }
+
     // Pre-Checkout Guardrails
     if (!formData.creditorName || !formData.creditorAddress) {
       toast.error("Please provide your complete Name and Address in Step 1.");
@@ -290,16 +305,19 @@ const DemandGenerator = () => {
       sessionStorage.setItem('axim_delivery_email', email);
       if (marketingOptIn) sessionStorage.setItem('axim_marketing_optin', 'true');
 
+      const today = getLocalIsoDate();
+      const payloadFormData = { ...formData, letterDate: today };
+
       const calculatedValues = calculateTotal(
-        formData.items,
-        formData.statutoryInterest,
-        formData.dueDate,
-        formData.jurisdiction,
-        formData.letterDate,
+        payloadFormData.items,
+        payloadFormData.statutoryInterest,
+        payloadFormData.dueDate,
+        payloadFormData.jurisdiction,
+        today,
         legalStatutes?.details || {}
       );
 
-      const session = await createCheckoutSession(formData, calculatedValues);
+      const session = await createCheckoutSession(payloadFormData, calculatedValues);
 
       if (session?.url) {
         window.location.href = session.url;
