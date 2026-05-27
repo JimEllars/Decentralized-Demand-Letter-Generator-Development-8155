@@ -112,7 +112,11 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         });
         y -= 10;
         drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, timesRomanBoldFont); y -= 20;
-        drawText(`Payment must be received by ${formatFriendlyDate(sFormData.dueDate)}. ${tone?.closing || ''}`, 12, timesRomanFont); y -= 20;
+        // Auto-calculate a standard 15-day deadline from the letter creation date
+        const deadlineDate = new Date(sFormData.letterDate || new Date());
+        deadlineDate.setDate(deadlineDate.getDate() + 15);
+        const formattedDeadline = formatFriendlyDate(deadlineDate.toISOString().split('T')[0]);
+        drawText(`Payment must be received by ${formattedDeadline}. ${tone?.closing || ''}`, 12, timesRomanFont); y -= 20;
         drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, timesRomanBoldFont);
         drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, timesRomanFont); y -= 40;
         drawText('Sincerely,', 12, timesRomanFont); y -= 30;
