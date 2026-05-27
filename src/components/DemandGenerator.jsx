@@ -15,7 +15,7 @@ import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { getToneTemplate, parseCurrency } from '../utils/calculations';
 import { generateId, getLocalDateString, getLocalIsoDate } from '../utils/helpers';
-import { validateForm, getFirstErrorFieldId, checkReasonableDeadline } from '../utils/validation';
+import { validateForm, getFirstErrorFieldId } from '../utils/validation';
 import { FiUser, FiDollarSign, FiEdit3, FiCheckCircle, FiChevronRight, FiChevronLeft, } from 'react-icons/fi';
 
 const getInitialState = () => ({
@@ -239,15 +239,6 @@ const DemandGenerator = () => {
     // Force refresh the letter date so stale saved drafts don't print old dates
     if (formData.letterDate !== today) {
       updateField('letterDate', today);
-    }
-
-    // Hard block for Past Due Dates
-    const dateWarning = checkReasonableDeadline(formData.dueDate, today);
-    if (dateWarning && dateWarning.includes("Logic Error")) {
-      toast.error("Your saved payment deadline is now in the past. We've routed you back to Step 2 to select a future date.");
-      setStep(2); // Automatically route them back to the date selection step
-      setIsGeneratingModal(false);
-      return; // Halt checkout
     }
 
     // Pre-Checkout Guardrails
