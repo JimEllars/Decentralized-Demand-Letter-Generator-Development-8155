@@ -244,7 +244,8 @@ const DemandGenerator = () => {
     // Hard block for Past Due Dates
     const dateWarning = checkReasonableDeadline(formData.dueDate, today);
     if (dateWarning && dateWarning.includes("Logic Error")) {
-      toast.error("Invalid Due Date: Your payment deadline cannot be in the past.");
+      toast.error("Your saved payment deadline is now in the past. We've routed you back to Step 2 to select a future date.");
+      setStep(2); // Automatically route them back to the date selection step
       setIsGeneratingModal(false);
       return; // Halt checkout
     }
