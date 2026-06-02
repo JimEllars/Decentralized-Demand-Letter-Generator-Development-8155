@@ -83,7 +83,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
               )}
             </div>
             <span className="text-[0.65rem] leading-snug font-medium text-zinc-300">
-              I verify all names, addresses, and amounts are spelled correctly. I understand this document is generated instantly and <strong className="text-red-400">all sales are final</strong>.
+              I understand and accept the AXiM Satisfaction Guarantee: if there are any technical issues with my generated document, support will make it right.
             </span>
           </label>
 

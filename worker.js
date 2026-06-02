@@ -128,7 +128,7 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         // Auto-calculate a standard 15-day deadline from the letter creation date
         const deadlineDate = new Date(sFormData.letterDate || new Date());
         deadlineDate.setDate(deadlineDate.getDate() + 15);
-        const formattedDeadline = formatFriendlyDate(deadlineDate.toISOString().split('T')[0]);
+        const formattedDeadline = deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
         drawText(`Payment must be received by ${formattedDeadline}. ${tone?.closing || ''}`, 12, customFont); y -= 20;
         drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, boldFont);
         drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, customFont); y -= 40;

@@ -163,7 +163,7 @@ const DemandLanding = () => {
             transition={{ delay: 0.2 }}
             className="text-zinc-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed relative z-10"
           >
-            A quick, affordable solution when you need a professional demand letter fast. Skip the expensive attorney fees and secure your legally formatted PDF for a limited-time promo of just $4.00 (normally $8.00). Includes instant download and an immediate email copy.
+            A quick, affordable solution when you need to draft a demand letter fast. Skip the legwork and let us handle your professionally formatted PDF <strong className="text-white font-bold">for a limited-time promo of just $4.00</strong> (<del className="text-zinc-500 mr-1">$8</del>). Includes instant download and an immediate email copy.
           </motion.p>
 
           <motion.div
