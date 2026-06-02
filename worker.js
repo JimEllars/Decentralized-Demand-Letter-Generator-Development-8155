@@ -1,7 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-let cachedRegularFont = null;
-let cachedBoldFont = null;
 const formatWorkerDate = (dateInput) => {
   if (!dateInput) return "";
   const d = new Date(dateInput);
@@ -49,18 +47,18 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         const pdfDoc = await PDFDocument.create();
         pdfDoc.setCreator('AXiM Document Engine');
         let currentPage = pdfDoc.addPage();
-            // Globally cache fonts in the V8 isolate to eliminate repetitive network latency
-    if (!cachedRegularFont) {
-      const fontRes = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf');
-      cachedRegularFont = await fontRes.arrayBuffer();
-    }
-    if (!cachedBoldFont) {
-      const boldFontRes = await fetch('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.ttf');
-      cachedBoldFont = await boldFontRes.arrayBuffer();
-    }
+    // Fetch fonts freshly per-request to prevent V8 ArrayBuffer memory locks.
+    // Cloudflare's Edge CDN resolves these internally in < 10ms.
+    const [fontRes, boldFontRes] = await Promise.all([
+      fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf'),
+      fetch('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.ttf')
+    ]);
 
-    const customFont = await pdfDoc.embedFont(cachedRegularFont.slice(0));
-    const boldFont = await pdfDoc.embedFont(cachedBoldFont.slice(0));
+    const regularFontBytes = await fontRes.arrayBuffer();
+    const boldFontBytes = await boldFontRes.arrayBuffer();
+
+    const customFont = await pdfDoc.embedFont(regularFontBytes);
+    const boldFont = await pdfDoc.embedFont(boldFontBytes);
         const { width, height } = currentPage.getSize();
         let y = height - 50;
 
