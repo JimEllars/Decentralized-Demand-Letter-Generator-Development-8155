@@ -2,6 +2,13 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 let cachedRegularFont = null;
 let cachedBoldFont = null;
+const formatWorkerDate = (dateInput) => {
+  if (!dateInput) return "";
+  const d = new Date(dateInput);
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+};
+
 
 const reportToCore = async (eventName, details, env) => {
   try {
@@ -92,17 +99,8 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
            });
         };
 
-        const formatFriendlyDate = (dateStr) => {
-          if (!dateStr) return '';
-          const [year, month, day] = dateStr.split('-');
-          if (year && month && day) {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
-          }
-          return dateStr;
-        };
 
-        const formattedDate = formatFriendlyDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
+        const formattedDate = formatWorkerDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
         const dateWidth = customFont.widthOfTextAtSize(formattedDate, 12);
         currentPage.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: customFont, color: rgb(0, 0, 0) });
         drawText('VIA CERTIFIED MAIL', 12, boldFont);
@@ -127,9 +125,8 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, boldFont); y -= 20;
         // Auto-calculate a standard 15-day deadline from the letter creation date
         const deadlineDate = new Date(sFormData.letterDate || new Date());
-        deadlineDate.setDate(deadlineDate.getDate() + 15);
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const formattedDeadline = `${months[deadlineDate.getMonth()]} ${deadlineDate.getDate()}, ${deadlineDate.getFullYear()}`;
+        deadlineDate.setUTCDate(deadlineDate.getUTCDate() + 15);
+        const formattedDeadline = formatWorkerDate(deadlineDate);
         drawText(`Payment must be received by ${formattedDeadline}. ${tone?.closing || ''}`, 12, customFont); y -= 20;
         drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, boldFont);
         drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, customFont); y -= 40;
