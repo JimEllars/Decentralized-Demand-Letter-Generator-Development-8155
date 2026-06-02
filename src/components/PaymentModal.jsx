@@ -83,7 +83,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
               )}
             </div>
             <span className="text-[0.65rem] leading-snug font-medium text-zinc-300">
-              I understand and accept the AXiM Satisfaction Guarantee: if there are any technical issues with my generated document, support will make it right.
+              The information I entered is correct and I agree to proceed with the order. I understand and accept the AXiM Satisfaction Guarantee: if there are any technical issues with my generated document, support will make it right.
             </span>
           </label>
 

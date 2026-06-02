@@ -52,8 +52,8 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
       cachedBoldFont = await boldFontRes.arrayBuffer();
     }
 
-    const customFont = await pdfDoc.embedFont(cachedRegularFont);
-    const boldFont = await pdfDoc.embedFont(cachedBoldFont);
+    const customFont = await pdfDoc.embedFont(cachedRegularFont.slice(0));
+    const boldFont = await pdfDoc.embedFont(cachedBoldFont.slice(0));
         const { width, height } = currentPage.getSize();
         let y = height - 50;
 
@@ -128,7 +128,8 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         // Auto-calculate a standard 15-day deadline from the letter creation date
         const deadlineDate = new Date(sFormData.letterDate || new Date());
         deadlineDate.setDate(deadlineDate.getDate() + 15);
-        const formattedDeadline = deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const formattedDeadline = `${months[deadlineDate.getMonth()]} ${deadlineDate.getDate()}, ${deadlineDate.getFullYear()}`;
         drawText(`Payment must be received by ${formattedDeadline}. ${tone?.closing || ''}`, 12, customFont); y -= 20;
         drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, boldFont);
         drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, customFont); y -= 40;
@@ -350,6 +351,14 @@ export default {
 
       // --- EDGE DICTIONARY FALLBACK ---
       // Decentralizes the app so it doesn't rely on a central backend for statutory rates
+      // --- HEALTH CHECK ---
+      if (request.method === 'GET' && url.pathname === '/api/health') {
+        return new Response(JSON.stringify({ status: "ok", version: "1.1.0", uptime: Math.floor(process.uptime ? process.uptime() : performance.now() / 1000) }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+        });
+      }
+
       // --- HEALTH CHECK ---
       if (request.method === 'GET' && url.pathname === '/api/health') {
         return new Response(JSON.stringify({ status: "ok", version: "1.1.0", uptime: Math.floor(process.uptime ? process.uptime() : performance.now() / 1000) }), {
