@@ -391,6 +391,15 @@ const SuccessPage = () => {
                 <SafeIcon icon={FiDownload} />
                 Download Again
               </button>
+            <button
+              onClick={() => {
+                resetForm();
+                navigate('/app/demand-generator');
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 mt-4 bg-transparent border border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900/50 rounded-sm font-mono text-xs uppercase tracking-widest transition-all duration-200"
+            >
+              <span>+ Draft Another Letter</span>
+            </button>
 
               <button
                 onClick={() => window.open(pdfBlobUrl, '_blank')}
