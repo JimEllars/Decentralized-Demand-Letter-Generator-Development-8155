@@ -47,9 +47,9 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         const pdfDoc = await PDFDocument.create();
         pdfDoc.setCreator('AXiM Document Engine');
         let currentPage = pdfDoc.addPage();
-    // Use native pdf-lib fonts to bypass network latency and memory limits
-    const customFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica);
-    const boldFont = await pdfDoc.embedStandardFont(StandardFonts.HelveticaBold);
+    // Use native standard fonts to completely eliminate network and memory overhead
+    const customFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const { width, height } = currentPage.getSize();
         let y = height - 50;
 
