@@ -47,18 +47,9 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
         const pdfDoc = await PDFDocument.create();
         pdfDoc.setCreator('AXiM Document Engine');
         let currentPage = pdfDoc.addPage();
-    // Fetch fonts freshly per-request to prevent V8 ArrayBuffer memory locks.
-    // Cloudflare's Edge CDN resolves these internally in < 10ms.
-    const [fontRes, boldFontRes] = await Promise.all([
-      fetch('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf'),
-      fetch('https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.ttf')
-    ]);
-
-    const regularFontBytes = await fontRes.arrayBuffer();
-    const boldFontBytes = await boldFontRes.arrayBuffer();
-
-    const customFont = await pdfDoc.embedFont(regularFontBytes);
-    const boldFont = await pdfDoc.embedFont(boldFontBytes);
+    // Use native pdf-lib fonts to bypass network latency and memory limits
+    const customFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const { width, height } = currentPage.getSize();
         let y = height - 50;
 
