@@ -51,14 +51,18 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
     const customFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const { width, height } = currentPage.getSize();
-        let y = height - 50;
+
+        const margin = 72;
+        let y = height - margin;
 
         const checkPageBreak = (requiredSpace) => {
-          if (y - requiredSpace < 70) { currentPage = pdfDoc.addPage(); y = height - 50; }
+          if (y - requiredSpace < margin) {
+              currentPage = pdfDoc.addPage();
+              y = height - margin;
+          }
         };
 
         const wrapText = (text, maxWidth, font, size) => {
-          // Forcefully break any contiguous string longer than 40 characters to prevent PDF edge bleed
           const safeText = text.replace(/([^\s]{40})/g, '$1 ');
           const words = safeText.split(' ');
           let lines = [], currentLine = '';
@@ -75,57 +79,88 @@ const generatePdfBytes = async (sFormData, calculatedValues, tone, session_id) =
           return lines;
         };
 
-        const drawText = (text, size = 12, font = customFont, xOffset = 50, maxWidth = width - 100) => {
+        const drawText = (text, size = 11, font = customFont, xOffset = margin, maxWidth = width - (margin * 2), align = 'left', spacing = 1.5) => {
            if (!text) return;
+           const lineHeight = size * spacing;
            text.split('\n').forEach(rawLine => {
-             if (rawLine.trim() === '') { y -= size + 4; return; }
+             if (rawLine.trim() === '') { y -= lineHeight; return; }
              wrapText(rawLine, maxWidth, font, size).forEach(line => {
-               checkPageBreak(size + 4);
-               currentPage.drawText(line, { x: xOffset, y, size, font, color: rgb(0, 0, 0) });
-               y -= size + 4;
+               checkPageBreak(lineHeight);
+               let drawX = xOffset;
+               if (align === 'center') {
+                   const textWidth = font.widthOfTextAtSize(line, size);
+                   drawX = (width - textWidth) / 2;
+               }
+               currentPage.drawText(line, { x: drawX, y, size, font, color: rgb(0, 0, 0) });
+               y -= lineHeight;
              });
-             y -= 4;
            });
         };
 
-
-        const formattedDate = formatWorkerDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
-        const dateWidth = customFont.widthOfTextAtSize(formattedDate, 12);
-        currentPage.drawText(formattedDate, { x: width - 50 - dateWidth, y, size: 12, font: customFont, color: rgb(0, 0, 0) });
-        drawText('VIA CERTIFIED MAIL', 12, boldFont);
-        drawText('CONFIDENTIAL LEGAL COMMUNICATION', 10, customFont, 50, width - 100);
+        // Sender Info
+        drawText('FROM:', 11, boldFont, margin, width - margin * 2, 'left', 1.2);
+        drawText(sFormData.creditorName, 11, customFont, margin, width - margin * 2, 'left', 1.2);
+        drawText(sFormData.creditorAddress, 11, customFont, margin, width - margin * 2, 'left', 1.2);
         y -= 15;
-        currentPage.drawText(tone?.title || 'FORMAL DEMAND FOR PAYMENT', { x: 50, y, size: 16, font: boldFont, color: rgb(0.12, 0.23, 0.54) });
-        y -= 30;
-        drawText('FROM:', 10, customFont); drawText(sFormData.creditorName, 12, boldFont); drawText(sFormData.creditorAddress, 12, customFont); y -= 20;
-        drawText('TO:', 10, customFont); drawText(sFormData.debtorName, 12, boldFont); drawText(sFormData.debtorAddress, 12, customFont); y -= 30;
-        drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 12, boldFont); y -= 20;
-        drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 12, customFont); y -= 10;
 
-        drawText('ITEMIZED DEBTS:', 12, boldFont);
+        // Date
+        const formattedDate = formatWorkerDate(sFormData.letterDate || new Date().toISOString().split('T')[0]);
+        drawText(formattedDate, 11, customFont, margin, width - margin * 2, 'left', 1.2);
+        y -= 15;
+
+        // Recipient Info
+        drawText('TO:', 11, boldFont, margin, width - margin * 2, 'left', 1.2);
+        drawText(sFormData.debtorName, 11, customFont, margin, width - margin * 2, 'left', 1.2);
+        drawText(sFormData.debtorAddress, 11, customFont, margin, width - margin * 2, 'left', 1.2);
+        y -= 25;
+
+        drawText('VIA CERTIFIED MAIL', 11, boldFont, margin, width - margin * 2, 'left', 1.2);
+        drawText('CONFIDENTIAL LEGAL COMMUNICATION', 11, boldFont, margin, width - margin * 2, 'left', 1.2);
+        y -= 25;
+
+        // Title
+        const titleText = tone?.title || 'FORMAL DEMAND FOR PAYMENT';
+        drawText(titleText, 14, boldFont, margin, width - margin * 2, 'center', 1.5);
+        y -= 15;
+
+        drawText(`RE: NOTICE OF OVERDUE ACCOUNT (${sFormData.jurisdiction})`, 11, boldFont);
+        y -= 15;
+
+        drawText(tone?.intro || 'We are writing to inform you of an overdue balance.', 11, customFont);
+        y -= 15;
+
+        drawText('ITEMIZED DEBTS:', 11, boldFont);
         sFormData.items?.forEach(item => {
           const itemDateStr = item.date ? ` (${item.date})` : '';
           const rawAmount = String(item.amount || '0').replace(/[^0-9.-]+/g, '');
           const parsedAmount = parseFloat(rawAmount);
-          const amountStr = !isNaN(parsedAmount) ? `$${parsedAmount.toFixed(2)}` : '$0.00';
-          drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, customFont, 70);
+          const amountStr = !isNaN(parsedAmount) ? `\${parsedAmount.toFixed(2)}` : '$0.00';
+          drawText(`- ${item.description || 'Service/Item'}${itemDateStr}: ${amountStr}`, 11, customFont, margin + 20);
         });
-        y -= 10;
-        drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 12, boldFont); y -= 20;
+        y -= 15;
+
+        drawText(`TOTAL DUE: ${calculatedValues?.formattedTotal}`, 11, boldFont);
+        y -= 15;
+
         // Auto-calculate a standard 15-day deadline from the letter creation date
         const deadlineDate = new Date(sFormData.letterDate || new Date());
         deadlineDate.setUTCDate(deadlineDate.getUTCDate() + 15);
         const formattedDeadline = formatWorkerDate(deadlineDate);
-        drawText(`Payment must be received by ${formattedDeadline}. ${tone?.closing || ''}`, 12, customFont); y -= 20;
-        drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 12, boldFont);
-        drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 10, customFont); y -= 40;
-        drawText('Sincerely,', 12, customFont); y -= 30;
-        drawText('__________________________', 12, customFont); drawText(sFormData.creditorName, 12, customFont);
 
-        checkPageBreak(50);
-        const referenceId = session_id === 'bypass_dev_mode' ? crypto.randomUUID() : session_id;
-        currentPage.drawText('Document Tracking Reference: ' + referenceId, { x: 50, y: 30, size: 8, font: customFont, color: rgb(0.5, 0.5, 0.5) });
-        currentPage.drawText('Generated via QuickDemandLetter.com. This document is user-generated and does not constitute legal advice.', { x: 50, y: 20, size: 8, font: customFont, color: rgb(0.5, 0.5, 0.5) });
+        drawText(`Payment must be received by ${formattedDeadline}.`, 11, boldFont);
+        if (tone?.closing) {
+            drawText(tone.closing, 11, customFont);
+        }
+        y -= 15;
+
+        drawText('LEGAL AUTHORITY & INTEREST CALCULATION', 11, boldFont);
+        drawText(`This demand includes interest calculated at an annual rate of ${calculatedValues?.rateUsed}%.`, 11, customFont);
+        y -= 25;
+
+        drawText('Sincerely,', 11, customFont);
+        y -= 40; // space for signature
+        drawText('__________________________', 11, customFont);
+        drawText(sFormData.creditorName, 11, customFont);
 
         return await pdfDoc.save();
       };
