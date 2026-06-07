@@ -54,3 +54,11 @@ To ensure that the user's data persists correctly across the Stripe checkout red
 3. **Fallback Resiliency Check:**
    - In `SuccessPage.jsx`, simulate a PDF generation failure (e.g., temporarily throw an error in `handleDownload`).
    - Confirm that the "Generating PDF..." loading state forcefully clears (i.e. `isGenerating` becomes `false`), and a clear error toast appears, directing the user to use the email delivery option instead.
+
+## Update: Production PDF Formatting & Success Page Enhancements
+
+- **Success Page**: Added a reminder text on the \`SuccessPage.jsx\` to instruct users to check their Spam/Junk folders for their document.
+- **Worker PDF Generation**:
+  - Fixed a string interpolation template literal bug that was not parsing \`$XX.XX\` correctly for itemized debts.
+  - Eliminated footer data and unneeded branding texts for full white-labeling.
+  - Formatted the document layout dynamically using \`pdf-lib\`, introducing 1-inch margins and professional structural elements, such as sender info, date alignments, recipient info, centered 14pt bold titles, well-spaced lines, and proper signature lines to reflect FDCPA standards.
