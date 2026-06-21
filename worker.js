@@ -478,7 +478,7 @@ export default {
         const newResponse = new Response(response.body, response);
         newResponse.headers.set('Access-Control-Allow-Origin', corsOrigin);
         return newResponse;
-      } catch (err) { return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': corsOrigin } }); }
+      } catch (err) { ctx.waitUntil(reportToCore('edge_timeout', { error: err.message, route: url.pathname }, env)); return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': corsOrigin } }); }
     }
 
     let assetResponse = await env.ASSETS.fetch(request);

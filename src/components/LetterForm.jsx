@@ -72,7 +72,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
   };
 
   const getInputClass = (fieldName, value, isRequired = false) => {
-    const baseClass = "bg-black/50 border text-white font-mono text-sm p-3 w-full rounded-sm transition-all outline-none placeholder:text-zinc-600 focus:ring-1";
+    const baseClass = "bg-black/50 border text-white font-mono text-sm p-4 w-full rounded-md shadow-inner transition-all outline-none placeholder:text-zinc-600 focus:ring-2";
     if (errors[fieldName]) return `${baseClass} border-red-500/50 focus:border-red-500 focus:ring-red-500/20 bg-red-500/5`;
     if (isRequired && !value) return `${baseClass} border-subtle focus:border-axim-teal focus:ring-axim-teal/20`;
     return `${baseClass} border-active focus:border-axim-teal focus:ring-axim-teal/20`;

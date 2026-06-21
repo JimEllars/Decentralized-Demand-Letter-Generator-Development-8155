@@ -62,3 +62,14 @@ To ensure that the user's data persists correctly across the Stripe checkout red
   - Fixed a string interpolation template literal bug that was not parsing \`$XX.XX\` correctly for itemized debts.
   - Eliminated footer data and unneeded branding texts for full white-labeling.
   - Formatted the document layout dynamically using \`pdf-lib\`, introducing 1-inch margins and professional structural elements, such as sender info, date alignments, recipient info, centered 14pt bold titles, well-spaced lines, and proper signature lines to reflect FDCPA standards.
+
+## Telemetry & UI Refinements (Task update)
+
+- **Telemetry Activation**:
+  - Implemented the `TELEMETRY_PAYLOAD` schema in `src/utils/telemetry.js`.
+  - Added strict silent error telemetry triggers inside `src/services/paymentService.js` to securely catch critical/high exceptions (like `checkout_exception` or `verify_session_exception`) during the Stripe flow without blocking the user's UI.
+  - Linked Cloudflare Edge worker proxy timeout failures to `ctx.waitUntil(reportToCore('edge_timeout', ...))` to track infrastructure hiccups.
+
+- **UI UX Modernization**:
+  - Refined `LetterForm.jsx` input boundaries using `p-4`, `rounded-md`, and `shadow-inner` coupled with `focus:ring-2` to create a more sophisticated, high-end enterprise aesthetic compared to the original basic border layout.
+  - Form spacing improvements maintained under the strict <16ms block threshold by utilizing Tailwind utility structures instead of custom React transition logic.
