@@ -1,3 +1,5 @@
+import { logSystemEvent } from '../utils/telemetry';
+
 export const initiateBackendTransaction = async (apiUrl, productId) => {
   try {
     const response = await fetch(`/api/create-checkout-session`, {
@@ -16,7 +18,10 @@ export const initiateBackendTransaction = async (apiUrl, productId) => {
       return { url: data.url };
     }
     return data;
-  } catch (error) { throw error; }
+  } catch (error) {
+    logSystemEvent('checkout_exception', 'critical', { error: error.message, productId });
+    throw error;
+  }
 };
 
 export const processPayment = async (productId) => initiateBackendTransaction('/api', productId);
@@ -37,31 +42,49 @@ export const createCheckoutSession = async (formData, calculatedValues) => {
     if (!response.ok) throw new Error('Failed to create payment session');
     const data = await response.json();
     return data;
-  } catch (error) { throw error; }
+  } catch (error) {
+    logSystemEvent('checkout_exception', 'critical', { error: error.message });
+    throw error;
+  }
 };
 
 export const verifyPaymentSession = async (sessionId) => {
-  const response = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`);
-  if (!response.ok) throw new Error('Failed to verify payment session');
-  return response.json();
+  try {
+    const response = await fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionId)}`);
+    if (!response.ok) throw new Error('Failed to verify payment session');
+    return await response.json();
+  } catch (error) {
+    logSystemEvent('verify_session_exception', 'high', { error: error.message, sessionId });
+    throw error;
+  }
 };
 
 export const deliverOrchestratedDocument = async (sessionId, formData, email, calculatedValues, toneTemplate) => {
-  const response = await fetch(`/api/deliver-document`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: sessionId, formData, email, calculatedValues, tone: toneTemplate })
-  });
-  if (!response.ok) throw new Error('Failed to deliver document');
-  return response.json();
+  try {
+    const response = await fetch(`/api/deliver-document`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, formData, email, calculatedValues, tone: toneTemplate })
+    });
+    if (!response.ok) throw new Error('Failed to deliver document');
+    return await response.json();
+  } catch (error) {
+    logSystemEvent('deliver_document_exception', 'high', { error: error.message, sessionId });
+    throw error;
+  }
 };
 
 export const deliverDocumentViaEmail = async (email, base64Pdf, filename) => {
-  const response = await fetch('/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, pdfData: base64Pdf, filename })
-  });
-  if (!response.ok) throw new Error('Failed to send email');
-  return response.json();
+  try {
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, pdfData: base64Pdf, filename })
+    });
+    if (!response.ok) throw new Error('Failed to send email');
+    return await response.json();
+  } catch (error) {
+    logSystemEvent('deliver_document_email_exception', 'high', { error: error.message });
+    throw error;
+  }
 };
