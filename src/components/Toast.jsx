@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { forwardRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiCheckCircle, FiAlertCircle, FiInfo, FiX } from 'react-icons/fi';
 
@@ -9,7 +9,7 @@ const icons = {
   warning: <FiAlertCircle className="w-5 h-5 text-amber-500" />,
 };
 
-const Toast = ({ id, message, type = 'info', onClose }) => {
+const Toast = forwardRef(({ id, message, type = 'info', onClose }, ref) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose(id);
@@ -20,6 +20,7 @@ const Toast = ({ id, message, type = 'info', onClose }) => {
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 50, scale: 0.3 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
@@ -37,6 +38,8 @@ const Toast = ({ id, message, type = 'info', onClose }) => {
       </button>
     </motion.div>
   );
-};
+});
+
+Toast.displayName = 'Toast';
 
 export default Toast;

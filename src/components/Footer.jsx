@@ -26,8 +26,8 @@ const Footer = () => {
           >
             <span className="w-2 h-2 rounded-full bg-red-500/50 block"></span> Wipe My Local Data
           </button>
-          <a href="mailto:support@quickdemandletter.com" className="hover:text-white transition-colors duration-200">
-            support@quickdemandletter.com
+          <a href="mailto:support@axim.us.com" className="hover:text-white transition-colors duration-200">
+            support@axim.us.com
           </a>
         </div>
       </div>

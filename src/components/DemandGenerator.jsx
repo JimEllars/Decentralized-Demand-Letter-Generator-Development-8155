@@ -232,7 +232,6 @@ const DemandGenerator = () => {
   const handleGenerate = (e) => {
     e?.preventDefault();
     if (isGeneratingModal) return;
-    setIsGeneratingModal(true);
 
     const today = getLocalIsoDate();
 
@@ -284,6 +283,7 @@ const DemandGenerator = () => {
     });
 
     // If all checks pass, open the Stripe modal
+    setIsGeneratingModal(true);
     setTimeout(() => {
       setShowPaymentModal(true);
       setIsGeneratingModal(false);

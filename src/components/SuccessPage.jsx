@@ -402,7 +402,7 @@ const SuccessPage = () => {
             </button>
 
               <button
-                onClick={() => window.open(pdfBlobUrl, '_blank')}
+                onClick={() => window.open(pdfBlobUrl, '_blank', 'noopener,noreferrer')}
                 disabled={!pdfBlobUrl || isGenerating}
                 className="w-full px-6 py-4 bg-transparent border border-axim-teal text-axim-teal font-bold uppercase tracking-wide text-sm hover:bg-axim-teal hover:text-black transition-all duration-300 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-3"
               >
