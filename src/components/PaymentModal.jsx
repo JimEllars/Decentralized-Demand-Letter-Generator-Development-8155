@@ -47,7 +47,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
             </div>
             <div className="flex items-center gap-2 mt-2">
               <span className="font-mono text-sm line-through text-zinc-500 decoration-red-500/70">$8.00</span>
-              <span className="font-mono font-bold text-xl text-white">$4.00</span>
+              <span className="font-mono font-bold text-xl text-white">$2.00</span>
             </div>
           </div>
 

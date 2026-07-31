@@ -73,3 +73,6 @@ To ensure that the user's data persists correctly across the Stripe checkout red
 - **UI UX Modernization**:
   - Refined `LetterForm.jsx` input boundaries using `p-4`, `rounded-md`, and `shadow-inner` coupled with `focus:ring-2` to create a more sophisticated, high-end enterprise aesthetic compared to the original basic border layout.
   - Form spacing improvements maintained under the strict <16ms block threshold by utilizing Tailwind utility structures instead of custom React transition logic.
+- **Pricing Update**: Applied $2.00 limited-time promotional pricing override across DemandLanding.jsx, PaymentModal.jsx, and the worker proxy checkout instantiation.
+- **Telemetry Updates**: Updated reportToCore event to generation_fault for pdf_engine_crash within worker.js. Verified checkout_exception telemetry exists natively in paymentService.js.
+- **UI Polish**: Appended focus:ring-2 and transition-all duration-200 to inputs in LetterForm.jsx and LetterItem.jsx to increase focus state polish.
