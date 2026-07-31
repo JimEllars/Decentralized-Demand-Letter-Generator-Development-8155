@@ -4,7 +4,7 @@ import SafeIcon from '../common/SafeIcon';
 
 const LetterItem = memo(({ item, index, onChange, onRemove, showRemove, itemErrors = {} }) => {
   const getInputClass = (hasError) => {
-    const base = "bg-black/50 border border-subtle text-white font-mono text-sm p-4 w-full rounded-md shadow-inner transition-all outline-none focus:ring-2 focus:ring-axim-teal/20 focus:border-axim-teal placeholder:text-zinc-600";
+    const base = "bg-black/50 border border-subtle text-white font-mono text-sm p-4 w-full rounded-md shadow-inner transition-all duration-200 outline-none focus:ring-2 focus:ring-axim-teal/20 focus:ring-2 focus:ring-axim-teal/20 focus:border-axim-teal placeholder:text-zinc-600";
     if (hasError) return `${base} border-red-500/50 bg-red-900/10 focus:border-red-500`;
     return base;
   };

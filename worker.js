@@ -312,7 +312,7 @@ export default {
 
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': corsOrigin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
                     } catch(e) {
-            ctx.waitUntil(reportToCore('pdf_engine_crash', { error: e.message, stack: e.stack }, env));
+            ctx.waitUntil(reportToCore('generation_fault', { error: e.message, stack: e.stack }, env));
             return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': corsOrigin } });
           }
         } else if (url.pathname === '/api/send-email') {
