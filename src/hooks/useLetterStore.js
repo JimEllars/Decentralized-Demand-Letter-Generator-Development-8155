@@ -128,3 +128,18 @@ export const useLetterStore = (initialDataOrFn) => {
     resetForm: resetFormWrapped
   };
 };
+
+
+export const useHistoryStore = create(
+  persist(
+    (set) => ({
+      history: [],
+      addDocument: (doc) => set((state) => ({ history: [doc, ...state.history] })),
+      clearHistory: () => set({ history: [] })
+    }),
+    {
+      name: 'axim_document_history',
+      storage: createJSONStorage(() => localStorage)
+    }
+  )
+);

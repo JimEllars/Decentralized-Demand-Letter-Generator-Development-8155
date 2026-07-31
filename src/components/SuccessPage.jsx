@@ -1,7 +1,7 @@
 import { logSystemEvent } from '../utils/telemetry';
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useLetterStore } from '../hooks/useLetterStore';
+import { useLetterStore, useHistoryStore } from '../hooks/useLetterStore';
 import { verifyPaymentSession, deliverDocumentViaEmail, deliverOrchestratedDocument } from '../services/paymentService';
 import { calculateTotal } from '../utils/calculations';
 import { TONE_TEMPLATES } from '../utils/constants';
@@ -29,6 +29,7 @@ const SuccessPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { formData, resetForm, isInitialized } = useLetterStore(DEFAULT_FORM_DATA);
+  const addDocument = useHistoryStore(state => state.addDocument);
   const [emailSentSuccessfully, setEmailSentSuccessfully] = useState(() => {
     const sessionId = searchParams.get('session_id');
     return sessionStorage.getItem(`axim_email_sent_${sessionId}`) === 'true';
@@ -261,6 +262,22 @@ const SuccessPage = () => {
   };
 
   // Auto-send email if user provided one during checkout
+  const hasSavedHistory = useRef(false);
+
+  useEffect(() => {
+    if (verificationStatus === 'success' && formData && !hasSavedHistory.current) {
+        hasSavedHistory.current = true;
+        addDocument({
+          id: Date.now().toString(),
+          recipient: formData.debtorName || 'Unknown Recipient',
+          amount: formData.principalAmount || 0,
+          date: new Date().toISOString(),
+          status: 'Delivered',
+          type: 'Demand Letter'
+        });
+    }
+  }, [verificationStatus, formData, addDocument]);
+
   useEffect(() => {
     let isMounted = true;
     if (verificationStatus === 'success' && email && !hasSentInitialEmail.current && pdfBase64) {
