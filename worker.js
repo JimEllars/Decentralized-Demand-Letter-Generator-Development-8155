@@ -491,6 +491,9 @@ export default {
       assetResponse.headers.set('X-Content-Type-Options', 'nosniff');
       assetResponse.headers.set('X-Frame-Options', 'DENY');
       assetResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    } else {
+      assetResponse = new Response(assetResponse.body, assetResponse);
+      assetResponse.headers.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
     }
     return assetResponse;
   }
