@@ -84,6 +84,7 @@ const DemandGenerator = () => {
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
@@ -211,7 +212,11 @@ const DemandGenerator = () => {
       } catch (e) {
         // Ignore telemetry errors
       }
-      setStep(currentStep + 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setStep(currentStep + 1);
+        setIsTransitioning(false);
+      }, 200);
     } else {
       setHasAttemptedSubmit(true);
       toast.error("Please complete all required fields for this step.");
@@ -220,7 +225,11 @@ const DemandGenerator = () => {
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
-      setStep(currentStep - 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setStep(currentStep - 1);
+        setIsTransitioning(false);
+      }, 200);
     }
   };
 
@@ -356,7 +365,15 @@ const DemandGenerator = () => {
                     const isActive = step.id === currentStep;
                     const isCompleted = step.id < currentStep;
                     return (
-                        <div key={step.id} className="flex flex-col items-center gap-2" onClick={() => step.id < currentStep && setStep(step.id)} style={{ cursor: step.id < currentStep ? 'pointer' : 'default' }}>
+                        <div key={step.id} className="flex flex-col items-center gap-2" onClick={() => {
+                              if (step.id < currentStep && !isTransitioning) {
+                                setIsTransitioning(true);
+                                setTimeout(() => {
+                                  setStep(step.id);
+                                  setIsTransitioning(false);
+                                }, 200);
+                              }
+                            }} style={{ cursor: step.id < currentStep ? 'pointer' : 'default' }}>
                             <motion.div
                                 className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
                                     isActive ? 'border-axim-teal bg-black text-axim-teal' :
@@ -388,6 +405,11 @@ const DemandGenerator = () => {
           </div>
 
           <div className="bg-black/20 relative min-h-[400px]">
+            {isTransitioning && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-b-2xl md:rounded-none">
+                <div className="w-8 h-8 border-2 border-axim-teal/30 border-t-axim-teal rounded-full animate-spin"></div>
+              </div>
+            )}
             <LetterForm
                formData={formData}
                onUpdate={updateField}
