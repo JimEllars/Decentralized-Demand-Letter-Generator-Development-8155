@@ -18,7 +18,7 @@ describe('PaymentModal', () => {
     assert.ok(screen.getByText('Secure Checkout'));
     assert.ok(screen.getByText('AXiM Encryption Active'));
     assert.ok(screen.getByText('Document Access'));
-    assert.ok(screen.getByText('$4.00'));
+    assert.ok(screen.getByText('$2.00'));
 
     // Renders disclaimer
     assert.ok(screen.getByText('Quality and Satisfaction Guaranteed.'));
