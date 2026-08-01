@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '../contexts/ToastContext';
 import { motion } from 'framer-motion';
 import { FiShield, FiCreditCard, FiLock, FiMail } from 'react-icons/fi';
@@ -9,10 +9,35 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
   const [email, setEmail] = useState('');
   const [marketingOptIn, setMarketingOptIn] = useState(false);
   const [dataVerified, setDataVerified] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+
+    // Inject Turnstile script
+  useEffect(() => {
+    if (!window.turnstile) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+
+    // Define a global callback for when Turnstile completes
+    window.onTurnstileSuccess = (token) => {
+      setTurnstileToken(token);
+    };
+
+    return () => {
+      delete window.onTurnstileSuccess;
+    };
+  }, []);
 
   const handleConfirm = () => {
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
       toast.error("Please enter a valid delivery email address.");
+      return;
+    }
+    if (!turnstileToken) {
+      toast.error("Please complete the security check.");
       return;
     }
     if (!dataVerified) {
@@ -103,13 +128,18 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
               />
             </div>
 
+
+            <div className="flex justify-center shrink-0">
+              <div className="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="onTurnstileSuccess"></div>
+            </div>
+
             <div className="space-y-3 pt-2 border-t border-white/5 shrink-0">
               <div className="text-center font-mono text-[0.65rem] text-zinc-500 font-bold mb-1 uppercase tracking-widest">
                 Quality and Satisfaction Guaranteed.
               </div>
               <button
                 type="submit"
-                disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) || !dataVerified}
+                disabled={isProcessing || !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email) || !dataVerified || !turnstileToken}
                 className={`w-full text-black border px-6 py-4 font-bold uppercase tracking-[1.5px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(255,234,0,0.4)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
               >
                 {isProcessing ? (
