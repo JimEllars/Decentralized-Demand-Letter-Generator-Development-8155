@@ -467,7 +467,18 @@ const SuccessPage = () => {
                 Create Another Letter
               </button>
 
-              {/* Note: Decentralized Proof of Generation Badge was removed since Web3 features are dormant */}
+              {import.meta.env.VITE_ENABLE_WEB3 === 'true' && (
+                <div className="w-full mt-4 bg-purple-500/10 border border-purple-500/20 rounded-lg p-4 flex flex-col items-center justify-center text-center">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center mb-2 border border-purple-500/30">
+                    <span className="text-purple-400 text-lg">⛓️</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white mb-1">Proof of Generation</h4>
+                  <p className="text-xs text-zinc-400 mb-3">This document's cryptographic hash is ready to be stamped on the ledger.</p>
+                  <button className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-md transition-colors duration-200">
+                    Stamp to Ledger
+                  </button>
+                </div>
+              )}
               {/* To reactivate Web3 features, set VITE_ENABLE_WEB3=true in the environment. */}
 
               {/* Quality Feedback Micro-Survey */}
