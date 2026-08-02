@@ -15,5 +15,11 @@
   ],
   "vars": {
     "BACKEND_URL": "https://axim-payment-backend.jrellars.workers.dev"
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "TELEMETRY_KV",
+      "id": "YOUR_KV_NAMESPACE_ID"
+    }
+  ]
 }
