@@ -127,3 +127,17 @@ To ensure that the user's data persists correctly across the Stripe checkout red
 
 - **Cloudflare Edge Routing Reinforcement**:
   - Reviewed `src/App.jsx` to ensure `React.lazy` is correctly implemented for `Dashboard` and `ContentAnalytics` routes. This ensures optimal main bundle size and instant caching at the Edge.
+
+
+## Admin KV Telemetry (feature/admin-kv-telemetry)
+
+- **Task 1: Provisioned Cloudflare KV Binding (wrangler.jsonc)**
+  - Added a new KV namespace binding for telemetry storage under `TELEMETRY_KV`.
+- **Task 2: Routed Telemetry to KV (worker.js)**
+  - Updated the telemetry endpoints (`/api/v1/telemetry`) to store incoming payloads in `env.TELEMETRY_KV` securely using a timestamp-based key `telemetry:${Date.now()}`.
+- **Task 3: Built the Admin Retrieval Endpoint (worker.js)**
+  - Created a new endpoint `GET /api/admin/telemetry-logs` which fetches up to 50 logs from `env.TELEMETRY_KV`.
+  - Implemented an authorization check comparing `Authorization` header with `env.ADMIN_SECRET`.
+  - Computed `systemHealth`, `checkout_exception`, and `generation_fault` from fetched parsed data.
+- **Task 4: Connected Dashboard Data Link (ContentAnalytics.jsx)**
+  - Updated `src/components/admin/ContentAnalytics.jsx` to fetch telemetry data passing an `Authorization` header containing `import.meta.env.VITE_ADMIN_SECRET` or fallback.

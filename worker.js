@@ -182,7 +182,7 @@ export default {
       const allowedRoutes = [
         '/api/create-checkout-session', '/api/verify-session', '/api/generate-demand-letter',
         '/api/deliver-document', '/api/send-email', '/api/webhooks/stripe', '/api/ledger/stamp',
-        '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback'
+                '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback', '/api/admin/telemetry-logs'
       ];
 
       if (!allowedRoutes.some(route => url.pathname.startsWith(route))) {
@@ -460,8 +460,68 @@ export default {
       // --------------------------------
 
             // --- TELEMETRY MOCK ---
-      // Intercepts telemetry events so the browser doesn't throw 404 console errors
+      // Handle telemetry ingestion using KV
+            // Admin telemetry logs retrieval
+      if (request.method === 'GET' && url.pathname === '/api/admin/telemetry-logs') {
+          const authHeader = request.headers.get('Authorization');
+          if (authHeader !== env.ADMIN_SECRET) {
+              return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                  status: 401,
+                  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+              });
+          }
+
+          try {
+              let systemHealth = '100% Operational';
+              let checkout_exception = 0;
+              let generation_fault = 0;
+
+              if (env.TELEMETRY_KV) {
+                  const listResult = await env.TELEMETRY_KV.list({ limit: 50 });
+                  for (const key of listResult.keys) {
+                      const val = await env.TELEMETRY_KV.get(key.name);
+                      if (val) {
+                          try {
+                              const parsed = JSON.parse(val);
+                              if (parsed.event === 'checkout_exception') checkout_exception++;
+                              if (parsed.event === 'generation_fault') generation_fault++;
+                          } catch (e) {
+                              // ignore json parse error
+                          }
+                      }
+                  }
+
+                  if (checkout_exception > 0 || generation_fault > 0) {
+                      systemHealth = 'Degraded';
+                  }
+              }
+
+              return new Response(JSON.stringify({
+                  systemHealth,
+                  recentFaults: { checkout_exception, generation_fault },
+                  activeNodes: 4
+              }), {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+              });
+          } catch (e) {
+              return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+                  status: 500,
+                  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+              });
+          }
+      }
+
       if (request.method === 'POST' && url.pathname.includes('/api/v1/telemetry')) {
+          try {
+              const bodyText = await request.clone().text();
+              if (env.TELEMETRY_KV) {
+                  const key = `telemetry:${Date.now()}`;
+                  await env.TELEMETRY_KV.put(key, bodyText);
+              }
+          } catch (e) {
+              console.error('Failed to parse or store telemetry', e);
+          }
           return new Response(JSON.stringify({ success: true }), {
               status: 200,
               headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }

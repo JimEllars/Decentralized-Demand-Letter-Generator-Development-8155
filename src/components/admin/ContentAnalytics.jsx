@@ -10,7 +10,11 @@ const ContentAnalytics = () => {
   useEffect(() => {
     const fetchTelemetry = async () => {
       try {
-        const response = await fetch('/api/admin/telemetry-logs');
+                const response = await fetch('/api/admin/telemetry-logs', {
+          headers: {
+            'Authorization': import.meta.env.VITE_ADMIN_SECRET || 'fallback-secret'
+          }
+        });
         if (!response.ok) throw new Error('Failed to fetch');
         const data = await response.json();
         setTelemetry(data);
