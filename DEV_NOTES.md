@@ -141,3 +141,12 @@ To ensure that the user's data persists correctly across the Stripe checkout red
   - Computed `systemHealth`, `checkout_exception`, and `generation_fault` from fetched parsed data.
 - **Task 4: Connected Dashboard Data Link (ContentAnalytics.jsx)**
   - Updated `src/components/admin/ContentAnalytics.jsx` to fetch telemetry data passing an `Authorization` header containing `import.meta.env.VITE_ADMIN_SECRET` or fallback.
+
+## Fix Cloudflare Build Error and Pricing Audit
+
+- **Task 1: Fix Cloudflare Build Error**
+  - Removed the `kv_namespaces` array block completely from `wrangler.jsonc` to resolve the [code: 10042] build error caused by the placeholder `YOUR_KV_NAMESPACE_ID`.
+- **Task 2: Graceful Telemetry Fallback**
+  - Updated `worker.js` to wrap all `env.TELEMETRY_KV.put()`, `env.TELEMETRY_KV.list()`, and `env.TELEMETRY_KV.get()` calls in a safety check (`if (env.TELEMETRY_KV) { ... } else { console.warn('KV not bound'); }`). This ensures that the worker falls back gracefully and does not throw a 500 error if the KV is missing.
+- **Task 3: Strict Pricing Audit ($2.00 Override)**
+  - Audited the promotional copy in `DemandLanding.jsx` and `PaymentModal.jsx`. Replaced promotional strings to ensure it exactly reads "originally $8 but the promotional price TODAY is $2". Verified `worker.js` and `paymentService.js` to ensure no 400 or 800 hardcoded amounts dictated pricing logic.
