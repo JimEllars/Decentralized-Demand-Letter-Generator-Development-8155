@@ -494,6 +494,8 @@ export default {
                   if (checkout_exception > 0 || generation_fault > 0) {
                       systemHealth = 'Degraded';
                   }
+              } else {
+                  console.warn('KV not bound');
               }
 
               return new Response(JSON.stringify({
@@ -518,6 +520,8 @@ export default {
               if (env.TELEMETRY_KV) {
                   const key = `telemetry:${Date.now()}`;
                   await env.TELEMETRY_KV.put(key, bodyText);
+              } else {
+                  console.warn('KV not bound');
               }
           } catch (e) {
               console.error('Failed to parse or store telemetry', e);

@@ -64,7 +64,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
         <div className="p-6 space-y-5">
           <div className="flex justify-between items-center bg-black/50 p-4 border border-axim-teal/30 rounded-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 bg-axim-teal text-black text-[0.55rem] font-bold px-2 py-0.5 uppercase tracking-wider rounded-bl-sm">
-              Limited Time Promo
+              originally $8 but the promotional price TODAY is $2
             </div>
             <div className="flex flex-col">
               <span className="font-mono text-[0.65rem] text-zinc-400 uppercase tracking-widest">Document Access</span>
@@ -72,7 +72,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
             </div>
             <div className="flex items-center gap-2 mt-2">
               <span className="font-mono text-sm line-through text-zinc-500 decoration-red-500/70">$8.00</span>
-              <span className="font-mono font-bold text-xl text-white">$2.00</span>
+              <span className="font-mono font-bold text-xl text-white">$2</span>
             </div>
           </div>
 
