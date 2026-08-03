@@ -72,10 +72,10 @@ describe('PaymentModal', () => {
     render(<ToastProvider><PaymentModal isProcessing={true} onConfirm={() => {}} onCancel={() => {}} /></ToastProvider>);
 
     // Verifying text should be present, standard Pay text shouldn't
-    assert.ok(screen.getByText(/Processing\.\.\./));
+    assert.ok(screen.getByText(/Securing Session\.\.\./));
     assert.strictEqual(screen.queryByText('Pay with Card'), null);
 
-    const payButton = screen.getByText(/Processing\.\.\./).closest('button');
+    const payButton = screen.getByText(/Securing Session\.\.\./).closest('button');
     const cancelButton = screen.getByText('Cancel').closest('button');
 
     // Both buttons should be disabled

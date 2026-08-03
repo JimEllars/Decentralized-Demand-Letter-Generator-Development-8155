@@ -150,3 +150,14 @@ To ensure that the user's data persists correctly across the Stripe checkout red
   - Updated `worker.js` to wrap all `env.TELEMETRY_KV.put()`, `env.TELEMETRY_KV.list()`, and `env.TELEMETRY_KV.get()` calls in a safety check (`if (env.TELEMETRY_KV) { ... } else { console.warn('KV not bound'); }`). This ensures that the worker falls back gracefully and does not throw a 500 error if the KV is missing.
 - **Task 3: Strict Pricing Audit ($2.00 Override)**
   - Audited the promotional copy in `DemandLanding.jsx` and `PaymentModal.jsx`. Replaced promotional strings to ensure it exactly reads "originally $8 but the promotional price TODAY is $2". Verified `worker.js` and `paymentService.js` to ensure no 400 or 800 hardcoded amounts dictated pricing logic.
+
+## SSO Header Scaffolding and UX Improvements (feature/sso-header-and-progress-ui)
+
+- **Task 1: Implement the AXiM Ecosystem SSO Header**
+  - Updated `src/components/Header.jsx` to include a dynamic 'Login' button in the top-right navigation.
+  - Implemented an `isAuthenticated` React state that toggles the button text from "Login" to "Hi AXiM User" as scaffolding for the future AXiM Passport integration.
+- **Task 2: UX Polish - Visual Progress Indicator**
+  - Updated `src/components/DemandGenerator.jsx` to replace the old visual stepper with a sleek, thin Tailwind progress bar (`h-1 bg-axim-teal`).
+  - This modern UX pattern aims to reduce form abandonment and ensure a responsive design across all devices.
+- **Task 3: UX Polish - Loading States on Checkout**
+  - Updated `src/components/PaymentModal.jsx` to change the "Confirm Purchase" (Pay with Card) button text to "Securing Session..." with a CSS spinner while the system awaits a proxy response from `createCheckoutSession`. This reduces user double-clicks and strengthens transaction integrity.
