@@ -351,14 +351,12 @@ const DemandGenerator = () => {
         <Instructions />
 
         {/* Stepper Progress Indicator */}
-        <div className="relative pt-4 pb-8">
-            <div className="absolute top-8 left-0 right-0 h-0.5 bg-zinc-800 rounded-full z-0 overflow-hidden">
-                <motion.div
-                    className="absolute top-0 left-0 h-full bg-axim-teal"
-                    initial={{ width: '0%' }}
-                    animate={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
-                    transition={{ duration: 0.3 }}
-                />
+        <div className="w-full relative pt-4 pb-8">
+            <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden mb-4">
+                <div
+                    className="h-full bg-axim-teal transition-all duration-300 ease-in-out"
+                    style={{ width: `${((currentStep) / STEPS.length) * 100}%` }}
+                ></div>
             </div>
             <div className="relative z-10 flex justify-between">
                 {STEPS.map((step) => {
@@ -374,18 +372,7 @@ const DemandGenerator = () => {
                                 }, 200);
                               }
                             }} style={{ cursor: step.id < currentStep ? 'pointer' : 'default' }}>
-                            <motion.div
-                                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
-                                    isActive ? 'border-axim-teal bg-black text-axim-teal' :
-                                    isCompleted ? 'border-axim-teal bg-axim-teal text-black' :
-                                    'border-zinc-700 bg-black text-zinc-500'
-                                }`}
-                                initial={false}
-                                animate={{ scale: isActive ? 1.1 : 1 }}
-                            >
-                                <SafeIcon icon={isCompleted ? FiCheckCircle : step.icon} className="w-4 h-4" />
-                            </motion.div>
-                            <span className={`text-[0.65rem] font-bold uppercase tracking-wider ${isActive || isCompleted ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                            <span className={`text-[0.65rem] font-bold uppercase tracking-wider transition-colors duration-300 ${isActive ? 'text-axim-teal' : isCompleted ? 'text-zinc-300' : 'text-zinc-600'}`}>
                                 {step.title}
                             </span>
                         </div>

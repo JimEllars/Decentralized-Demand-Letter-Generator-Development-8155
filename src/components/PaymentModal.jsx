@@ -143,7 +143,7 @@ const PaymentModal = ({ isProcessing, onConfirm, onCancel, formData }) => {
                 className={`w-full text-black border px-6 py-4 font-bold uppercase tracking-[1.5px] text-[0.75rem] transition-all duration-300 rounded-sm flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(255,234,0,0.4)] hover:bg-white hover:border-white disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none bg-axim-gold border-axim-gold`}
               >
                 {isProcessing ? (
-                  <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Processing...</>
+                  <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Securing Session...</>
                 ) : (
                   <><SafeIcon icon={FiCreditCard} /> Pay with Card</>
                 )}
