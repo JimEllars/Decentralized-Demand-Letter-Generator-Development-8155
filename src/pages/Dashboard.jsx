@@ -122,11 +122,20 @@ const Dashboard = () => {
                             day: 'numeric'
                           })}
                         </td>
-                        <td className="px-6 py-5 whitespace-nowrap">
+                        <td className="px-6 py-5 whitespace-nowrap flex items-center justify-between">
                           <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-axim-teal/10 text-axim-teal border border-axim-teal/20 group-hover:bg-axim-teal group-hover:text-white transition-colors items-center gap-1">
                             <FiCheckCircle />
                             {doc.status || 'Delivered'}
                           </span>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              console.log('Receipt feature coming soon');
+                            }}
+                            className="ml-4 text-xs font-semibold text-axim-teal hover:underline transition-all group-hover:text-axim-teal group-hover:opacity-90 focus:outline-none"
+                          >
+                            View Certificate
+                          </button>
                         </td>
                       </tr>
                     ))}

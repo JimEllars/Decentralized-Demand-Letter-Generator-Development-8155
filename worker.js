@@ -206,6 +206,29 @@ export default {
         if (url.pathname === '/api/create-checkout-session') {
           try {
             const body = await request.clone().json();
+
+            // Turnstile Validation
+            const turnstileToken = body.turnstileToken;
+            if (env.TURNSTILE_SECRET_KEY) {
+              if (!turnstileToken) {
+                return new Response(JSON.stringify({ error: 'Turnstile token missing' }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin } });
+              }
+              const formData = new FormData();
+              formData.append('secret', env.TURNSTILE_SECRET_KEY);
+              formData.append('response', turnstileToken);
+
+              const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+                method: 'POST',
+                body: formData
+              });
+              const turnstileOutcome = await turnstileRes.json();
+              if (!turnstileOutcome.success) {
+                return new Response(JSON.stringify({ error: 'Turnstile validation failed' }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin } });
+              }
+            } else {
+              console.warn('TURNSTILE_SECRET_KEY missing. Bypassing Turnstile validation gracefully.');
+            }
+
             const clientOrigin = request.headers.get('Origin') || 'https://quickdemandletter.com';
             body.success_url = body.success_url || `${clientOrigin}/success?session_id={CHECKOUT_SESSION_ID}`;
             body.cancel_url = body.cancel_url || `${clientOrigin}/start?canceled=true`;
@@ -539,10 +562,40 @@ export default {
 
       try {
         const response = await fetch(new Request(backendUrl.toString(), fetchOptions), fetchConfig);
+        if (!response.ok) {
+          if (ctx && ctx.waitUntil) {
+            ctx.waitUntil(reportToCore('upstream_error', { status: response.status, route: url.pathname }, env));
+          } else {
+             console.error('Upstream error (test context):', response.status);
+          }
+          let errorDetails = 'Upstream service error';
+          try {
+            const errorBody = await response.clone().json();
+            if (errorBody && errorBody.error) {
+              errorDetails = errorBody.error;
+            }
+          } catch (e) {
+            // ignore JSON parse error for error response
+          }
+          return new Response(JSON.stringify({ error: errorDetails, status: response.status }), {
+            status: response.status,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+          });
+        }
         const newResponse = new Response(response.body, response);
         newResponse.headers.set('Access-Control-Allow-Origin', corsOrigin);
         return newResponse;
-      } catch (err) { ctx.waitUntil(reportToCore('edge_timeout', { error: err.message, route: url.pathname }, env)); return new Response(JSON.stringify({ error: 'Proxy error' }), { status: 502, headers: { 'Access-Control-Allow-Origin': corsOrigin } }); }
+      } catch (err) {
+        if (ctx && ctx.waitUntil) {
+          ctx.waitUntil(reportToCore('edge_timeout', { error: err.message, route: url.pathname }, env));
+        } else {
+          console.error('Edge timeout (test context):', err.message);
+        }
+        return new Response(JSON.stringify({ error: 'Proxy timeout or connection error' }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+        });
+      }
     }
 
     let assetResponse = await env.ASSETS.fetch(request);
