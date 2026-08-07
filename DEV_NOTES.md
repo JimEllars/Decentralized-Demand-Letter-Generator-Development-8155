@@ -161,3 +161,23 @@ To ensure that the user's data persists correctly across the Stripe checkout red
   - This modern UX pattern aims to reduce form abandonment and ensure a responsive design across all devices.
 - **Task 3: UX Polish - Loading States on Checkout**
   - Updated `src/components/PaymentModal.jsx` to change the "Confirm Purchase" (Pay with Card) button text to "Securing Session..." with a CSS spinner while the system awaits a proxy response from `createCheckoutSession`. This reduces user double-clicks and strengthens transaction integrity.
+
+## Security & Reliability Enhancements (feature/turnstile-validation-and-receipts)
+
+- **Task 1: Cloudflare Turnstile Backend Validation**
+  - Updated `worker.js` to validate the `turnstileToken` during the `/api/create-checkout-session` POST request.
+  - Verification is securely processed at the Edge against Cloudflare's `siteverify` endpoint using `env.TURNSTILE_SECRET_KEY`.
+  - Enforced a 403 Forbidden response for invalid tokens, preventing bot-driven checkout abuse.
+  - Implemented a graceful fallback that logs a warning and bypasses validation if the secret key is missing (for local dev resilience).
+
+- **Task 2: Graceful Upstream Error Handling**
+  - Enhanced error handling in the Stripe proxy fetch call within `worker.js`.
+  - Added robust checks for non-2xx upstream responses (e.g., Stripe backend errors/timeouts).
+  - Configured graceful telemetry tracking for `upstream_error` events using `reportToCore`.
+  - Ensured sanitized JSON error responses are returned to the client rather than exposing raw server errors.
+
+- **Task 3: Dashboard Vault UI - Receipt Scaffolding**
+  - Updated `src/pages/Dashboard.jsx` to expand the vault utility for users.
+  - Added a "View Certificate" placeholder button to each generated document row.
+  - Styled with Tailwind (`text-axim-teal hover:underline transition-all`) to match the premium brand aesthetic.
+  - Attached a safe fallback console log for the forthcoming cryptographic receipt feature to avoid breaking live flows.
