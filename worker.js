@@ -10,7 +10,6 @@ const formatWorkerDate = (dateInput) => {
 
 const reportToCore = async (eventName, details, env) => {
   try {
-    // If AXIM_TELEMETRY_URL is set in CF variables, report directly to Onyx/Core
     if (env && env.AXIM_TELEMETRY_URL) {
       await fetch(env.AXIM_TELEMETRY_URL, {
         method: 'POST',
@@ -19,14 +18,15 @@ const reportToCore = async (eventName, details, env) => {
           'Authorization': `Bearer ${env.AXIM_TELEMETRY_KEY || ''}`
         },
         body: JSON.stringify({
-          system: 'edge_worker',
-          event: eventName,
-          details
+          app_id: "axim-demand-letter-generator",
+          event_type: eventName,
+          timestamp: new Date().toISOString(),
+          metadata: details
         })
       });
     }
   } catch(e) {
-    console.error('Telemetry reporting failed', e);
+    // fail silently
   }
 };
 
@@ -295,18 +295,18 @@ export default {
  */
                 // PRIMARY: EmailIt API
                 try {
-                  const emailItRes = await fetch('https://api.emailit.com/v2/emails', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      from: 'AXiM Document Engine <deliveries@axim.us.com>',
-                      reply_to: 'support@axim.us.com',
-                      to: [email],
-                      subject: 'Your Demand Letter PDF is Ready',
-                      html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">AXiM Documents</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
-                      attachments: [{ filename: 'Demand_Letter.pdf', content: base64Pdf, content_type: 'application/pdf' }]
-                    })
-                  });
+                  const emailItRes = await fetch('https://api.emailit.com/v1/send', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  from: 'AXiM Legal Desk <deliveries@emailit.axim.us.com>',
+                  reply_to: 'support@axim.us.com',
+                  to: [email],
+                  subject: 'Your Demand Letter PDF is Ready',
+                  html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">AXiM Documents</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
+                  attachments: [{ filename: safeFilename, content: pdfData }]
+                })
+              });
                   if (emailItRes.ok) emailSuccess = true;
                 } catch (e) { console.error('EmailIt Route Failed:', e); }
 
@@ -350,16 +350,16 @@ export default {
 
             // PRIMARY ROUTE: EmailIt API (axim.us.com)
             try {
-              const emailItRes = await fetch('https://api.emailit.com/v2/emails', {
+              const emailItRes = await fetch('https://api.emailit.com/v1/send', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${env.EMAILIT_API_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  from: 'AXiM Document Engine <deliveries@axim.us.com>',
+                  from: 'AXiM Legal Desk <deliveries@emailit.axim.us.com>',
                   reply_to: 'support@axim.us.com',
                   to: [email],
                   subject: 'Your Demand Letter PDF is Ready',
                   html: '<div style="font-family: monospace; max-width: 600px; margin: 0 auto; background-color: #000; color: #f4f4f5; border: 1px solid #27272a; border-radius: 8px; overflow: hidden;"><div style="background-color: #18181b; padding: 24px; text-align: center; border-bottom: 2px solid #00e5ff;"><h1 style="margin: 0; color: #00e5ff; font-size: 20px; text-transform: uppercase; letter-spacing: 2px;">AXiM Documents</h1></div><div style="padding: 32px;"><h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Your Document is Ready</h2><p style="font-size: 14px; line-height: 1.6; color: #a1a1aa;">Thank you for your purchase. Your formally structured Demand Letter has been securely generated and is attached to this email as a PDF.</p><div style="background-color: #18181b; border-left: 3px solid #f59e0b; padding: 16px; margin: 24px 0;"><p style="margin: 0; font-size: 12px; color: #fbbf24; font-weight: bold; text-transform: uppercase;">⚠️ Important Privacy Notice</p><p style="margin: 8px 0 0 0; font-size: 12px; line-height: 1.5; color: #a1a1aa;">We utilize a strict Zero-Knowledge architecture. We do not store your data. <strong>Please save the attached PDF to your local device permanently.</strong></p></div></div></div>',
-                  attachments: [{ filename: safeFilename, content: pdfData, content_type: 'application/pdf' }]
+                  attachments: [{ filename: safeFilename, content: pdfData }]
                 })
               });
               if (emailItRes.ok) emailSuccess = true;
@@ -518,7 +518,10 @@ export default {
                       systemHealth = 'Degraded';
                   }
               } else {
-                  console.warn('KV not bound');
+                  return new Response(JSON.stringify({ status: "unbound", events: [] }), {
+                      status: 200,
+                      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+                  });
               }
 
               return new Response(JSON.stringify({
@@ -541,10 +544,28 @@ export default {
           try {
               const bodyText = await request.clone().text();
               if (env.TELEMETRY_KV) {
-                  const key = `telemetry:${Date.now()}`;
-                  await env.TELEMETRY_KV.put(key, bodyText);
+                  const listResult = await env.TELEMETRY_KV.list({ limit: 50 });
+                  for (const key of listResult.keys) {
+                      const val = await env.TELEMETRY_KV.get(key.name);
+                      if (val) {
+                          try {
+                              const parsed = JSON.parse(val);
+                              if (parsed.event === 'checkout_exception') checkout_exception++;
+                              if (parsed.event === 'generation_fault') generation_fault++;
+                          } catch (e) {
+                              // ignore json parse error
+                          }
+                      }
+                  }
+
+                  if (checkout_exception > 0 || generation_fault > 0) {
+                      systemHealth = 'Degraded';
+                  }
               } else {
-                  console.warn('KV not bound');
+                  return new Response(JSON.stringify({ status: "unbound", events: [] }), {
+                      status: 200,
+                      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+                  });
               }
           } catch (e) {
               console.error('Failed to parse or store telemetry', e);
