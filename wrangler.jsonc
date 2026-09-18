@@ -13,6 +13,13 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+    "kv_namespaces": [
+    {
+      "binding": "TELEMETRY_KV",
+      "id": "cb17b8f0cc674254b7324df23351d182",
+      "preview_id": "cb17b8f0cc674254b7324df23351d182"
+    }
+  ],
   "vars": {
     "BACKEND_URL": "https://axim-payment-backend.jrellars.workers.dev"
   }
