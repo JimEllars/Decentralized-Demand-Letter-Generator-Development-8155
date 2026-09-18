@@ -16,8 +16,8 @@
     "kv_namespaces": [
     {
       "binding": "TELEMETRY_KV",
-      "id": "TELEMETRY_KV_ID",
-      "preview_id": "TELEMETRY_KV_PREVIEW_ID"
+      "id": "00000000000000000000000000000000",
+      "preview_id": "00000000000000000000000000000000"
     }
   ],
   "vars": {
