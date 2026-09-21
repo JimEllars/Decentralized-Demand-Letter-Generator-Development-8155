@@ -518,6 +518,7 @@ export default {
                       systemHealth = 'Degraded';
                   }
               } else {
+                  console.warn("TELEMETRY_KV not bound");
                   return new Response(JSON.stringify({ status: "unbound", events: [] }), {
                       status: 200,
                       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
@@ -562,6 +563,7 @@ export default {
                       systemHealth = 'Degraded';
                   }
               } else {
+                  console.warn("TELEMETRY_KV not bound");
                   return new Response(JSON.stringify({ status: "unbound", events: [] }), {
                       status: 200,
                       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }

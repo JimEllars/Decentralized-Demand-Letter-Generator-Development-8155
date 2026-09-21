@@ -11,6 +11,7 @@ import SummaryCard from './SummaryCard';
 import UpsellCard from './UpsellCard';
 import PaymentModal from './PaymentModal';
 import { useLetterStore } from '../hooks/useLetterStore';
+import { useAximAuth } from '../hooks/useAximAuth';
 import { useToast } from '../contexts/ToastContext';
 import { useLegalStatutes } from '../hooks/useLegalStatutes';
 import { getToneTemplate, parseCurrency } from '../utils/calculations';
@@ -49,6 +50,16 @@ const DemandGenerator = () => {
   const [isGeneratingModal, setIsGeneratingModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
+
+  const { isAuthenticated, user } = useAximAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email && !formData.creditorEmail) {
+      console.log('Autofilling creditorEmail from AXiM Passport user session');
+      updateField('creditorEmail', user.email);
+    }
+  }, [isAuthenticated, user, formData.creditorEmail, updateField]);
+
   const toast = useToast();
   const navigate = useNavigate();
   const { data: legalStatutes } = useLegalStatutes();

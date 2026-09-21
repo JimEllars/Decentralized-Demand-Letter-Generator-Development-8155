@@ -181,3 +181,13 @@ To ensure that the user's data persists correctly across the Stripe checkout red
   - Added a "View Certificate" placeholder button to each generated document row.
   - Styled with Tailwind (`text-axim-teal hover:underline transition-all`) to match the premium brand aesthetic.
   - Attached a safe fallback console log for the forthcoming cryptographic receipt feature to avoid breaking live flows.
+
+## Fix KV Build Error and AXiM SSO Auto-fill (fix/cloudflare-kv-build-error)
+
+- **Task 1: Unblock the Cloudflare Deployment (wrangler.jsonc)**
+  - Completely deleted the `kv_namespaces` array block in `wrangler.jsonc`. We will bind the `TELEMETRY_KV` namespace directly via the Cloudflare Dashboard UI to keep environment-specific IDs out of the repository.
+- **Task 2: Worker Resilience against Missing KV (worker.js)**
+  - Updated `worker.js` to ensure all instances where `env.TELEMETRY_KV` is accessed (specifically in the `/api/v1/telemetry/ingest` and `/api/admin/telemetry-logs` routes) are wrapped in a safety check (`if (env.TELEMETRY_KV) { ... } else { console.warn('TELEMETRY_KV not bound'); }`). This guarantees the worker never throws a 500 error if `TELEMETRY_KV` is unbound.
+- **Task 3: Ecosystem Consistency - Contact Data Auto-fill (DemandGenerator.jsx)**
+  - Imported `useAximAuth` into `src/components/DemandGenerator.jsx`.
+  - Added a `useEffect` hook to automatically pre-fill the `creditorEmail` if `isAuthenticated` is true and `formData.creditorEmail` is currently empty. This connects the AXiM Passport SSO to the form without overwriting existing user data.
