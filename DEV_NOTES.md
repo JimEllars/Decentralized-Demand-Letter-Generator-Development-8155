@@ -191,3 +191,9 @@ To ensure that the user's data persists correctly across the Stripe checkout red
 - **Task 3: Ecosystem Consistency - Contact Data Auto-fill (DemandGenerator.jsx)**
   - Imported `useAximAuth` into `src/components/DemandGenerator.jsx`.
   - Added a `useEffect` hook to automatically pre-fill the `creditorEmail` if `isAuthenticated` is true and `formData.creditorEmail` is currently empty. This connects the AXiM Passport SSO to the form without overwriting existing user data.
+
+## Support Triage webhook
+Added a webhook hook in `worker.js` that triggers on PDF generation failure. The payload body contains `{ task_type: "support_triage", priority: "critical", description: "Demand Letter PDF Generation Crash after Payment", session_id }` and fetches `https://api.axim.us.com/v1/tasks/dispatch`.
+
+## Vault Link
+Added a Vault Dashboard link (`<Link to="/dashboard">My Vault</Link>`) inside `src/components/Header.jsx` for authenticated users.

@@ -54,10 +54,13 @@ const DemandGenerator = () => {
   const { isAuthenticated, user } = useAximAuth();
 
   useEffect(() => {
-    if (isAuthenticated && user?.email && !formData.creditorEmail) {
-      console.log('Autofilling creditorEmail from AXiM Passport user session');
-      updateField('creditorEmail', user.email);
+    if (isAuthenticated && user?.email && !formData.creditorEmail && !window.sessionStorage.getItem("hasAutofilledCreditorEmail")) {
+      console.log("Autofilling creditorEmail from AXiM Passport user session");
+      updateField("creditorEmail", user.email);
+      window.sessionStorage.setItem("hasAutofilledCreditorEmail", "true");
+
     }
+
   }, [isAuthenticated, user, formData.creditorEmail, updateField]);
 
   const toast = useToast();
