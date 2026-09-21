@@ -621,7 +621,7 @@ export default {
 
     let assetResponse = await env.ASSETS.fetch(request);
     if (assetResponse.status === 404 && request.method === 'GET' && !url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/i)) {
-      assetResponse = await env.ASSETS.fetch(new Request(new URL('/', request.url), request));
+      assetResponse = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
     }
     if (assetResponse.headers.get('content-type')?.includes('text/html')) {
       assetResponse = new Response(assetResponse.body, assetResponse);
