@@ -197,3 +197,12 @@ Added a webhook hook in `worker.js` that triggers on PDF generation failure. The
 
 ## Vault Link
 Added a Vault Dashboard link (`<Link to="/dashboard">My Vault</Link>`) inside `src/components/Header.jsx` for authenticated users.
+
+## Telemetry & Edge Hardening (v1.1)
+
+- **Edge Security Headers**: Injected enterprise headers (`Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, `Referrer-Policy`) globally on all Worker HTTP responses in `worker.js`.
+- **Cache Configuration**: Applied `Cache-Control: public, max-age=31536000, immutable` for static assets (`/assets/*`), and `no-store, no-cache, must-revalidate` for dynamic `/api/*` and `index.html`.
+- **Telemetry Ingestion**: Implemented an authenticated edge endpoint `POST /api/v1/telemetry/ingest` in `worker.js`. It validates the `{ event, timestamp, metadata, sessionId }` payload and securely writes the data to the Cloudflare Analytics Engine (if bound) or logs it properly without throwing unhandled exceptions.
+- **Client Dispatcher (`src/utils/telemetry.js`)**: Configured to track events like `letter_generation_initiated`, `letter_generation_completed`, `statute_lookup_latency`, `payment_modal_opened`, and `session_auth_fallback` using resilient fetch or `navigator.sendBeacon`.
+- **UX & Loading States**: Added a phased progress modal in `DemandGenerator.jsx` during AI generation. It provides immediate structural feedback ("Analyzing facts...", "Matching state statutes...", "Compiling demand format..."). Wrapped generation inputs in `useLetterStore` for automatic localized sync.
+- **Resiliency**: Integrated `fetchWithRetry` into `useLegalStatutes.js` for safe lookups with exponential backoff. Added background token refresh logic to `useAximAuth.js` to ensure the session remains persistent during checkout and navigation.
