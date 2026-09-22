@@ -336,6 +336,12 @@ export default {
             return new Response(pdfBytes, { status: 200, headers: { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': corsOrigin, 'Content-Disposition': 'attachment; filename="demand_letter.pdf"' } });
                     } catch(e) {
             ctx.waitUntil(reportToCore('generation_fault', { error: e.message, stack: e.stack }, env));
+            ctx.waitUntil(fetch("https://api.axim.us.com/v1/tasks/dispatch", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${env.AXIM_TELEMETRY_KEY || ""}` },
+                body: JSON.stringify({ task_type: "support_triage", priority: "critical", description: "Demand Letter PDF Generation Crash after Payment", session_id: typeof body !== "undefined" && body.session_id ? body.session_id : session_id })
+            }).catch(() => {}));
+
             return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': corsOrigin } });
           }
         } else if (url.pathname === '/api/send-email') {

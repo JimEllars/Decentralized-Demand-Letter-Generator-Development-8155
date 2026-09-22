@@ -30,6 +30,9 @@ const Header = () => {
       {isAuthenticated ? (
         <div className="flex items-center gap-4">
           <span className="text-zinc-400 text-xs font-inter">{user?.email}</span>
+          <Link to="/dashboard" className="text-zinc-400 hover:text-white text-xs font-inter transition-colors hover:underline">
+            My Vault
+          </Link>
           <button
             onClick={logout}
             className="px-4 py-1.5 text-xs font-semibold tracking-wider uppercase text-zinc-400 hover:text-white bg-transparent hover:bg-zinc-800 rounded border border-transparent hover:border-zinc-700 transition-colors"
