@@ -48,6 +48,7 @@ const STEPS = [
 
 const DemandGenerator = () => {
   const [isGeneratingModal, setIsGeneratingModal] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const { formData, updateField, resetForm: resetStore, isInitialized, currentStep, setStep } = useLetterStore(getInitialState);
 
@@ -359,7 +360,30 @@ const DemandGenerator = () => {
     <div className="min-h-screen bg-bg-void text-white font-inter pb-20 relative">
       <Header />
 
+
       <main className="max-w-3xl mx-auto px-4 flex flex-col gap-12 relative z-10">
+
+        {/* Mobile Preview Toggle */}
+        <div className="lg:hidden fixed bottom-4 right-4 z-50">
+          <button
+            type="button"
+            onClick={() => setShowMobilePreview(!showMobilePreview)}
+            className="bg-axim-teal text-black px-6 py-3 rounded-full font-bold shadow-xl border border-white/20 hover:scale-105 transition-transform"
+          >
+            {showMobilePreview ? 'Close Preview' : 'View Preview'}
+          </button>
+        </div>
+
+        {/* Mobile Preview Sheet */}
+        <div className={`mobile-preview-sheet lg:hidden flex flex-col ${showMobilePreview ? 'open' : ''}`}>
+          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <SummaryCard calculatedValues={calculatedValues} jurisdiction={formData.jurisdiction} />
+            <div className="mt-4">
+               {/* Removed missing component */}
+            </div>
+          </div>
+        </div>
+
         <div className="w-full flex flex-col gap-8">
 
         <Instructions />

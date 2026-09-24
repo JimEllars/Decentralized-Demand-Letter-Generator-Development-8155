@@ -58,3 +58,25 @@ body {
     text-shadow: none !important;
   }
 }
+
+/* Bottom sheet for mobile preview */
+@media (max-width: 768px) {
+  .mobile-preview-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70vh;
+    background: #111;
+    z-index: 50;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .mobile-preview-sheet.open {
+    transform: translateY(0);
+  }
+}

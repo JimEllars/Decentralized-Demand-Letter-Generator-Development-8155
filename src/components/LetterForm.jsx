@@ -15,6 +15,34 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
   const { data: legalStatutes } = useLegalStatutes();
   const toast = useToast();
 
+
+  const handleCurrencyChange = (e, idx) => {
+    let value = e.target.value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+    if (parts.length === 2 && parts[1].length > 2) value = parts[0] + '.' + parts[1].substring(0, 2);
+
+    const newItems = [...formData.items];
+    newItems[idx] = { ...newItems[idx], amount: value };
+    onUpdate('items', newItems);
+  };
+
+  const formatPhoneNumber = (value) => {
+    if (!value) return value;
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
+  const handlePhoneChange = (e) => {
+    const { name, value } = e.target;
+    onUpdate(name, formatPhoneNumber(value));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     onUpdate(name, value);

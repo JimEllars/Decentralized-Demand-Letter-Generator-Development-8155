@@ -585,12 +585,40 @@ export default {
       }
 
       let fetchConfig = {};
-      if (request.method === 'GET' && url.pathname.includes('legal-statutes')) {
-        fetchConfig = { cf: { cacheTtl: 3600, cacheEverything: true } };
+      let isLegalStatutes = request.method === 'GET' && url.pathname.includes('legal-statutes');
+      if (isLegalStatutes) {
+        fetchConfig = { cf: { cacheTtl: 86400, cacheEverything: true } };
       }
 
       try {
-        const response = await fetch(new Request(backendUrl.toString(), fetchOptions), fetchConfig);
+        let response;
+        if (isLegalStatutes) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                response = await fetch(new Request(backendUrl.toString(), fetchOptions), {
+                    ...fetchConfig,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                   throw new Error('Upstream error');
+                }
+            } catch (err) {
+                // Fallback structured JSON for legal statutes on timeout or 5xx
+                const fallbackStatutes = {
+                    details: { maxInterestRate: 16, standardInterestRate: 6 },
+                    clauses: []
+                };
+                return new Response(JSON.stringify({ success: true, data: fallbackStatutes, meta: { fallback: true } }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': corsOrigin }
+                });
+            }
+        } else {
+            response = await fetch(new Request(backendUrl.toString(), fetchOptions), fetchConfig);
+        }
         if (!response.ok) {
           if (ctx && ctx.waitUntil) {
             ctx.waitUntil(reportToCore('upstream_error', { status: response.status, route: url.pathname }, env));
@@ -635,6 +663,7 @@ export default {
       assetResponse = new Response(assetResponse.body, assetResponse);
       assetResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       assetResponse.headers.set('X-Content-Type-Options', 'nosniff');
+      assetResponse.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://api.stripe.com https://challenges.cloudflare.com");
       assetResponse.headers.set('X-Frame-Options', 'DENY');
       assetResponse.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     } else {
