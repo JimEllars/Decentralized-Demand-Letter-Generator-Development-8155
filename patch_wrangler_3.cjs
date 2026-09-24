@@ -12,15 +12,9 @@ code = code.replace(
   '"preview_id": "REPLACE_WITH_PREVIEW_KV_ID"'
 );
 
-// Remove AI binding
-code = code.replace(
-  /,\s*"ai":\s*\{\s*"binding":\s*"AI"\s*\}/,
-  ''
-);
-code = code.replace(
-  /"ai":\s*\{\s*"binding":\s*"AI"\s*\},\s*/,
-  ''
-);
+// Remove AI binding completely
+code = code.replace(/,\s*"ai":\s*\{\s*"binding":\s*"AI"\s*\}/g, '');
+code = code.replace(/"ai":\s*\{\s*"binding":\s*"AI"\s*\},\s*/g, '');
 
 fs.writeFileSync('wrangler.jsonc', code);
-console.log('reverted wrangler.jsonc to expected placeholder IDs and removed AI binding');
+console.log('reverted wrangler.jsonc');
