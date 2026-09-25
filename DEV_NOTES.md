@@ -206,3 +206,20 @@ Added a Vault Dashboard link (`<Link to="/dashboard">My Vault</Link>`) inside `s
 - **Client Dispatcher (`src/utils/telemetry.js`)**: Configured to track events like `letter_generation_initiated`, `letter_generation_completed`, `statute_lookup_latency`, `payment_modal_opened`, and `session_auth_fallback` using resilient fetch or `navigator.sendBeacon`.
 - **UX & Loading States**: Added a phased progress modal in `DemandGenerator.jsx` during AI generation. It provides immediate structural feedback ("Analyzing facts...", "Matching state statutes...", "Compiling demand format..."). Wrapped generation inputs in `useLetterStore` for automatic localized sync.
 - **Resiliency**: Integrated `fetchWithRetry` into `useLegalStatutes.js` for safe lookups with exponential backoff. Added background token refresh logic to `useAximAuth.js` to ensure the session remains persistent during checkout and navigation.
+
+## Release v1.2: System Stabilization, Telemetry Activation & Zero-Downtime Hardening
+
+1. **Edge Telemetry Ingestion (worker.js & src/utils/telemetry.js)**:
+   - Added `POST /api/telemetry` edge worker endpoint to handle incoming payloads from `navigator.sendBeacon`.
+   - Wired to write securely to `TELEMETRY_KV` and `ANALYTICS_ENGINE`.
+2. **Auth Session Hardening & Offline Fallbacks**:
+   - `src/hooks/useAximAuth.js` implements proactive token refresh and graceful UI handling on token expiry.
+   - `src/pages/Dashboard.jsx` implements "Offline/Cached Mode" using encrypted drafts and local receipts when the network is unstable.
+3. **AI Generation & Statute Fallback Guardrails**:
+   - Upstream `/api/v1/legal-statutes` fetch now explicitly times out after 8 seconds (via `AbortSignal`) and falls back gracefully to default JSON templates preventing UI deadlock.
+   - `src/hooks/useLegalStatutes.js` uses an in-memory Map structure (`statuteCache`) to bypass network fetch and eliminate API latency on duplicate jurisdiction calls.
+4. **UI Polish & Mobile Ergonomics**:
+   - Input fields in `LetterForm.jsx` now mask currencies and standardize US phone numbers automatically.
+   - Replaced sticky desktop preview with an animated `framer-motion` sliding bottom-sheet on mobile vis `<div className="mobile-preview-sheet">`.
+5. **Configuration Audits**:
+   - Wrangler KV telemetry namespaces activated. `worker.js` enforces `nosniff`, `Strict-Transport-Security`, `DENY` frames, and full `Content-Security-Policy`.

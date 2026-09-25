@@ -13,6 +13,8 @@ const SummaryCard = ({ calculatedValues, jurisdiction }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      key={`${principal}-${interest}-${jurisdiction}`}
       className="bg-black/50 rounded-xl shadow-lg border border-subtle overflow-hidden relative watermark-bg"
     >
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-axim-teal to-axim-gold opacity-50 z-10"></div>
