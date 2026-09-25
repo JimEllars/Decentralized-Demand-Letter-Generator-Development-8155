@@ -33,6 +33,9 @@ if (isValidHex) {
   delete wranglerConfig.kv_namespaces;
 }
 
+// Write back to wrangler.jsonc so Cloudflare picks up the sanitized version
+fs.writeFileSync('wrangler.jsonc', JSON.stringify(wranglerConfig, null, 2));
+// Also write to wrangler.json just in case
 fs.writeFileSync('wrangler.json', JSON.stringify(wranglerConfig, null, 2));
 
 const distWranglerPath = 'dist/demand_letter_generator_app_v1_axim/wrangler.json';
