@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "npm run build && wrangler dev",
     "test": "node --import tsx --import ./tests/setup.js --test tests/*.test.js tests/*.test.jsx",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && node scripts/prepare-wrangler.cjs && wrangler deploy -c wrangler.json"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.99.2",
