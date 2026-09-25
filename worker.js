@@ -505,7 +505,8 @@ export default {
               let checkout_exception = 0;
               let generation_fault = 0;
 
-              if (env.TELEMETRY_KV) {
+              const hasTelemetryKV = Boolean(env.TELEMETRY_KV && typeof env.TELEMETRY_KV.list === 'function');
+              if (hasTelemetryKV) {
                   const listResult = await env.TELEMETRY_KV.list({ limit: 50 });
                   for (const key of listResult.keys) {
                       const val = await env.TELEMETRY_KV.get(key.name);
@@ -550,7 +551,8 @@ export default {
       if (request.method === 'POST' && url.pathname.includes('/api/v1/telemetry')) {
           try {
               const bodyText = await request.clone().text();
-              if (env.TELEMETRY_KV) {
+              const hasTelemetryKV = Boolean(env.TELEMETRY_KV && typeof env.TELEMETRY_KV.list === 'function');
+              if (hasTelemetryKV) {
                   const listResult = await env.TELEMETRY_KV.list({ limit: 50 });
                   for (const key of listResult.keys) {
                       const val = await env.TELEMETRY_KV.get(key.name);
