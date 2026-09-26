@@ -180,9 +180,9 @@ export default {
 
     if (url.pathname.startsWith('/api/')) {
       const allowedRoutes = [
-        '/api/create-checkout-session', '/api/verify-session', '/api/generate-demand-letter',
+        '/api/create-checkout-session', '/api/verify-session', '/api/generate', '/api/generate-demand-letter',
         '/api/deliver-document', '/api/send-email', '/api/webhooks/stripe', '/api/ledger/stamp',
-                '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback', '/api/admin/telemetry-logs'
+                '/api/v1/legal-statutes', '/api/v1/telemetry/ingest', '/api/v1/telemetry/feedback', '/api/telemetry', '/api/admin/telemetry-logs'
       ];
 
       if (!allowedRoutes.some(route => url.pathname.startsWith(route))) {
@@ -198,6 +198,74 @@ export default {
       const backendUrl = new URL(subPath, baseUrl);
       backendUrl.search = url.search;
       let fetchOptions = { method: request.method, headers: new Headers(request.headers) };
+
+      if (request.method === 'POST' && url.pathname === '/api/generate') {
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': corsOrigin,
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        };
+        try {
+            const body = await request.clone().json();
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+            // Simulating AI streaming response for now as this is what is expected
+            const { readable, writable } = new TransformStream();
+            const writer = writable.getWriter();
+
+            const encoder = new TextEncoder();
+
+            // We'll write chunks after a brief delay
+            ctx.waitUntil((async () => {
+                try {
+                    // Try to simulate external AI call
+                    // let's do a fake generation that "streams" text
+                    const simulatedText = `Dear ${body.formData?.debtorName || 'Debtor'},
+
+This is a formal demand letter. You owe ${body.calculatedValues?.formattedTotal || '$0.00'}. Please remit payment by ${body.formData?.dueDate || 'immediately'}.
+
+Sincerely,
+${body.formData?.creditorName || 'Creditor'}`;
+
+                    const chunks = simulatedText.split(' ');
+
+                    for (const chunk of chunks) {
+                       if (controller.signal.aborted) throw new Error('Timeout');
+                       await writer.write(encoder.encode(`data: ${JSON.stringify({ text: chunk + ' ' })}\n\n`));
+                       await new Promise(r => setTimeout(r, 100)); // simulate latency
+                    }
+                    await writer.write(encoder.encode('data: [DONE]\n\n'));
+                    await writer.close();
+                } catch (e) {
+                    // Fallback to deterministic template
+                    const fallbackText = "FALLBACK TEMPLATE: Formal Demand. Pay immediately.";
+                    try {
+                        await writer.write(encoder.encode(`data: ${JSON.stringify({ text: fallbackText })}\n\n`));
+                        await writer.write(encoder.encode('data: [DONE]\n\n'));
+                        await writer.close();
+                    } catch(err) {
+                        // stream already closed
+                    }
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            })());
+
+            return new Response(readable, {
+                headers: {
+                    ...corsHeaders,
+                    'Content-Type': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive'
+                }
+            });
+
+        } catch (e) {
+            return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: corsHeaders });
+        }
+      }
 
       // Shared PDF Generator Helper
 
@@ -343,6 +411,39 @@ export default {
             }).catch(() => {}));
 
             return new Response(JSON.stringify({ error: 'Generation failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': corsOrigin } });
+          }
+        } else if (url.pathname === '/api/telemetry') {
+          let corsHeaders = { 'Access-Control-Allow-Origin': corsOrigin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };
+          if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+          try {
+            const body = await request.clone().json();
+
+            if (body && !Array.isArray(body.events) && body.event) body.events = [body];
+            // Validate payload schema
+            if (!body || !Array.isArray(body.events)) {
+                return new Response(JSON.stringify({ error: 'Invalid telemetry payload' }), { status: 400, headers: corsHeaders });
+            }
+
+            // Ingest data points safely
+            body.events.forEach(event => {
+                if (event && event.timestamp && event.event) {
+                    // Log structured JSON to console for Cloudflare Logpush
+                    console.log(JSON.stringify({
+                        _tag: 'telemetry_ingest',
+                        timestamp: event.timestamp,
+                        eventType: event.event,
+                        duration: event.duration,
+                        userSessionId: event.userSessionId,
+                        errorPayload: event.errorPayload,
+                        raw: event
+                    }));
+                }
+            });
+
+            return new Response(null, { status: 204, headers: corsHeaders });
+          } catch (err) {
+            console.error('Telemetry ingest error:', err);
+            return new Response(null, { status: 204, headers: corsHeaders }); // Do not throw to client
           }
         } else if (url.pathname === '/api/send-email') {
           let corsHeaders = { 'Access-Control-Allow-Origin': corsOrigin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' };

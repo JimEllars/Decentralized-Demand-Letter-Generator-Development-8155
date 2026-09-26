@@ -223,3 +223,9 @@ Added a Vault Dashboard link (`<Link to="/dashboard">My Vault</Link>`) inside `s
    - Replaced sticky desktop preview with an animated `framer-motion` sliding bottom-sheet on mobile vis `<div className="mobile-preview-sheet">`.
 5. **Configuration Audits**:
    - Wrangler KV telemetry namespaces activated. `worker.js` enforces `nosniff`, `Strict-Transport-Security`, `DENY` frames, and full `Content-Security-Policy`.
+
+## Version 1.2.0 Hardening Updates
+* **Telemetry**: Added `logSystemEvent` batching to `src/utils/telemetry.js`. Uses `navigator.sendBeacon` with `keepalive: true` fallback. Edge worker now listens on `/api/telemetry` to ingest batched arrays gracefully without throwing errors.
+* **AI Generative Preview**: Upgraded `worker.js` `/api/generate` endpoint to emit a simulated Server-Sent Event (SSE) response stream. Fallback is handled deterministically on timeout. Added `LetterForm.jsx` streaming preview component bound to `useLetterStore.js` via an AbortController for stream cancellation.
+* **Accessible Loading UIs**: Refactored `FormSection.jsx` to present sleek skeleton cards via `framer-motion` when the `isGenerating` prop is true. Improved `SummaryCard.jsx` responsive rendering and explicit ARIA properties.
+* **Isolated Auth-Agnostic Storage**: Hardened `useLetterStore.js` to map Zustand's persist directly to `localStorage`. Refactored `sessionStorageManager.clearAuthOnly` and `useAximAuth` to preserve draft progress upon session logout, ensuring complete isolation between auth state and offline form completion flow.

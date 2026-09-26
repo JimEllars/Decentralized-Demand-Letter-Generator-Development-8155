@@ -27,9 +27,27 @@ export const sessionStorageManager = {
 
   clear: () => {
     try {
+      // Intentionally do NOT clear 'axim_demand_draft' or other local storage
+      // when clearing session storage to preserve isolated drafts.
+      // This function only clears session storage.
       sessionStorage.clear();
     } catch (error) {
       console.warn('Error clearing sessionStorage:', error);
     }
+  },
+
+  clearAuthOnly: () => {
+    try {
+       // Clear known auth keys but preserve others
+       const keysToKeep = ['axim_demand_draft', 'axim_document_history'];
+       const keysToRemove = [];
+       for (let i = 0; i < sessionStorage.length; i++) {
+           const key = sessionStorage.key(i);
+           if (!keysToKeep.includes(key)) {
+               keysToRemove.push(key);
+           }
+       }
+       keysToRemove.forEach(k => sessionStorage.removeItem(k));
+    } catch (e) {}
   }
 };

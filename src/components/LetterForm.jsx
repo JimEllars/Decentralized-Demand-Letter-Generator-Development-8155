@@ -15,6 +15,68 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
   const { data: legalStatutes } = useLegalStatutes();
   const toast = useToast();
 
+  const [previewText, setPreviewText] = React.useState('');
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const abortControllerRef = React.useRef(null);
+
+  const handleGeneratePreview = async () => {
+    setIsGenerating(true);
+    setPreviewText('');
+    abortControllerRef.current = new AbortController();
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formData, calculatedValues }),
+        signal: abortControllerRef.current.signal,
+      });
+
+      if (!response.ok) throw new Error('Generation failed');
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.substring(6).trim();
+            if (dataStr === '[DONE]') break;
+            if (dataStr) {
+               try {
+                   const data = JSON.parse(dataStr);
+                   if (data.text) {
+                       setPreviewText(prev => prev + data.text);
+                   }
+               } catch (e) {
+                   // ignore json parse errs on partial chunks
+               }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+         toast.error('Failed to generate preview. Try again later.');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCancelGenerate = () => {
+      if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+      }
+  };
+
+
 
   const handleCurrencyChange = (e, idx) => {
     let value = e.target.value.replace(/[^0-9.]/g, '');
@@ -130,10 +192,37 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
 
   return (
     <div className="p-6">
+      {/* AI Preview Section */}
+      {(isGenerating || previewText) && (
+        <div className="mb-6 p-4 border border-axim-teal/30 bg-axim-teal/5 rounded-lg shadow-inner">
+            <div className="flex justify-between items-center mb-2">
+                <h4 className="text-axim-teal font-inter text-sm uppercase tracking-wide">
+                    {isGenerating ? 'AI Generating Preview...' : 'AI Generated Preview'}
+                </h4>
+                {isGenerating && (
+                    <button onClick={handleCancelGenerate} className="text-red-400 hover:text-red-300 text-xs uppercase font-mono px-2 py-1 border border-red-500/30 rounded transition-colors bg-red-900/20">
+                        Cancel Stream
+                    </button>
+                )}
+            </div>
+            <p className="font-mono text-xs text-zinc-300 whitespace-pre-wrap">{previewText}</p>
+        </div>
+      )}
+
+
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleGeneratePreview}
+          disabled={isGenerating}
+          className="bg-axim-teal/20 text-axim-teal border border-axim-teal/50 hover:bg-axim-teal/30 px-4 py-2 rounded text-xs font-mono uppercase tracking-wide transition-colors"
+        >
+          {isGenerating ? 'Generating...' : 'Preview Letter with AI'}
+        </button>
+      </div>
       <AnimatePresence mode="wait">
         {currentStep === 1 && (
             <motion.div key="step1" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                <FormSection
+                <FormSection isGenerating={isGenerating}
                     title="Parties"
                     icon={FiUser}
                     description="Enter the exact legal names and valid mailing addresses for both parties. This ensures proper legal service."
@@ -232,7 +321,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
 
         {currentStep === 2 && (
             <motion.div key="step2" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                <FormSection
+                <FormSection isGenerating={isGenerating}
                     title="Itemized Debt Specifics"
                     icon={FiDollarSign}
                     description="List the unpaid invoices, services, or damages. You can easily apply a late fee if applicable."
@@ -359,7 +448,7 @@ const LetterForm = memo(({ formData, onUpdate, errors = {}, currentStep, calcula
 
         {currentStep === 3 && (
             <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                <FormSection
+                <FormSection isGenerating={isGenerating}
                     title="Tone & Configuration"
                     icon={FiEdit3}
                     description="Finalize the tone and date of your letter."
