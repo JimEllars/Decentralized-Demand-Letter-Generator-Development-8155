@@ -35,6 +35,10 @@ export const useAximAuth = () => {
   const logout = () => {
     // Clear cookie (if we have access to do so, though it might be HttpOnly or Domain restricted in real life)
     document.cookie = 'axim_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Explicitly DO NOT clear local storage for drafts to preserve user work
+    // We only clear auth-related session storage if needed, but not draft state
+
     setIsAuthenticated(false);
     setUser(null);
   };

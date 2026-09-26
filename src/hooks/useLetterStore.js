@@ -55,6 +55,10 @@ const createStore = (initialDataOrFn) => {
         }),
 
         setStep: (step) => set({ currentStep: step }),
+        previewText: '',
+        isGenerating: false,
+        setPreviewText: (text) => set({ previewText: text }),
+        setIsGenerating: (isGen) => set({ isGenerating: isGen }),
 
         resetForm: () => {
             set({ formData: getInitialState(), currentStep: 1 });
@@ -125,6 +129,10 @@ export const useLetterStore = (initialDataOrFn) => {
     isInitialized: store._hasHydrated || store.isInitialized,
     updateField: store.updateField,
     setStep: store.setStep,
+    previewText: store.previewText,
+    isGenerating: store.isGenerating,
+    setPreviewText: store.setPreviewText,
+    setIsGenerating: store.setIsGenerating,
     resetForm: resetFormWrapped
   };
 };
